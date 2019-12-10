@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.852
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualInformationSystem", "VisualInformationSystem\VisualInformationSystem.csproj", "{F0D0B801-554D-4576-83FA-2382E96CF1AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0D0B801-554D-4576-83FA-2382E96CF1AF}.Debug|x64.ActiveCfg = Debug|x64
+		{F0D0B801-554D-4576-83FA-2382E96CF1AF}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {596CBCB3-7BAC-4FCC-A984-55EB6304D6CD}
+	EndGlobalSection
+EndGlobal
