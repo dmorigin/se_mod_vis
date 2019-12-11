@@ -85,3 +85,26 @@ Dies ist Teil einer Vorlage oder direkt teil der Konfiugration eines Bildschirms
                 /*!
                  * Syntax: check:type:options
                  */
+
+**Graphic:Text Konfiguration**
+
+            /*!
+             * Setting the font with size and color. The size is a floating point value. Colors
+             * are always rgb integer values between 0 ... 255. The alpha value is optional. The
+             * values of size and color are optional. If you don't set this values size will be
+             * set to 0.0f and color to white. If size is zero the font will scale by size.
+             * 
+             * Syntax: font:name:size:r,g,b(,a)
+             */
+             
+            /*!
+             * Set the text that you want to display.
+             * 
+             * Syntax: text:string
+             */
+             
+            /*!
+             * Set the alignment of a text.
+             * 
+             * Syntax: alignment:c|center|l|left|r|right
+             */
