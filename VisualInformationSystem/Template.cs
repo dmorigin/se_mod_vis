@@ -145,14 +145,6 @@ namespace IngameScript
                 }
 
                 #region Handler
-                /*!
-                 * Set the name of an existing template. The name is declared as a string. If you set
-                 * a template all values will be copied from the existing one. Every data below this
-                 * statement overrides his individual value. So if you want to modify an existing
-                 * template declare this statement first and all other below.
-                 * 
-                 * Syntax: template:name
-                 */
                 bool configUseTemplate(string key, string value, Configuration.Options options)
                 {
                     if (value != string.Empty)
@@ -163,13 +155,6 @@ namespace IngameScript
                     return false;
                 }
 
-                /*!
-                 * Set the interval in seconds in which this display will update it's content.
-                 * The value is a floating point value. A value of 1.0 means one second. The
-                 * default value is 5s.
-                 * 
-                 * Syntax: updateinterval:value
-                 */
                 bool configUpdateInterval(string key, string value, Configuration.Options options)
                 {
                     float seconds = Configuration.asFloat(value, Program.Default.UpdateIntervalInSec);
@@ -177,26 +162,12 @@ namespace IngameScript
                     return true;
                 }
 
-                /*!
-                 * Setting the background color. Colors are always rgb integer values between
-                 * 0 ... 255. The alpha value is optional. The default value is black.
-                 * 
-                 * Syntax: backgroundcolor:r,g,b(,a)
-                 */
                 bool configBackgroundColor(string key, string value, Configuration.Options options)
                 {
                     Template.BackgroundColor = Configuration.asColor(value, Program.Default.BackgroundColor);
                     return true;
                 }
 
-                /*!
-                 * Setting the default font with size and color. The size is a floating point value.
-                 * Colors are always rgb integer values between 0 ... 255. The alpha value is 
-                 * optional. The values of size and color are optional. If you don't set this values 
-                 * size will be set to 1.0f and color to white.
-                 * 
-                 * Syntax: font:name:size:r,g,b(,a)
-                 */
                 bool configFont(string key, string value, Configuration.Options options)
                 {
                     Template.Font = value != string.Empty ? value : Program.Default.Font;
@@ -205,8 +176,6 @@ namespace IngameScript
                     return true;
                 }
 
-                /*!
-                 */
                 bool configAlignment(string key, string value, Configuration.Options options)
                 {
                     string data = value.ToLower();
@@ -231,23 +200,31 @@ namespace IngameScript
                     return true;
                 }
 
-                /*!
-                 * Setting up a single graphic. A graphic can be a simple text, a simple quad or
-                 * a complex structure like a bar. Set the name to select which type of graphic
-                 * you want to use. The options will be passed through the graphic.
-                 * 
-                 * Syntax: graphic:type:dataretriever:(options)
-                 */
                 bool configGraphic(string key, string value, Configuration.Options options)
                 {
-                    if (value.ToLower() == "text")
+                    Graphic graphic = null;
+
+                    switch (value.ToLower())
                     {
-                        GraphicText graphic = new GraphicText(Template, options);
+                        case "text":
+                            graphic = new GraphicText(Template, options);
+                            break;
+                        case "battery":
+                            graphic = new GraphicBattery(Template, options);
+                            break;
+                        case "list":
+                            graphic = new GraphicList(Template, options);
+                            break;
+                    }
+
+                    if (graphic != null)
+                    {
                         setSubHandler(graphic.getConfigHandler());
                         template_.graphics_.Add(graphic);
                         return true;
                     }
 
+                    Template.log(Console.LogType.Error, $"Invalid graphic type {value}");
                     return false;
                 }
                 #endregion // Handler

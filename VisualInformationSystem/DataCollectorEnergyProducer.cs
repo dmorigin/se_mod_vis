@@ -33,9 +33,9 @@ namespace IngameScript
                 if (!base.construct())
                     return false;
 
-                foreach (IMyPowerProducer battery in Blocks)
+                foreach (IMyPowerProducer producer in Blocks)
                 {
-                    maxOutput_ += battery.MaxOutput;
+                    maxOutput_ += producer.MaxOutput;
                 }
 
                 update();
@@ -65,9 +65,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerusing%", powerUsing_.ToString())
-                    .Replace("%maxoutput%", maxOutput_.ToString())
-                    .Replace("%currentoutput%", currentOutput_.ToString());
+                    .Replace("%powerusing%", powerUsing_.ToString(Program.Default.StringFormat))
+                    .Replace("%maxoutput%", maxOutput_.ToString(Program.Default.StringFormat))
+                    .Replace("%currentoutput%", currentOutput_.ToString(Program.Default.StringFormat));
             }
 
 
@@ -125,6 +125,7 @@ namespace IngameScript
                     foreach (IMyPowerProducer pp in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
+                        item.onoff = DataCollector<T>.isOn(pp);
                         item.name = pp.CustomName;
                         item.indicator = pp.CurrentOutput / pp.MaxOutput;
                         item.value = pp.CurrentOutput;

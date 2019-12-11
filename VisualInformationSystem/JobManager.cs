@@ -134,7 +134,7 @@ namespace IngameScript
                     timedJob.tick(Manager.Timer.Ticks - timedJob.LastExecute);
                     timedJob.LastExecute = Manager.Timer.Ticks;
                     timedJob.NextExecute = timedJob.LastExecute + timedJob.Interval;
-                    log(Console.LogType.Debug, $"Execute timed job({timedJob.JobID}) at {Manager.Timer.Ticks}");
+                    //log(Console.LogType.Debug, $"Execute timed job({timedJob.JobID}) at {Manager.Timer.Ticks}");
                 }
             }
         }

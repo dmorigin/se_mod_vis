@@ -36,12 +36,6 @@ namespace IngameScript
 
             public override bool construct()
             {
-                if (Options.Count < 2)
-                {
-                    log(Console.LogType.Error, $"Invalid options for check type");
-                    return false;
-                }
-
                 BlockName = Options[0];
                 IsGroup = Options.getAsBoolean(1, false);
 
@@ -64,6 +58,7 @@ namespace IngameScript
                     }
                 }
 
+                log(Console.LogType.Debug, $"Found: {Blocks.Count} blocks");
                 Constructed = true;
                 return true;
             }
@@ -223,6 +218,11 @@ namespace IngameScript
                 }
 
                 return false;
+            }
+
+            protected static bool isOn(IMyTerminalBlock block)
+            {
+                return block.GetValue<bool>("OnOff") && block.IsFunctional;
             }
         }
     }

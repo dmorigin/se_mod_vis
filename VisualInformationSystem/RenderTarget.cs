@@ -103,7 +103,7 @@ namespace IngameScript
                 renderSize_ = surface_.SurfaceSize;
                 renderPosition_ = (surface_.TextureSize - renderSize_) * 0.5f;
 
-                displayOffset_ = renderSize_ * coordinate_ + renderPosition_;
+                displayOffset_ = -(renderSize_ * coordinate_) + renderPosition_;
 
                 adjustFontSize(Program.Default.Font, 1f);
                 drawInitScreen();

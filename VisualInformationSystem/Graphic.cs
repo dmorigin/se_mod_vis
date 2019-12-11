@@ -93,26 +93,12 @@ namespace IngameScript
                     return true;
                 }
 
-                /*!
-                 * Set a color. This color is used for all sprites. The alpha value is
-                 * optional.
-                 * 
-                 * Syntax: color:r,g,b(,a)
-                 */
                 protected virtual bool configColor(string key, string value, Configuration.Options options)
                 {
-                    //graphic_.Color = Configuration.asColor(value, Program.Default.Color);
                     graphic_.addGradientColor(1f, Configuration.asColor(value, Program.Default.Color));
                     return true;
                 }
 
-                /*!
-                 * Set a color for a gradient. This colors are used if a graphic has a data collector. The alpha
-                 * value is optional. The indicator is set as floating point value. The interpretation is
-                 * from 0 to n
-                 * 
-                 * Syntax: gradient:indicator:r,g,b(,a)
-                 */
                 protected virtual bool configGradient(string key, string value, Configuration.Options options)
                 {
                     if (options.Count == 1)
@@ -124,9 +110,6 @@ namespace IngameScript
                     return false;
                 }
 
-                /*!
-                 * Syntax: check:type:options
-                 */
                 bool configCheck(string key, string value, Configuration.Options options)
                 {
                     string name = value.ToLower();

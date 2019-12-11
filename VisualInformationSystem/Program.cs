@@ -22,15 +22,13 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        protected static Program App = null;
-
+        static Program App = null;
 
         VISManager manager_ = null;
-        public VISManager Manager
+        VISManager Manager
         {
             get { return manager_; }
         }
-
 
         public Program()
         {
@@ -47,7 +45,6 @@ namespace IngameScript
             if (manager_ != null)
                 manager_.onSave();
         }
-
 
         char[] runSymbol_ = { '-', '\\', '|', '/' };
         int runSymbolPos_ = 0;

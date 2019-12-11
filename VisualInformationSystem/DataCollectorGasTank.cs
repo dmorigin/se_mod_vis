@@ -75,9 +75,9 @@ namespace IngameScript
 
             public override string getText(string data)
             {
-                return data.Replace("%capacity%", capacity_.ToString())
-                    .Replace("%fillration%", fillRation_.ToString())
-                    .Replace("%fillvalue", (fillRation_ * capacity_).ToString());
+                return data.Replace("%capacity%", capacity_.ToString(Program.Default.StringFormat))
+                    .Replace("%fillration%", fillRation_.ToString(Program.Default.StringFormat))
+                    .Replace("%fillvalue", (fillRation_ * capacity_).ToString(Program.Default.StringFormat));
             }
 
             float fillRation_ = 0f;
@@ -118,6 +118,7 @@ namespace IngameScript
                     foreach (var tank in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
+                        item.onoff = DataCollector<IMyGasTank>.isOn(tank);
                         item.name = tank.CustomName;
                         item.indicator = (float)tank.FilledRatio;
                         item.min = 0;

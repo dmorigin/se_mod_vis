@@ -25,9 +25,6 @@ namespace IngameScript
         {
             private static int nextId_ = 1;
 
-            
-
-
             public VISObject(string name = "")
             {
                 id_ = VISObject.nextId_++;
@@ -38,8 +35,7 @@ namespace IngameScript
                     name_ = name;
             }
 
-
-            public Program App
+            protected Program App
             {
                 get
                 {
@@ -47,12 +43,10 @@ namespace IngameScript
                 }
             }
 
-
             public void Echo(string line)
             {
                 App.addEchoMessageLine(line);
             }
-
 
             private int id_ = 0;
             public int Id
@@ -60,31 +54,26 @@ namespace IngameScript
                 get { return id_; }
             }
 
-
             private string name_ = "";
             public string Name
             {
                 get { return name_; }
             }
 
-
             public VISManager Manager
             {
                 get { return App.Manager; }
             }
-
 
             public void log(Console.LogType logType, string message)
             {
                 Manager.Console.log(logType, message);
             }
 
-
             public void log(string message)
             {
                 Manager.Console.log(Console.LogType.Info, message);
             }
-
 
             bool constructed_ = false;
             public bool Constructed

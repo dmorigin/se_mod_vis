@@ -86,12 +86,12 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", powerLeft_.ToString())
-                    .Replace("%powerstoring%", powerStoring_.ToString())
-                    .Replace("%maxinput%", maxInput_.ToString())
-                    .Replace("%maxstored%", maxStored_.ToString())
-                    .Replace("%currentinput%", currentInput_.ToString())
-                    .Replace("%currentstored%", currentStored_.ToString());
+                    .Replace("%powerleft%", powerLeft_.ToString(Program.Default.StringFormat))
+                    .Replace("%powerstoring%", powerStoring_.ToString(Program.Default.StringFormat))
+                    .Replace("%maxinput%", maxInput_.ToString(Program.Default.StringFormat))
+                    .Replace("%maxstored%", maxStored_.ToString(Program.Default.StringFormat))
+                    .Replace("%currentinput%", currentInput_.ToString(Program.Default.StringFormat))
+                    .Replace("%currentstored%", currentStored_.ToString(Program.Default.StringFormat));
             }
 
             public override DataRetriever getDataRetriever(string name)
@@ -144,6 +144,7 @@ namespace IngameScript
                     foreach (var ep in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
+                        item.onoff = DataCollector<IMyBatteryBlock>.isOn(ep);
                         item.name = ep.CustomName;
                         item.indicator = ep.CurrentStoredPower / ep.MaxStoredPower;
                         item.value = ep.CurrentStoredPower;
@@ -190,6 +191,7 @@ namespace IngameScript
                     foreach (var battery in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
+                        item.onoff = DataCollector<IMyBatteryBlock>.isOn(battery);
                         item.name = battery.CustomName;
                         item.indicator = (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput);
                         item.value = battery.CurrentInput - battery.CurrentOutput;

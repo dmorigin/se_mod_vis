@@ -28,10 +28,9 @@ namespace IngameScript
             {
             }
 
-
             List<Display> displays_ = new List<Display>();
-
             static int genericDisplayGroupId_ = 0;
+
             public Display createDisplay(string groupId)
             {
                 Display display;
@@ -42,7 +41,7 @@ namespace IngameScript
                     log(Console.LogType.Info, $"Create new display: group({groupId})");
                     display = new Display(groupId);
                 }
-                else if (getDisplayGroup(groupId) == null)
+                else if ((display = getDisplayGroup(groupId)) == null)
                 {
                     log(Console.LogType.Info, $"Create new display: group({groupId})");
                     display = new Display(groupId);
@@ -54,21 +53,9 @@ namespace IngameScript
                 }
 
                 display.construct();
+                displays_.Add(display);
                 return display;
             }
-
-
-            public bool addDisplay(Display display)
-            {
-                if (getDisplayGroup(display.GroupID) == null)
-                {
-                    displays_.Add(display);
-                    return true;
-                }
-
-                return false;
-            }
-
 
             public Display getDisplayGroup(string id)
             {

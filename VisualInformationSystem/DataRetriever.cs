@@ -25,6 +25,7 @@ namespace IngameScript
         {
             public struct ListContainer
             {
+                public bool onoff;
                 public string name;
                 public double min;
                 public double max;

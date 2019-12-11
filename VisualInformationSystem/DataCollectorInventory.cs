@@ -268,6 +268,7 @@ namespace IngameScript
                     foreach (var inventory in inv_.inventories_)
                     {
                         ListContainer item = new ListContainer();
+                        item.onoff = true;
                         item.indicator = inventory.CurrentVolume.RawValue / inventory.MaxVolume.RawValue;
                         item.min = 0f;
                         item.max = inventory.MaxVolume.RawValue;
@@ -314,6 +315,7 @@ namespace IngameScript
                         ListContainer entry = new ListContainer();
                         double indicator = item.currentAmount / item.maxAmount;
 
+                        entry.onoff = true;
                         entry.indicator = indicator > 1 ? 1 : indicator;
                         entry.min = 0;
                         entry.max = item.maxAmount;

@@ -65,85 +65,87 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (DataCollector != null)
+                DataCollectorBattery batteries = DataCollector as DataCollectorBattery;
+                if (batteries == null)
+                    return;
+
+                Vector2 renderSize = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                Vector2 renderPosition = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+
+                List<DataRetriever.ListContainer> capacityList;
+                List<DataRetriever.ListContainer> inoutList;
+                batteries.getDataRetriever("capacity").getList(out capacityList);
+                batteries.getDataRetriever("inout").getList(out inoutList);
+                    
+                // calculate rows and cols size
+                int rows = rows_;
+                int cols = cols_;
+                float scale = 0.0f;
+                Vector2 size = new Vector2();
+
+                // full automatic
+                if (rows_ <= 0 && cols_ <= 0)
                 {
-                    DataCollectorBattery batteries = DataCollector as DataCollectorBattery;
-                    if (batteries == null)
-                        return;
-
-                    List<DataRetriever.ListContainer> capacityList;
-                    List<DataRetriever.ListContainer> inoutList;
-                    batteries.getDataRetriever("capacity").getList(out capacityList);
-                    batteries.getDataRetriever("inout").getList(out inoutList);
-
-                    // calculate rows and cols size
-                    int rows = rows_;
-                    int cols = cols_;
-                    float scale = 0f;
-                    Vector2 size = new Vector2();
-
-                    // full automatic
-                    if (rows_ == 0 && cols_ == 0)
+                    for(int curCols = capacityList.Count; curCols > 0; curCols--)
                     {
-                        cols = capacityList.Count;
-                        while(cols > 0)
-                        {
-                            // padding == 2pixel
-                            Vector2 currentSize = new Vector2((Size.X - ((cols + 1) * 2)) / cols, (Size.Y - ((rows + 1) * 2)) / rows);
-                            float currentScale = Math.Min(batterySize.X / size.X, batterySize.Y / size.Y);
+                        // padding == 2pixel
+                        int curRows = (int)Math.Ceiling((double)capacityList.Count / curCols);
+                        Vector2 curSize = new Vector2((renderSize.X - (curCols * 2)) / curCols, (renderSize.Y - (curRows * 2)) / curRows);
+                        float curScale = Math.Min(curSize.X / batterySize_.X, curSize.Y / batterySize_.Y);
 
-                            if (currentScale < scale)
-                                break;
+                        if (curScale < scale)
+                            break;
 
-                            scale = currentScale;
-                            size = currentSize;
-                            rows = (int)(capacityList.Count / --cols);
-                        }
+                        scale = curScale;
+                        size = curSize;
+                        rows = curRows;
+                        cols = curCols;
                     }
-                    else
+                }
+                else
+                {
+                    // calculate rows
+                    if (rows <= 0)
+                        rows = (int)Math.Ceiling((double)capacityList.Count / cols);
+                    // calculate cols
+                    else if (cols <= 0)
+                        cols = (int)Math.Ceiling((double)capacityList.Count / rows);
+
+                    size = new Vector2((renderSize.X - (cols * 2)) / cols, (renderSize.Y - (rows * 2)) / rows);
+                    scale = Math.Min(size.X / batterySize_.X, size.Y / batterySize_.Y);
+                }
+
+                float positionX = renderPosition.X + rt.DisplayOffset.X + 2f - (renderSize.X * 0.5f) + (size.X * 0.5f);
+                float positionY = renderPosition.Y + rt.DisplayOffset.Y + 2f - (renderSize.Y * 0.5f) + (size.Y * 0.5f);
+                float offsetX = size.X + 2f;
+                float offsetY = size.Y + 2f;
+
+                // draw batteries
+                for (int r = 0; r < rows; r++)
+                {
+                    for (int c = 0; c < cols; c++)
                     {
-                        // calculate rows
-                        if (rows == 0)
-                            cols = (int)(capacityList.Count / rows);
-                        // calculate cols
-                        else
-                            cols = (int)(capacityList.Count / cols);
+                        int index = (cols * r) + c;
+                        if (index >= capacityList.Count)
+                            break;
 
-                        size = new Vector2((Size.X - ((cols + 1) * 2)) / cols, (Size.Y - ((rows + 1) * 2)) / rows);
-                        scale = Math.Min(batterySize.X / size.X, batterySize.Y / size.Y);
-                    }
-
-                    float positionX = Position.X + rt.DisplayOffset.X + 2f - (Size.X * 0.5f) + (size.X * 0.5f);
-                    float positionY = Position.Y + rt.DisplayOffset.Y + 2f - (Size.Y * 0.5f) + (size.Y * 0.5f);
-                    float offsetX = size.X + 2f;
-                    float offsetY = size.Y + 2f;
-
-                    // draw batteries
-                    for (int r = 0; r < rows; r++)
-                    {
-                        for (int c = 0; c < cols; c++)
-                        {
-                            int index = c * (r + 1);
-                            if (index >= capacityList.Count)
-                                break;
-
-                            Vector2 position = new Vector2(positionX + (offsetX * cols), positionY + (offsetY * rows));
-                            drawSingleBattery(size, position, scale, (float)capacityList[index].indicator, (float)inoutList[index].indicator, true, addSprite);
-                        }
+                        Vector2 position = new Vector2(positionX + (offsetX * c), positionY + (offsetY * r));
+                        drawSingleBattery(position, scale, (float)capacityList[index].indicator,
+                            (float)inoutList[index].indicator, inoutList[index].onoff, addSprite);
                     }
                 }
             }
 
-            Vector2 batterySize = new Vector2(60f, 120f);
-            int capacitySegments = 6;
+            Vector2 batterySize_ = new Vector2(60f, 120f);
+            int capacitySegments_ = 6;
 
-            void drawSingleBattery(Vector2 size, Vector2 position, float scale, float capacity, float load, bool onoff, AddSpriteDelegate addSprite)
+            void drawSingleBattery(Vector2 position, float scale, float capacity, float load, bool onoff, AddSpriteDelegate addSprite)
             {
                 float borderSize = 8f * scale;
                 float capacityBorder = borderSize * 0.5f;
 
-                Vector2 poleSize = new Vector2(batterySize.X * 0.5f, 10f) * scale;
-                Vector2 backgroundSize = new Vector2(batterySize.X * scale, (batterySize.Y * scale) - poleSize.Y);
+                Vector2 poleSize = new Vector2(batterySize_.X * 0.5f, 10f) * scale;
+                Vector2 backgroundSize = new Vector2(batterySize_.X * scale, (batterySize_.Y * scale) - poleSize.Y);
                 Vector2 InnerSectionSize = backgroundSize - borderSize;
 
                 Color borderColor = load <= 0f || onoff == false ? Color.Red : Color.Green;
@@ -151,13 +153,13 @@ namespace IngameScript
                 // draw plus pole
                 MySprite sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
                     new Vector2(position.X, position.Y - backgroundSize.Y * 0.5f),
-                    poleSize, Color.White);
+                    poleSize, borderColor);
                 addSprite(sprite);
 
                 // draw background
                 sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
                     new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
-                    backgroundSize, Color.White);
+                    backgroundSize, borderColor);
                 addSprite(sprite);
 
                 // draw inner section
@@ -171,13 +173,13 @@ namespace IngameScript
                 {
                     // draw capacity marker
                     Vector2 capacitySize = new Vector2(InnerSectionSize.X - capacityBorder * 2f,
-                        (InnerSectionSize.Y - (capacityBorder * (capacitySegments + 1f))) / capacitySegments);
+                        (InnerSectionSize.Y - (capacityBorder * (capacitySegments_ + 1f))) / capacitySegments_);
                     float capacityYOffset = capacitySize.Y + capacityBorder;
                     float capacityYPosition = position.Y + (poleSize.Y + InnerSectionSize.Y - capacitySize.Y) * 0.5f - capacityBorder;
 
                     for (int s = 0; s < 6; s++)
                     {
-                        float lerp = (1f / capacitySegments) * s;
+                        float lerp = (1f / capacitySegments_) * s;
                         if (capacity <= lerp)
                             break;
 

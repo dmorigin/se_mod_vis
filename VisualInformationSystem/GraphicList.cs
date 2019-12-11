@@ -109,10 +109,12 @@ namespace IngameScript
                     // draw text
                     if (showText_)
                     {
+                        string rightText = $"{entry.value.ToString(Program.Default.StringFormat)}/{entry.max.ToString(Program.Default.StringFormat)}";
+
                         renderTextLine(rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
                             Template.FontColor, entry.name, TextAlignment.LEFT);
                         renderTextLine(rt, addSprite, Template.Font, Template.FontSize, new Vector2(textRightPositionX, textPositionY),
-                            Template.FontColor, $"{entry.value}", TextAlignment.RIGHT);
+                            Template.FontColor, rightText, TextAlignment.RIGHT);
 
                         textPositionY += lineHeight;
                     }

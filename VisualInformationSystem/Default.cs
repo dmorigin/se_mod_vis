@@ -27,13 +27,14 @@ namespace IngameScript
             public static float FontSize = 1.0f;
             public static Color FontColor = Color.LawnGreen;
             public static TextAlignment FontAlignment = TextAlignment.LEFT;
+            public static string StringFormat = "#0.000";
 
             public static Color Color = Color.White;
             public static Color BackgroundColor = Color.Black;
-            public static Vector2 Position = new Vector2(0f, 0f);
-            public static Graphic.ValueType PositionType = Graphic.ValueType.Absolut;
+            public static Vector2 Position = new Vector2(0.5f, 0.5f);
+            public static Graphic.ValueType PositionType = Graphic.ValueType.Relative;
             public static Vector2 Size = new Vector2(1f, 1f);
-            public static Graphic.ValueType SizeType = Graphic.ValueType.Absolut;
+            public static Graphic.ValueType SizeType = Graphic.ValueType.Relative;
 
             public static string DisplayNameTag = "[VIS]";
             public static Vector2I DisplayCoordinate = new Vector2I(0, 0);

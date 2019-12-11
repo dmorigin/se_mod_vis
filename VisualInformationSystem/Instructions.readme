@@ -3,38 +3,3 @@
 
 Author: [DM]Origin
 Page: https://www.gamers-shell.de/
-
-
-List of Sprites
-Offline
-Online
-Arrow
-Cross
-Danger
-No Entry
-Construction
-White screen
-Grid
-DecorativeBracketLeft
-DecorativeBracketRight
-SquareTapered
-SquareSimple
-IconEnergy
-IconHydrogen
-IconTemperature
-RightTriangle
-Triangle
-Circle
-SemiCircle
-CircleHallow
-SquareHollow
-UVChecker
-OutOfOrder
-StoreBlock2
-Screen_LoadingBar
-Screen_LoadingBar2
-
-MyObjectBuilder_Component/*
-MyObjectBuilder_Ore/*
-MyObjectBuilder_Ingot/*
-MyObjectBuilder_PhysicalGunObject/*

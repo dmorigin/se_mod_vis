@@ -6,7 +6,7 @@
     -->
     <MDKVersion>1.2.22</MDKVersion>
     <MDKTrimTypes>
-      <Enabled>no</Enabled>
+      <Enabled>yes</Enabled>
     </MDKTrimTypes>
     <MDKMinify>
       <Enabled>yes</Enabled>

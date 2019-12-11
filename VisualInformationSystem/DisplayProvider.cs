@@ -79,26 +79,6 @@ namespace IngameScript
                 }
 
 
-                /*!
-                 * Configure this display to use with the VIS. A Display can be a single lcd or a
-                 * group of lcd panels. It defines more a virtual display that inerhite at least
-                 * one render target. If you want to setup multiple render targets you need to set
-                 * a group. In this case all displays passing his rendert targets to one display
-                 * object.
-                 * 
-                 * Syntax: display:id:group:x,y
-                 * 
-                 * id:    Is set as an integer and is the Surface ID of a block.
-                 * group: The name of your group. This parameter is optional. So, you need to set
-                 *        this parameter only if you want to group multiple displays.
-                 * x,y:   These are the coorinate of a display inside the group. Values are given
-                 *        as integer values. The top left corner has the coorindate 0,0 and the
-                 *        bottem right n,m. You need to set it if you setup a group.
-                 *
-                 * Note:
-                 * All further configurations will be read only at display with the coordinate
-                 * 0,0.
-                 */
                 bool configDisplay(string key, string value, Configuration.Options options)
                 {
                     // set surface index
@@ -124,11 +104,11 @@ namespace IngameScript
                         display = provider_.Manager.DisplayManager.getDisplayGroup(groupId);
                         if (display == null)
                         {
-                            provider_.log(Console.LogType.Info, $"Create new display group {groupId}");
+                            provider_.log(Console.LogType.Info, $"Create new display group:{groupId}");
                             display = provider_.Manager.DisplayManager.createDisplay(groupId);
                             if (display == null)
                             {
-                                provider_.log(Console.LogType.Error, $"Failed to create display group {groupId}");
+                                provider_.log(Console.LogType.Error, $"Failed to create display group:{groupId}");
                                 return false;
                             }
                         }
@@ -160,7 +140,7 @@ namespace IngameScript
                             return false;
                         }
 
-                        provider_.log(Console.LogType.Debug, "set  sub config handler");
+                        provider_.log(Console.LogType.Debug, "set sub config handler");
                         setSubHandler(template.getConfigHandler());
                         display.Template = template;
                     }

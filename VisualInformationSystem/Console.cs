@@ -78,9 +78,27 @@ namespace IngameScript
                 Debug
             }
 
+            // workaround for pack code
+            private string logTypeToString(LogType type)
+            {
+                switch (type)
+                {
+                    case LogType.Info:
+                        return "Info";
+                    case LogType.Warning:
+                        return "Warning";
+                    case LogType.Error:
+                        return "Error";
+                    case LogType.Debug:
+                        return "Debug";
+                }
+
+                return "Invalid";
+            }
+
             public new void log(LogType logType, string message)
             {
-                messages_.Enqueue($"[{logType}]: {message}");
+                messages_.Enqueue($"[{logTypeToString(logType)}]: {message}");
                 if (messages_.Count > maxStoreLines_)
                     messages_.Dequeue();
                 newMesssages_ = true;

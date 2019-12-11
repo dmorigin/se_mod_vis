@@ -77,14 +77,6 @@ namespace IngameScript
 
 
             #region Configuration
-            /*!
-             * Setting the font with size and color. The size is a floating point value. Colors
-             * are always rgb integer values between 0 ... 255. The alpha value is optional. The
-             * values of size and color are optional. If you don't set this values size will be
-             * set to 0.0f and color to white. If size is zero the font will scale by size.
-             * 
-             * Syntax: font:name:size:r,g,b(,a)
-             */
             bool configFont(string key, string value, Configuration.Options options)
             {
                 font_ = value != string.Empty ? value : Program.Default.Font;
@@ -99,24 +91,12 @@ namespace IngameScript
                 return true;
             }
 
-
-            /*!
-             * Set the text that you want to display.
-             * 
-             * Syntax: text:string
-             */
             bool configText(string key, string value, Configuration.Options options)
             {
                 text_ += $"{value}\n";
                 return true;
             }
 
-
-            /*!
-             * Set the alignment of a text.
-             * 
-             * Syntax: alignment:c|center|l|left|r|right
-             */
             bool configAlignment(string key, string value, Configuration.Options options)
             {
                 string data = value.ToLower();
@@ -177,15 +157,9 @@ namespace IngameScript
                 }
 
                 // fix font position
-                //Vector2 offset = new Vector2(rt.DisplayOffset.X, rt.DisplayOffset.Y - (0.75f * (fontSize * rt.FontSize.Y) * lines));
                 Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-
-                /*
-                MySprite sprite = MySprite.CreateText(DataCollector != null ? DataCollector.getText(Text) : Text, Font, FontColor, fontSize, TextAlignment);
-                sprite.Position = position + offset;
-                addSprite(sprite);
-                */
-                Graphic.renderTextLine(rt, addSprite, Font, fontSize, position, FontColor, DataCollector != null ? DataCollector.getText(Text) : Text, TextAlignment);
+                Graphic.renderTextLine(rt, addSprite, Font, fontSize, position, FontColor, 
+                    DataCollector != null ? DataCollector.getText(Text) : Text, TextAlignment);
             }
         }
     }
