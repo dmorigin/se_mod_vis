@@ -141,6 +141,13 @@ namespace IngameScript
                 return true;
             }
 
+            public override bool reconstruct()
+            {
+                itemTypes_.Clear();
+                inventories_.Clear();
+                return base.reconstruct();
+            }
+
             protected override void update()
             {
                 long currentVolume = 0;

@@ -43,6 +43,7 @@ namespace IngameScript
 
             public static TimeSpan UpdateInterval = TimeSpan.FromSeconds(5.0);
             public static float UpdateIntervalInSec = 5.0f;
+            public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(5.0);
         }
     }
 }

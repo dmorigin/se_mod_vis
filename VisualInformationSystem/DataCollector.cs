@@ -31,6 +31,7 @@ namespace IngameScript
                     options_ = options;
 
                 typeId_ = typeId;
+                nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
             }
 
 
@@ -62,6 +63,15 @@ namespace IngameScript
                 Constructed = true;
                 return true;
             }
+
+
+            public virtual bool reconstruct()
+            {
+                blocks_.Clear();
+                Constructed = false;
+                return construct();
+            }
+
 
             public virtual string CollectorTypeName
             {
@@ -133,10 +143,18 @@ namespace IngameScript
 
             TimeSpan lastUpdate_ = new TimeSpan();
             TimeSpan maxInterval_ = TimeSpan.FromSeconds(1.0);
+            TimeSpan nextReconstruct_ = new TimeSpan();
 
 
             public override void tick(TimeSpan delta)
             {
+                // reconstruct
+                if (nextReconstruct_ <= Manager.Timer.Ticks)
+                {
+                    reconstruct();
+                    nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                }
+
                 if ((lastUpdate_ + maxInterval_) < Manager.Timer.Ticks)
                 {
                     update();

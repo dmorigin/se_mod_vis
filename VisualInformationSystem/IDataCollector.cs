@@ -23,6 +23,8 @@ namespace IngameScript
     {
         public interface IDataCollector
         {
+            bool reconstruct();
+
             string CollectorTypeName { get; }
             string BlockName { get; }
             bool IsGroup { get; }

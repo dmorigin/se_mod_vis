@@ -33,10 +33,9 @@ namespace IngameScript
                 if (!base.construct())
                     return false;
 
+                maxOutput_ = 0f;
                 foreach (IMyPowerProducer producer in Blocks)
-                {
                     maxOutput_ += producer.MaxOutput;
-                }
 
                 update();
                 Constructed = true;

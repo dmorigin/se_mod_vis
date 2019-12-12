@@ -33,6 +33,9 @@ namespace IngameScript
                 if (!base.construct())
                     return false;
 
+                maxOutput_ = 0f;
+                maxInput_ = 0f;
+                maxStored_ = 0f;
                 foreach(var battery in Blocks)
                 {
                     maxOutput_ += battery.MaxOutput;
