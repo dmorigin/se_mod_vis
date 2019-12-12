@@ -67,12 +67,6 @@ namespace IngameScript
 
             public override bool construct()
             {
-                if (Options.Count < 2)
-                {
-                    log(Console.LogType.Error, $"Invalid options for checking inventory");
-                    return false;
-                }
-
                 BlockName = Options[0];
                 IsGroup = Options.getAsBoolean(1, false);
                 long maxItems = 0;
@@ -245,19 +239,19 @@ namespace IngameScript
                     return inv_.volumeRation_;
                 }
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return 0;
+                    return new ValueType(0, unit:Unit.l);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return 1;
+                    return new ValueType(inv_.maxVolume_, unit: Unit.l);
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return inv_.currentVolume_;
+                    return new ValueType(inv_.currentVolume_, unit: Unit.l);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -270,10 +264,10 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.onoff = true;
                         item.indicator = inventory.CurrentVolume.RawValue / inventory.MaxVolume.RawValue;
-                        item.min = 0f;
-                        item.max = inventory.MaxVolume.RawValue;
-                        item.value = inventory.CurrentVolume.RawValue;
-                        item.name = inventory.Owner.DisplayName;
+                        item.min = new ValueType(0, unit:Unit.l);
+                        item.max = new ValueType(inventory.MaxVolume.RawValue, unit:Unit.l);
+                        item.value = new ValueType(inventory.CurrentVolume.RawValue, unit: Unit.l);
+                        item.name = (inventory.Owner as IMyTerminalBlock).CustomName;
                         container.Add(item);
                     }
                 }
@@ -292,19 +286,19 @@ namespace IngameScript
                     return inv_.itemRation_;
                 }
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return 0;
+                    return new ValueType(0);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return inv_.maxItems_;
+                    return new ValueType(inv_.maxItems_);
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return inv_.currentItems_;
+                    return new ValueType(inv_.currentItems_);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -317,9 +311,9 @@ namespace IngameScript
 
                         entry.onoff = true;
                         entry.indicator = indicator > 1 ? 1 : indicator;
-                        entry.min = 0;
-                        entry.max = item.maxAmount;
-                        entry.value = item.currentAmount;
+                        entry.min = new ValueType(0);
+                        entry.max = new ValueType(item.maxAmount);
+                        entry.value = new ValueType(item.currentAmount);
                         entry.name = item.type.SubtypeId;
                         entry.type = item.type;
                         container.Add(entry);

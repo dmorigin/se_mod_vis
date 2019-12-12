@@ -75,9 +75,9 @@ namespace IngameScript
 
             public override string getText(string data)
             {
-                return data.Replace("%capacity%", capacity_.ToString(Program.Default.StringFormat))
+                return data.Replace("%capacity%", (new ValueType(capacity_, unit: Unit.l)).pack().ToString())
                     .Replace("%fillration%", fillRation_.ToString(Program.Default.StringFormat))
-                    .Replace("%fillvalue", (fillRation_ * capacity_).ToString(Program.Default.StringFormat));
+                    .Replace("%fillvalue", (new ValueType(fillRation_ * capacity_, unit: Unit.l)).pack().ToString());
             }
 
             float fillRation_ = 0f;
@@ -92,19 +92,19 @@ namespace IngameScript
 
                 DataCollectorGasTank collector_ = null;
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return 0;
+                    return new ValueType(0, unit: Unit.l);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return collector_.capacity_;
+                    return new ValueType(collector_.capacity_, unit: Unit.l);
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return collector_.capacity_ * collector_.fillRation_;
+                    return new ValueType(collector_.capacity_ * collector_.fillRation_, unit: Unit.l);
                 }
 
                 public override double getIndicator()
@@ -121,9 +121,9 @@ namespace IngameScript
                         item.onoff = DataCollector<IMyGasTank>.isOn(tank);
                         item.name = tank.CustomName;
                         item.indicator = (float)tank.FilledRatio;
-                        item.min = 0;
-                        item.max = tank.Capacity;
-                        item.value = (float)(tank.FilledRatio * tank.Capacity);
+                        item.min = new ValueType(0, unit:Unit.l);
+                        item.max = new ValueType(tank.Capacity, unit: Unit.l);
+                        item.value = new ValueType(tank.FilledRatio * tank.Capacity, unit: Unit.l);
                         container.Add(item);
                     }
                 }

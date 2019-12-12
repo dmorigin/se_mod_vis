@@ -27,18 +27,18 @@ namespace IngameScript
             {
                 public bool onoff;
                 public string name;
-                public double min;
-                public double max;
+                public ValueType min;
+                public ValueType max;
                 public double indicator;
-                public double value;
+                public ValueType value;
                 public MyItemType type;
             }
 
             public abstract double getIndicator();
-            public abstract double getValue();
+            public abstract ValueType getValue();
             public abstract void getList(out List<ListContainer> container);
-            public abstract double getMin();
-            public abstract double getMax();
+            public abstract ValueType getMin();
+            public abstract ValueType getMax();
         }
     }
 }

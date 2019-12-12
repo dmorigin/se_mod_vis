@@ -43,6 +43,7 @@ namespace IngameScript
             }
 
 
+            public abstract Graphic clone();
             protected abstract bool supportCheck(string name);
 
 
@@ -148,6 +149,12 @@ namespace IngameScript
             }
 
             #region Properties
+            Template template_ = null;
+            public Template Template
+            {
+                get { return template_; }
+            }
+
             Configuration.Options options_ = null;
             protected Configuration.Options Options
             {
@@ -178,12 +185,6 @@ namespace IngameScript
             {
                 get { return dataRetriever_; }
                 set { dataRetriever_ = value; }
-            }
-
-            Template template_ = null;
-            public Template Template
-            {
-                get { return template_; }
             }
 
             Vector2 position_ = Program.Default.Position;

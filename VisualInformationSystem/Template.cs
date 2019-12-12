@@ -30,15 +30,22 @@ namespace IngameScript
                 templateName_ = name;
             }
 
-            public override bool construct()
-            {
-                log(Console.LogType.Info, "Construct template manager");
-                return base.construct();
-            }
-
             public virtual Settings getConfigHandler()
             {
                 return new Settings(this);
+            }
+
+            public virtual void merge(Template template)
+            {
+                updateInterval_ = template.updateInterval_;
+                backgroundColor_ = template.backgroundColor_;
+                font_ = template.font_;
+                fontSize_ = template.fontSize_;
+                fontColor_ = template.fontColor_;
+                alignment_ = template.alignment_;
+
+                foreach (var gfx in template.graphics_)
+                    graphics_.Add(gfx.clone());
             }
 
             #region Properties
@@ -53,13 +60,6 @@ namespace IngameScript
             {
                 get { return templateName_; }
                 set { templateName_ = value; }
-            }
-
-            string useTemplate_ = "";
-            public string UseTemplate
-            {
-                get { return useTemplate_; }
-                protected set { useTemplate_ = value; }
             }
 
             TimeSpan updateInterval_ = Program.Default.UpdateInterval;
@@ -149,7 +149,14 @@ namespace IngameScript
                 {
                     if (value != string.Empty)
                     {
-                        Template.UseTemplate = value;
+                        Template template = Template.TemplateManager.loadTemplate(value);
+                        if (template == null)
+                        {
+                            template_.log(Console.LogType.Error, $"Invalid template name:{value}");
+                            return false;
+                        }
+
+                        template_.merge(template);
                         return true;
                     }
                     return false;

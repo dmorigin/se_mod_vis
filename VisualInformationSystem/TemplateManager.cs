@@ -28,25 +28,39 @@ namespace IngameScript
             {
             }
 
+            public override bool construct()
+            {
+                // create default templates
+                createDefaultTemplate("Base", "font:debug:0.8:255,255,255\nalignment:left\nbackgroundcolor:0,0,0");
+                createDefaultTemplate("Transparent", "usetemplate:Default_Base\nbackgroundcolor:0,0,0,0");
+
+                return base.construct();
+            }
 
             List<Template> templates_ = new List<Template>();
 
-
-            public Template createFromConfig(IMyTerminalBlock block)
+            public Template createDefaultTemplate(string name, string config)
             {
-                return createFromConfig(block.CustomData);
+                Template template = createTemplate($"Default_{name}");
+                if (template != null)
+                {
+                    Configuration.Handler handler = template.getConfigHandler();
+                    if (!Configuration.Process(handler, config, (key, value, options) =>
+                    {
+                        log(Console.LogType.Error, $"Read config: \"{key}\", \"{value}\"");
+                        return false;
+                    }))
+                    {
+                        log(Console.LogType.Error, $"Failed to read template configuration");
+                        return null;
+                    }
+
+                    saveTemplate(template);
+                    return template;
+                }
+
+                return null;
             }
-
-
-            public Template createFromConfig(string config)
-            {
-                Template template = createTemplate((templates_.Count + 1).ToString());
-
-                // read config
-
-                return template;
-            }
-
 
             public Template createTemplate(string name)
             {
@@ -64,7 +78,6 @@ namespace IngameScript
                 return null;
             }
 
-
             public Template loadTemplate(string name)
             {
                 foreach(var template in templates_)
@@ -75,7 +88,6 @@ namespace IngameScript
 
                 return null;
             }
-
 
             public bool saveTemplate(Template template)
             {

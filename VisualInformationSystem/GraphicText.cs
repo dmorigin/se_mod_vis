@@ -29,6 +29,33 @@ namespace IngameScript
             }
 
 
+            public override Graphic clone()
+            {
+                GraphicText gfx = new GraphicText(Template, Options);
+                gfx.construct();
+
+                gfx.DataCollector = DataCollector;
+                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetrieverName = DataRetrieverName;
+                gfx.Position = Position;
+                gfx.PositionType = PositionType;
+                gfx.Size = Size;
+                gfx.SizeType = SizeType;
+
+                foreach (var color in Gradient)
+                    gfx.addGradientColor(color.Key, color.Value);
+
+                gfx.useDefaultFont_ = useDefaultFont_;
+                gfx.useFontSize_ = useFontSize_;
+                gfx.useDefaultAlignment_ = useDefaultAlignment_;
+                gfx.font_ = font_;
+                gfx.alignment_ = alignment_;
+                gfx.text_.AddList(text_);
+
+                return gfx;
+            }
+
+
             bool useDefaultFont_ = true;
             public bool UseDefaultFont
             {
@@ -69,11 +96,7 @@ namespace IngameScript
             }
 
 
-            string text_ = "";
-            public string Text
-            {
-                get { return text_; }
-            }
+            List<string> text_ = new List<string>();
 
 
             #region Configuration
@@ -93,7 +116,7 @@ namespace IngameScript
 
             bool configText(string key, string value, Configuration.Options options)
             {
-                text_ += $"{value}\n";
+                text_.Add(value);
                 return true;
             }
 
@@ -143,23 +166,32 @@ namespace IngameScript
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 float fontSize = FontSize;
-                int lines = Text.Count<char>(c => c == '\n') + 1;
+                int maxLength = 0;
+                foreach(string text in text_)
+                {
+                    if (text.Length > maxLength)
+                        maxLength = text.Length;
+                }
 
                 if (!UseFontSize)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
                     // scale font over size
-                    float length = display.FontSize.X * Text.Length;
-                    float height = display.FontSize.Y * lines;
+                    float length = display.FontSize.X * maxLength;
+                    float height = display.FontSize.Y * text_.Count;
 
                     fontSize = Math.Min(size.X / length, size.Y / height);
                 }
 
-                // fix font position
-                Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                Graphic.renderTextLine(rt, addSprite, Font, fontSize, position, FontColor, 
-                    DataCollector != null ? DataCollector.getText(Text) : Text, TextAlignment);
+                Vector2 renderPosition = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                float positionY = renderPosition.Y - ((rt.FontSize.Y * (text_.Count - 1)) * 0.5f);
+
+                for (int c = 0; c < text_.Count; c++)
+                {
+                    Graphic.renderTextLine(rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), FontColor,
+                        DataCollector != null ? DataCollector.getText(text_[c]) : text_[c], TextAlignment);
+                }
             }
         }
     }

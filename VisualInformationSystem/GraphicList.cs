@@ -33,6 +33,33 @@ namespace IngameScript
                 return true;
             }
 
+            public override Graphic clone()
+            {
+                GraphicList gfx = new GraphicList(Template, Options);
+                gfx.construct();
+
+                gfx.DataCollector = DataCollector;
+                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetrieverName = DataRetrieverName;
+                gfx.Position = Position;
+                gfx.PositionType = PositionType;
+                gfx.Size = Size;
+                gfx.SizeType = SizeType;
+
+                foreach (var color in Gradient)
+                    gfx.addGradientColor(color.Key, color.Value);
+
+                gfx.lines_ = lines_;
+                gfx.showBar_ = showBar_;
+                gfx.showIcon_ = showIcon_;
+                gfx.showText_ = showText_;
+                gfx.barBackground_ = barBackground_;
+                gfx.barHight_ = barHight_;
+                gfx.autoScroll_ = autoScroll_;
+
+                return gfx;
+            }
+
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
@@ -109,7 +136,7 @@ namespace IngameScript
                     // draw text
                     if (showText_)
                     {
-                        string rightText = $"{entry.value.ToString(Program.Default.StringFormat)}/{entry.max.ToString(Program.Default.StringFormat)}";
+                        string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
 
                         renderTextLine(rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
                             Template.FontColor, entry.name, TextAlignment.LEFT);

@@ -37,6 +37,29 @@ namespace IngameScript
             }
 
 
+            public override Graphic clone()
+            {
+                GraphicBattery gfx = new GraphicBattery(Template, Options);
+                gfx.construct();
+
+                gfx.DataCollector = DataCollector;
+                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetrieverName = DataRetrieverName;
+                gfx.Position = Position;
+                gfx.PositionType = PositionType;
+                gfx.Size = Size;
+                gfx.SizeType = SizeType;
+
+                foreach (var color in Gradient)
+                    gfx.addGradientColor(color.Key, color.Value);
+
+                gfx.rows_ = rows_;
+                gfx.cols_ = cols_;
+
+                return gfx;
+            }
+
+
             #region Configuration
             int cols_ = 0;
             int rows_ = 0;

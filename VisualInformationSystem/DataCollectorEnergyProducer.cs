@@ -66,8 +66,8 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%powerusing%", powerUsing_.ToString(Program.Default.StringFormat))
-                    .Replace("%maxoutput%", maxOutput_.ToString(Program.Default.StringFormat))
-                    .Replace("%currentoutput%", currentOutput_.ToString(Program.Default.StringFormat));
+                    .Replace("%maxoutput%", (new ValueType(maxOutput_, Multiplier.M, Unit.W)).pack().ToString())
+                    .Replace("%currentoutput%", (new ValueType(currentOutput_, Multiplier.M, Unit.W)).pack().ToString());
             }
 
 
@@ -104,19 +104,19 @@ namespace IngameScript
                     return collector_.powerUsing_;
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return collector_.currentOutput_;
+                    return new ValueType(collector_.currentOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return 0;
+                    return new ValueType(0, Multiplier.M, Unit.W);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return collector_.maxOutput_;
+                    return new ValueType(collector_.maxOutput_, Multiplier.M, Unit.W);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -128,9 +128,9 @@ namespace IngameScript
                         item.onoff = DataCollector<T>.isOn(pp);
                         item.name = pp.CustomName;
                         item.indicator = pp.CurrentOutput / pp.MaxOutput;
-                        item.value = pp.CurrentOutput;
-                        item.min = 0f;
-                        item.max = pp.MaxOutput;
+                        item.value = new ValueType(pp.CurrentOutput, Multiplier.M, Unit.W);
+                        item.min = new ValueType(0, Multiplier.M, Unit.W);
+                        item.max = new ValueType(pp.MaxOutput, Multiplier.M, Unit.W);
                         container.Add(item);
                     }
                 }

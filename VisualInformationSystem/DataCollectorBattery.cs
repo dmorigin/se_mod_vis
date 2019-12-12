@@ -88,10 +88,10 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%powerleft%", powerLeft_.ToString(Program.Default.StringFormat))
                     .Replace("%powerstoring%", powerStoring_.ToString(Program.Default.StringFormat))
-                    .Replace("%maxinput%", maxInput_.ToString(Program.Default.StringFormat))
-                    .Replace("%maxstored%", maxStored_.ToString(Program.Default.StringFormat))
-                    .Replace("%currentinput%", currentInput_.ToString(Program.Default.StringFormat))
-                    .Replace("%currentstored%", currentStored_.ToString(Program.Default.StringFormat));
+                    .Replace("%maxinput%", (new ValueType(maxInput_, Multiplier.M, Unit.W)).pack().ToString())
+                    .Replace("%maxstored%", (new ValueType(maxStored_, Multiplier.M, Unit.Wh)).pack().ToString())
+                    .Replace("%currentinput%", (new ValueType(currentInput_, Multiplier.M, Unit.W)).pack().ToString())
+                    .Replace("%currentstored%", (new ValueType(currentStored_, Multiplier.M, Unit.Wh)).pack().ToString());
             }
 
             public override DataRetriever getDataRetriever(string name)
@@ -123,19 +123,19 @@ namespace IngameScript
                     return collector_.powerLeft_;
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return collector_.currentStored_;
+                    return new ValueType(collector_.currentStored_, Multiplier.M, Unit.Wh);
                 }
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return 0;
+                    return new ValueType(0, Multiplier.M, Unit.Wh);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return collector_.maxStored_;
+                    return new ValueType(collector_.maxStored_, Multiplier.M, Unit.Wh);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -147,9 +147,9 @@ namespace IngameScript
                         item.onoff = DataCollector<IMyBatteryBlock>.isOn(ep);
                         item.name = ep.CustomName;
                         item.indicator = ep.CurrentStoredPower / ep.MaxStoredPower;
-                        item.value = ep.CurrentStoredPower;
-                        item.min = 0f;
-                        item.max = ep.MaxStoredPower;
+                        item.value = new ValueType(ep.CurrentStoredPower, Multiplier.M, Unit.Wh);
+                        item.min = new ValueType(0, Multiplier.M, Unit.Wh);
+                        item.max = new ValueType(ep.MaxStoredPower, Multiplier.M, Unit.Wh);
                         container.Add(item);
                     }
                 }
@@ -170,19 +170,19 @@ namespace IngameScript
                     return collector_.powerStoring_ - collector_.powerUsing_;
                 }
 
-                public override double getValue()
+                public override ValueType getValue()
                 {
-                    return collector_.currentInput_ - collector_.currentOutput_;
+                    return new ValueType(collector_.currentInput_ - collector_.currentOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override double getMin()
+                public override ValueType getMin()
                 {
-                    return -collector_.maxOutput_;
+                    return new ValueType(-collector_.maxOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override double getMax()
+                public override ValueType getMax()
                 {
-                    return collector_.maxInput_;
+                    return new ValueType(collector_.maxInput_, Multiplier.M, Unit.W);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -194,9 +194,9 @@ namespace IngameScript
                         item.onoff = DataCollector<IMyBatteryBlock>.isOn(battery);
                         item.name = battery.CustomName;
                         item.indicator = (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput);
-                        item.value = battery.CurrentInput - battery.CurrentOutput;
-                        item.min = battery.MaxOutput;
-                        item.max = battery.MaxInput;
+                        item.value = new ValueType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.W);
+                        item.min = new ValueType(battery.MaxOutput, Multiplier.M, Unit.W);
+                        item.max = new ValueType(battery.MaxInput, Multiplier.M, Unit.W);
                         container.Add(item);
                     }
                 }
