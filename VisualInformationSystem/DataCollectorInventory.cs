@@ -31,7 +31,6 @@ namespace IngameScript
             string pattern = "^(MyObjectBuilder\\_[Ingot|Ore|PhysicalGunObject|Component|AmmoMagazine])\\/([0-9a-zA-Z]+)$";
             void addInventoryBlock(IMyTerminalBlock block)
             {
-                long maxVolume = 0;
                 if (block.InventoryCount > 0)
                 {
                     for (int i = 0; i < block.InventoryCount; i++)
@@ -56,20 +55,17 @@ namespace IngameScript
                         if (accepted)
                         {
                             inventories_.Add(inventory);
-                            maxVolume += inventory.MaxVolume.RawValue;
                             Blocks.Add(block);
+                            maxVolume_ = (double)inventory.MaxVolume;
                         }
                     }
                 }
-
-                maxVolume_ = maxVolume;
             }
 
             public override bool construct()
             {
                 BlockName = Options[0];
-                IsGroup = Options.getAsBoolean(1, false);
-                long maxItems = 0;
+                IsGroup = Options.asBoolean(1, false);
 
                 // process item type
                 if (Options.Count > 2)
@@ -80,19 +76,19 @@ namespace IngameScript
                         switch (itemType.ToLower())
                         {
                             case "ammo":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", "")));
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", ""), defaultMaxAmountItems_));
                                 continue;
                             case "components":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", "")));
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", ""), defaultMaxAmountItems_));
                                 continue;
                             case "handtools":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", "")));
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", ""), defaultMaxAmountItems_));
                                 continue;
                             case "ore":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", "")));
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", ""), defaultMaxAmountItems_));
                                 continue;
                             case "ingots":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", "")));
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", ""), defaultMaxAmountItems_));
                                 continue;
                         }
 
@@ -100,12 +96,18 @@ namespace IngameScript
                         if (System.Text.RegularExpressions.Regex.IsMatch(itemType, pattern))
                         {
                             string[] parts = itemType.Split('/');
-                            itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1])));
+                            itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
+                            maxItems_ += defaultMaxAmountItems_;
                         }
                         else if (int.TryParse(itemType, out amount))
                         {
-                            itemTypes_[itemTypes_.Count - 1].amount = amount;
-                            maxItems += amount;
+                            if (itemTypes_.Count > 0)
+                            {
+                                itemTypes_[itemTypes_.Count - 1].amount = amount;
+                                maxItems_ -= defaultMaxAmountItems_ - amount;
+                            }
+                            else
+                                defaultMaxAmountItems_ = amount;
                         }
                         else
                         {
@@ -114,7 +116,6 @@ namespace IngameScript
                         }
                     }
                 }
-
 
                 if (BlockName != "")
                 {
@@ -135,14 +136,17 @@ namespace IngameScript
                     }
                 }
 
+                maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
+
                 update();
-                maxItems_ = maxItems;
                 Constructed = true;
                 return true;
             }
 
             public override bool reconstruct()
             {
+                maxItems_ = 0;
+                maxVolume_ = 0.0;
                 itemTypes_.Clear();
                 inventories_.Clear();
                 return base.reconstruct();
@@ -150,13 +154,13 @@ namespace IngameScript
 
             protected override void update()
             {
-                long currentVolume = 0;
+                double currentVolume = 0.0;
                 long currentItems = 0;
                 items_.Clear();
 
                 foreach(IMyInventory inventory in inventories_)
                 {
-                    currentVolume += inventory.CurrentVolume.RawValue;
+                    currentVolume += (double)inventory.CurrentVolume;
 
                     List<MyInventoryItem> inventoryItems = new List<MyInventoryItem>();
                     foreach (MyInventoryItem inventoryItem in inventoryItems)
@@ -164,23 +168,30 @@ namespace IngameScript
                         int index = items_.FindIndex(x => x.type == inventoryItem.Type);
                         if (index >= 0)
                         {
-                            items_[index].currentAmount += inventoryItem.Amount.RawValue;
-                            currentItems += inventoryItem.Amount.RawValue;
+                            items_[index].currentAmount += (long)inventoryItem.Amount;
+                            currentItems += (long)inventoryItem.Amount;
                         }
                         else
                         {
                             InventoryItem item = new InventoryItem();
-                            item.currentAmount = inventoryItem.Amount.RawValue;
-                            item.maxAmount = itemTypes_.Find(x => x.type == inventoryItem.Type).amount;
+                            item.currentAmount = (long)inventoryItem.Amount;
                             item.type = inventoryItem.Type;
+
+                            int itemTypeIndex = itemTypes_.FindIndex(x => x.type == inventoryItem.Type);
+                            if (itemTypeIndex >= 0)
+                                item.maxAmount = itemTypes_[itemTypeIndex].amount;
+                            else
+                                item.maxAmount = defaultMaxAmountItems_;
+
+                            items_.Add(item);
                         }
                     }
                 }
 
                 currentVolume_ = currentVolume;
                 currentItems_ = currentItems;
-                volumeRation_ = currentVolume_ / maxVolume_;
-                itemRation_ = currentItems_ / maxItems_;
+                volumeRation_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
+                itemRation_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
                 itemRation_ = itemRation_ > 1 ? 1 : itemRation_;
             }
 
@@ -191,23 +202,25 @@ namespace IngameScript
 
             class ItemType
             {
-                public ItemType(MyItemType itemType)
+                public ItemType(MyItemType itemType, long a)
                 {
                     type = itemType;
-                    amount = 0;
+                    amount = a;
                 }
 
                 public MyItemType type;
-                public int amount;
+                public long amount;
             }
             List<ItemType> itemTypes_ = new List<ItemType>();
             List<IMyInventory> inventories_ = new List<IMyInventory>();
             double currentVolume_ = 0;
             double maxVolume_ = 0;
             double volumeRation_ = 0;
-            double maxItems_ = 0;
-            double currentItems_ = 0;
+            long maxItems_ = 0;
+            long currentItems_ = 0;
             double itemRation_ = 0;
+
+            long defaultMaxAmountItems_ = Program.Default.AmountItems;
 
             class InventoryItem
             {
@@ -248,17 +261,17 @@ namespace IngameScript
 
                 public override ValueType getMin()
                 {
-                    return new ValueType(0, unit:Unit.l);
+                    return new ValueType(0, Multiplier.K, Unit.l);
                 }
 
                 public override ValueType getMax()
                 {
-                    return new ValueType(inv_.maxVolume_, unit: Unit.l);
+                    return new ValueType(inv_.maxVolume_, Multiplier.K, Unit.l);
                 }
 
                 public override ValueType getValue()
                 {
-                    return new ValueType(inv_.currentVolume_, unit: Unit.l);
+                    return new ValueType(inv_.currentVolume_, Multiplier.K, Unit.l);
                 }
 
                 public override void getList(out List<ListContainer> container)
@@ -271,9 +284,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.onoff = true;
                         item.indicator = inventory.CurrentVolume.RawValue / inventory.MaxVolume.RawValue;
-                        item.min = new ValueType(0, unit:Unit.l);
-                        item.max = new ValueType(inventory.MaxVolume.RawValue, unit:Unit.l);
-                        item.value = new ValueType(inventory.CurrentVolume.RawValue, unit: Unit.l);
+                        item.min = new ValueType(0, Multiplier.K, Unit.l);
+                        item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
+                        item.value = new ValueType((double)inventory.CurrentVolume, Multiplier.K, Unit.l);
                         item.name = (inventory.Owner as IMyTerminalBlock).CustomName;
                         container.Add(item);
                     }

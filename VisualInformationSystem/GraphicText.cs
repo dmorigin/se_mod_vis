@@ -57,17 +57,7 @@ namespace IngameScript
 
 
             bool useDefaultFont_ = true;
-            public bool UseDefaultFont
-            {
-                get { return useDefaultFont_; }
-            }
-
             bool useFontSize_ = false;
-            public bool UseFontSize
-            {
-                get { return useFontSize_; }
-            }
-
             float fontSize_ = Program.Default.FontSize;
             public float FontSize
             {
@@ -103,13 +93,13 @@ namespace IngameScript
             bool configFont(string key, string value, Configuration.Options options)
             {
                 font_ = value != string.Empty ? value : Program.Default.Font;
-                fontSize_ = options.getAsFloat(0, 0f);
+                fontSize_ = options.asFloat(0, 0f);
                 if (fontSize_ == 0f)
                     useFontSize_ = false;
                 else
                     useFontSize_ = true;
 
-                Color = options.getAsColor(1, Program.Default.FontColor);
+                Color = options.asColor(1, Program.Default.FontColor);
                 useDefaultFont_ = false;
                 return true;
             }
@@ -173,7 +163,7 @@ namespace IngameScript
                         maxLength = text.Length;
                 }
 
-                if (!UseFontSize)
+                if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
@@ -189,8 +179,8 @@ namespace IngameScript
 
                 for (int c = 0; c < text_.Count; c++)
                 {
-                    Graphic.renderTextLine(rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), FontColor,
-                        DataCollector != null ? DataCollector.getText(text_[c]) : text_[c], TextAlignment);
+                    Graphic.renderTextLine(display, rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), 
+                        FontColor, DataCollector != null ? DataCollector.getText(text_[c]) : text_[c], TextAlignment);
                 }
             }
         }

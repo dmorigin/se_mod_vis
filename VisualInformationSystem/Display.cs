@@ -187,6 +187,8 @@ namespace IngameScript
             {
                 foreach (var rt in renderTargets_)
                 {
+                    rt.BackgroundColor = template_.BackgroundColor;
+
                     using (var frame = rt.getRenderFrame())
                     {
                         foreach (var graphic in template_.getGraphics())

@@ -43,13 +43,11 @@ namespace IngameScript
                 get { return fontSize_; }
             }
 
-
             Vector2I coordinate_ = new Vector2I();
             public Vector2I Coordinate
             {
                 get { return coordinate_; }
             }
-
 
             Vector2 displayOffset_ = new Vector2();
             public Vector2 DisplayOffset
@@ -57,28 +55,11 @@ namespace IngameScript
                 get { return displayOffset_; }
             }
 
-
             public Color BackgroundColor
             {
                 get { return surface_.ScriptBackgroundColor; }
                 set { surface_.ScriptBackgroundColor = value; }
             }
-
-/*
-            Display display_ = null;
-            public Display Display2
-            {
-                get { return display_; }
-            }
-
-
-            public RenderTarget(Display display, Vector2I coordinate)
-                : base(display.App)
-            {
-                display_ = display;
-                coordinate_ = coordinate;
-            }
-*/
 
             public RenderTarget(Vector2I coordinate)
             {
@@ -104,6 +85,9 @@ namespace IngameScript
                 renderPosition_ = (surface_.TextureSize - renderSize_) * 0.5f;
 
                 displayOffset_ = -(renderSize_ * coordinate_) + renderPosition_;
+
+                if (RenderTarget.sprites_.Count == 0)
+                    surface_.GetSprites(RenderTarget.sprites_);
 
                 adjustFontSize(Program.Default.Font, 1f);
                 drawInitScreen();
@@ -143,11 +127,10 @@ namespace IngameScript
             }
 
 
+            static List<string> sprites_ = new List<string>();
             public bool spriteExist(string name)
             {
-                List<string> sprites = new List<string>();
-                surface_.GetSprites(sprites);
-                return sprites.Exists(x => x == name);
+                return RenderTarget.sprites_.Exists(x => x == name);
             }
 
 

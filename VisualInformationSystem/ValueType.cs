@@ -112,7 +112,7 @@ namespace IngameScript
                     case Unit.Wh:
                         return "Wh";
                     case Unit.l:
-                        return "l";
+                        return "L";
                     case Unit.g:
                         return "g";
                 }
@@ -144,15 +144,15 @@ namespace IngameScript
                 double value = value_;
                 Multiplier multiplier = multiplier_;
 
-                while (value >= 1000 && multiplier != Multiplier.P)
+                while (value >= 1000.0 && multiplier != Multiplier.P)
                 {
-                    value /= 1000;
+                    value /= 1000.0;
                     multiplier = getNextHeigher(multiplier);
                 }
 
-                while (value < 0 && multiplier != Multiplier.None)
+                while (value < 0.0 && multiplier != Multiplier.None)
                 {
-                    value *= 1000;
+                    value *= 1000.0;
                     multiplier = getNextLower(multiplier);
                 }
 

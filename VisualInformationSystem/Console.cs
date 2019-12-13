@@ -44,7 +44,7 @@ namespace IngameScript
             }
 
 
-            private int maxStoreLines_ = 30;
+            int maxStoreLines_ = 30;
             public int MaxStoreLines
             {
                 get { return maxStoreLines_; }
@@ -60,14 +60,14 @@ namespace IngameScript
             }
 
 
-            private string font_ = "DEBUG";
-            private Color fontColor_ = Color.LightGreen;
-            private float fontSize_ = 0.6f;
-            private float lineHeight_ = 0f;
-            private float lineCorrection_ = 0f;
-            private Queue<string> messages_ = new Queue<string>();
-            private RenderTarget renderTarget_ = null;
-            private bool newMesssages_ = false;
+            string font_ = "DEBUG";
+            //Color fontColor_ = Color.LightGreen;
+            float fontSize_ = 0.5f;
+            float lineHeight_ = 0f;
+            float lineCorrection_ = 0f;
+            Queue<KeyValuePair<LogType, string>> messages_ = new Queue<KeyValuePair<LogType, string>>();
+            RenderTarget renderTarget_ = null;
+            bool newMesssages_ = false;
 
 
             public enum LogType
@@ -79,7 +79,7 @@ namespace IngameScript
             }
 
             // workaround for pack code
-            private string logTypeToString(LogType type)
+            string logTypeToString(LogType type)
             {
                 switch (type)
                 {
@@ -96,9 +96,24 @@ namespace IngameScript
                 return "Invalid";
             }
 
+            Color getFontColor(LogType logType)
+            {
+                switch (logType)
+                {
+                    case LogType.Warning:
+                        return Color.YellowGreen;
+                    case LogType.Error:
+                        return Color.Red;
+                    case LogType.Debug:
+                        return Color.DarkOliveGreen;
+                }
+
+                return Color.LightGreen;
+            }
+
             public new void log(LogType logType, string message)
             {
-                messages_.Enqueue($"[{logTypeToString(logType)}]: {message}");
+                messages_.Enqueue(new KeyValuePair<LogType, string>(logType, $"[{logTypeToString(logType)}]: {message}"));
                 if (messages_.Count > maxStoreLines_)
                     messages_.Dequeue();
                 newMesssages_ = true;
@@ -118,7 +133,7 @@ namespace IngameScript
                         // flush message lines
                         foreach (var message in messages_)
                         {
-                            MySprite line = MySprite.CreateText(message, font_, fontColor_, fontSize_, TextAlignment.LEFT);
+                            MySprite line = MySprite.CreateText(message.Value, font_, getFontColor(message.Key), fontSize_, TextAlignment.LEFT);
                             line.Position = new Vector2(renderTarget_.Position.X, lineCount++ * lineHeight_ - offset);
                             frame.Add(line);
                         }

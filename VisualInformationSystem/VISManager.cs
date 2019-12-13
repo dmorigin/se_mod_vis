@@ -118,9 +118,7 @@ namespace IngameScript
                 get { return timer_; }
             }
 
-
             List<DisplayProvider> displayProviders_ = new List<DisplayProvider>();
-
 
             #region Command line
             CommandLine cmdLine_ = new CommandLine();
@@ -137,16 +135,9 @@ namespace IngameScript
                 get { return console_; }
             }
 
-
             private void log(Console.LogType logType, string messsage)
             {
                 console_.log(logType, messsage);
-            }
-
-
-            private void log(string message)
-            {
-                console_.log(Console.LogType.Info, message);
             }
             #endregion // Console
 
@@ -341,7 +332,6 @@ namespace IngameScript
 
             public void onSave()
             {
-                log("VISManager: onSave()");
             }
 
 

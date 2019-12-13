@@ -127,7 +127,7 @@ namespace IngameScript
             {
                 public Settings(Template template)
                 {
-                    template_ = template;
+                    tpl_ = template;
 
                     // fill up handler
                     add("usetemplate", configUseTemplate);
@@ -138,25 +138,21 @@ namespace IngameScript
                     add("graphic", configGraphic);
                 }
 
-                Template template_ = null;
-                public Template Template
-                {
-                    get { return template_; }
-                }
+                Template tpl_ = null;
 
                 #region Handler
                 bool configUseTemplate(string key, string value, Configuration.Options options)
                 {
                     if (value != string.Empty)
                     {
-                        Template template = Template.TemplateManager.loadTemplate(value);
+                        Template template = tpl_.TemplateManager.loadTemplate(value);
                         if (template == null)
                         {
-                            template_.log(Console.LogType.Error, $"Invalid template name:{value}");
+                            tpl_.log(Console.LogType.Error, $"Invalid template name:{value}");
                             return false;
                         }
 
-                        template_.merge(template);
+                        tpl_.merge(template);
                         return true;
                     }
                     return false;
@@ -165,21 +161,21 @@ namespace IngameScript
                 bool configUpdateInterval(string key, string value, Configuration.Options options)
                 {
                     float seconds = Configuration.asFloat(value, Program.Default.UpdateIntervalInSec);
-                    Template.UpdateInterval = TimeSpan.FromSeconds(seconds);
+                    tpl_.UpdateInterval = TimeSpan.FromSeconds(seconds);
                     return true;
                 }
 
                 bool configBackgroundColor(string key, string value, Configuration.Options options)
                 {
-                    Template.BackgroundColor = Configuration.asColor(value, Program.Default.BackgroundColor);
+                    tpl_.BackgroundColor = Configuration.asColor(value, Program.Default.BackgroundColor);
                     return true;
                 }
 
                 bool configFont(string key, string value, Configuration.Options options)
                 {
-                    Template.Font = value != string.Empty ? value : Program.Default.Font;
-                    Template.FontSize = options.getAsFloat(0, Program.Default.FontSize);
-                    Template.FontColor = options.getAsColor(1, Program.Default.FontColor);
+                    tpl_.Font = value != string.Empty ? value : Program.Default.Font;
+                    tpl_.FontSize = options.asFloat(0, Program.Default.FontSize);
+                    tpl_.FontColor = options.asColor(1, Program.Default.FontColor);
                     return true;
                 }
 
@@ -190,15 +186,15 @@ namespace IngameScript
                     {
                         case "center":
                         case "c":
-                            Template.TextAlignment = TextAlignment.CENTER;
+                            tpl_.TextAlignment = TextAlignment.CENTER;
                             break;
                         case "left":
                         case "l":
-                            Template.TextAlignment = TextAlignment.LEFT;
+                            tpl_.TextAlignment = TextAlignment.LEFT;
                             break;
                         case "right":
                         case "r":
-                            Template.TextAlignment = TextAlignment.RIGHT;
+                            tpl_.TextAlignment = TextAlignment.RIGHT;
                             break;
                         default:
                             return false;
@@ -214,24 +210,25 @@ namespace IngameScript
                     switch (value.ToLower())
                     {
                         case "text":
-                            graphic = new GraphicText(Template, options);
+                            graphic = new GraphicText(tpl_, options);
                             break;
                         case "battery":
-                            graphic = new GraphicBattery(Template, options);
+                            graphic = new GraphicBattery(tpl_, options);
                             break;
                         case "list":
-                            graphic = new GraphicList(Template, options);
+                            graphic = new GraphicList(tpl_, options);
                             break;
                     }
 
                     if (graphic != null)
                     {
+                        graphic.construct();
                         setSubHandler(graphic.getConfigHandler());
-                        template_.graphics_.Add(graphic);
+                        tpl_.graphics_.Add(graphic);
                         return true;
                     }
 
-                    Template.log(Console.LogType.Error, $"Invalid graphic type {value}");
+                    tpl_.log(Console.LogType.Error, $"Invalid graphic type {value}");
                     return false;
                 }
                 #endregion // Handler

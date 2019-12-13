@@ -65,16 +65,13 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
-                Vector2 fontSize = showText_ == true ? rt.FontSize * Template.FontSize : new Vector2(0);
+                Vector2 fontSize = showText_ == true ? display.FontSize * Template.FontSize : new Vector2(0);
                 Vector2 barSize = showBar_ ? new Vector2(size.X, barHight_ == 0f ? fontSize.Y : barHight_) : new Vector2();
                 float lineHeight = fontSize.Y + barSize.Y;
-                int lines = lines_;
 
-                if (lines <= 0)
-                    lines = (int)(size.Y / lineHeight) + 1;
-                else
+                if (lines_ > 0)
                 {
-                    float scale = (size.Y / lines) / lineHeight;
+                    float scale = (size.Y / lines_) / lineHeight;
 
                     fontSize *= scale;
                     barSize *= scale;
@@ -84,6 +81,7 @@ namespace IngameScript
                 if (showIcon_ && !showText_)
                     barSize.X -= barSize.Y;
 
+                int lines = (int)(size.Y / lineHeight);
                 float textPositionY = position.Y - (size.Y * 0.5f) + (fontSize.Y * 0.5f);
                 float barPositionY = position.Y - (size.Y * 0.5f) + (barSize.Y * 0.5f) + fontSize.Y;
                 float iconPositionY = 0f;
@@ -112,8 +110,10 @@ namespace IngameScript
                 // render name
                 List<DataRetriever.ListContainer> container;
                 DataRetriever.getList(out container);
-                foreach(var entry in container)
+                for (int l = 0; l < lines; l++)
                 {
+                    var entry = container[l];
+
                     // draw icon
                     if (showIcon_)
                     {
@@ -138,9 +138,9 @@ namespace IngameScript
                     {
                         string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
 
-                        renderTextLine(rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
+                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
                             Template.FontColor, entry.name, TextAlignment.LEFT);
-                        renderTextLine(rt, addSprite, Template.Font, Template.FontSize, new Vector2(textRightPositionX, textPositionY),
+                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textRightPositionX, textPositionY),
                             Template.FontColor, rightText, TextAlignment.RIGHT);
 
                         textPositionY += lineHeight;

@@ -70,11 +70,6 @@ namespace IngameScript
                 Manager.Console.log(logType, message);
             }
 
-            public void log(string message)
-            {
-                Manager.Console.log(Console.LogType.Info, message);
-            }
-
             bool constructed_ = false;
             public bool Constructed
             {

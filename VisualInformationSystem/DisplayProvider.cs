@@ -93,7 +93,7 @@ namespace IngameScript
                         groupId = options[0];
 
                         // extract coordinates
-                        coordinate = options.getAsVector(1, Program.Default.DisplayCoordinate);
+                        coordinate = options.asVector(1, Program.Default.DisplayCoordinate);
                     }
 
                     Display display = null;
@@ -140,7 +140,6 @@ namespace IngameScript
                             return false;
                         }
 
-                        provider_.log(Console.LogType.Debug, "set sub config handler");
                         setSubHandler(template.getConfigHandler());
                         display.Template = template;
                     }

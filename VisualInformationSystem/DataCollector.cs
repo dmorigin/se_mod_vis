@@ -38,7 +38,7 @@ namespace IngameScript
             public override bool construct()
             {
                 BlockName = Options[0];
-                IsGroup = Options.getAsBoolean(1, false);
+                IsGroup = Options.asBoolean(1, false);
 
                 if (BlockName != "")
                 {
@@ -59,7 +59,8 @@ namespace IngameScript
                     }
                 }
 
-                log(Console.LogType.Debug, $"Found: {Blocks.Count} blocks");
+                if (blocks_.Count == 0)
+                    log(Console.LogType.Warning, $"No blocks found for {blockName_}:{(isGroup_ ? "group" : "")}");
                 Constructed = true;
                 return true;
             }

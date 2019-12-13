@@ -57,13 +57,13 @@ namespace IngameScript
             public static Color asColor(string data, Color defaultValue = new Color())
             {
                 int count = data.Count(x => x == ',');
-                if (count == 3)
+                if (count == 2)
                 {
                     Vector3I vec = asVector(data, new Vector3I(defaultValue.R, defaultValue.G, defaultValue.B));
                     return new Color(vec.X, vec.Y, vec.Z);
                 }
 
-                if (count == 4)
+                if (count == 3)
                 {
                     Vector4I vec = asVector(data, new Vector4I(defaultValue.R, defaultValue.G, defaultValue.B, defaultValue.A));
                     return new Color(vec.X, vec.Y, vec.Z, vec.W);
@@ -205,6 +205,21 @@ namespace IngameScript
                 }
 
 
+                public Options(Options other)
+                {
+                    options_ = new List<string>();
+                    options_.AddList(other.options_);
+                }
+
+
+                public Options clone()
+                {
+                    List<string> data = new List<string>();
+                    data.AddList(options_);
+                    return new Options(data);
+                }
+
+
                 public override bool Equals(object obj)
                 {
                     if (GetType() != obj.GetType())
@@ -244,61 +259,61 @@ namespace IngameScript
                 }
 
 
-                public bool getAsBoolean(int index, bool defaultValue = true)
+                public bool asBoolean(int index, bool defaultValue = true)
                 {
                     return Configuration.asBoolean(this[index], defaultValue);
                 }
 
 
-                public int getAsInteger(int index, int defaultValue = 0)
+                public int asInteger(int index, int defaultValue = 0)
                 {
                     return Configuration.asInteger(this[index], defaultValue);
                 }
 
 
-                public float getAsFloat(int index, float defaultValue = 0f)
+                public float asFloat(int index, float defaultValue = 0f)
                 {
                     return Configuration.asFloat(this[index], defaultValue);
                 }
 
 
-                public Color getAsColor(int index, Color defaultValue = new Color())
+                public Color asColor(int index, Color defaultValue = new Color())
                 {
                     return Configuration.asColor(this[index], defaultValue);
                 }
 
 
-                public Vector2 getAsVector(int index, Vector2 defaultValue = new Vector2())
+                public Vector2 asVector(int index, Vector2 defaultValue = new Vector2())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
 
 
-                public Vector3 getAsVector(int index, Vector3 defaultValue = new Vector3())
+                public Vector3 asVector(int index, Vector3 defaultValue = new Vector3())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
 
 
-                public Vector4 getAsVector(int index, Vector4 defaultValue = new Vector4())
+                public Vector4 asVector(int index, Vector4 defaultValue = new Vector4())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
 
 
-                public Vector2I getAsVector(int index, Vector2I defaultValue = new Vector2I())
+                public Vector2I asVector(int index, Vector2I defaultValue = new Vector2I())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
 
 
-                public Vector3I getAsVector(int index, Vector3I defaultValue = new Vector3I())
+                public Vector3I asVector(int index, Vector3I defaultValue = new Vector3I())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
 
 
-                public Vector4I getAsVector(int index, Vector4I defaultValue = new Vector4I())
+                public Vector4I asVector(int index, Vector4I defaultValue = new Vector4I())
                 {
                     return Configuration.asVector(this[index], defaultValue);
                 }
@@ -308,8 +323,8 @@ namespace IngameScript
             public class Handler
             {
                 public delegate bool KeyHandler(string key, string value, Options options);
-                private Dictionary<string, KeyHandler> handler_ = new Dictionary<string, KeyHandler>();
-                private Handler subHandler_ = null;
+                Dictionary<string, KeyHandler> handler_ = new Dictionary<string, KeyHandler>();
+                Handler subHandler_ = null;
 
 
                 public void setSubHandler(Handler subHandler)
@@ -361,13 +376,13 @@ namespace IngameScript
                 }
 
 
-                private bool commentHandler(string key, string value, Options options)
+                bool commentHandler(string key, string value, Options options)
                 {
                     return true;
                 }
 
 
-                private bool wildcardHandler(string key, string value, Options options)
+                bool wildcardHandler(string key, string value, Options options)
                 {
                     return false;
                 }
@@ -381,7 +396,7 @@ namespace IngameScript
             }
 
 
-            private static bool processConfig(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler)
+            static bool processConfig(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler)
             {
                 // convert to line list
                 List<string> lines = config.Trim().Split('\n').ToList();

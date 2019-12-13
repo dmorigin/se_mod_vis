@@ -29,23 +29,18 @@ namespace IngameScript
                 template_ = template;
             }
 
-
             public override bool construct()
             {
                 if (Options.Count >= 1)
-                {
                     dataRetrieverName_ = Options[0];
-                    return true;
-                }
+                else
+                    log(Console.LogType.Warning, $"No data retriever defined");
 
-                log(Console.LogType.Error, $"Missing data retriever");
-                return false;
+                return true;
             }
-
 
             public abstract Graphic clone();
             protected abstract bool supportCheck(string name);
-
 
             #region Configuration
             public class ConfigHandler : Configuration.Handler
@@ -105,7 +100,7 @@ namespace IngameScript
                     if (options.Count == 1)
                     {
                         float indicator = Configuration.asFloat(value, 0f);
-                        Color color = options.getAsColor(0, Program.Default.Color);
+                        Color color = options.asColor(0, Program.Default.Color);
                         graphic_.addGradientColor(indicator, color);
                     }
                     return false;
@@ -126,6 +121,8 @@ namespace IngameScript
                                 graphic_.DataRetriever = retriever;
                                 return true;
                             }
+                            else
+                                graphic_.log(Console.LogType.Error, $"Data retriever ${graphic_.DataRetrieverName} isn't supported");
                         }
                     }
                     else
@@ -140,7 +137,6 @@ namespace IngameScript
                 return new ConfigHandler(this);
             }
             #endregion // Configuration
-
 
             public enum ValueType
             {
@@ -256,11 +252,11 @@ namespace IngameScript
             public abstract void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite);
 
             #region Render Helper
-            protected static void renderTextLine(RenderTarget rt, AddSpriteDelegate addSprite, string font, float fontSize, Vector2 position, 
-                Color fontColor, string textLine, TextAlignment alignment)
+            protected static void renderTextLine(Display display, RenderTarget rt, AddSpriteDelegate addSprite, 
+                string font, float fontSize, Vector2 position, Color fontColor, string textLine, TextAlignment alignment)
             {
                 // fix font position
-                Vector2 offset = new Vector2(rt.DisplayOffset.X, rt.DisplayOffset.Y - (0.75f * (fontSize * rt.FontSize.Y)));
+                Vector2 offset = new Vector2(rt.DisplayOffset.X, rt.DisplayOffset.Y - (0.75f * (fontSize * display.FontSize.Y)));
                 MySprite sprite = MySprite.CreateText(textLine, font, fontColor, fontSize, alignment);
                 sprite.Position = position + offset;
                 addSprite(sprite);
