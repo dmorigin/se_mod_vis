@@ -97,8 +97,8 @@ namespace IngameScript
 
                 List<DataRetriever.ListContainer> capacityList;
                 List<DataRetriever.ListContainer> inoutList;
-                batteries.getDataRetriever("capacity").getList(out capacityList);
-                batteries.getDataRetriever("inout").getList(out inoutList);
+                batteries.getDataRetriever("capacity").list(out capacityList);
+                batteries.getDataRetriever("inout").list(out inoutList);
                     
                 // calculate rows and cols size
                 int rows = rows_;

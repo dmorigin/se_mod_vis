@@ -43,7 +43,6 @@ namespace IngameScript
                     maxStored_ += battery.MaxStoredPower;
                 }
 
-                update();
                 Constructed = true;
                 return true;
             }
@@ -121,27 +120,27 @@ namespace IngameScript
                 DataCollectorBattery collector_ = null;
 
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return collector_.powerLeft_;
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(collector_.currentStored_, Multiplier.M, Unit.Wh);
                 }
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
                     return new ValueType(0, Multiplier.M, Unit.Wh);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(collector_.maxStored_, Multiplier.M, Unit.Wh);
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
                     foreach (var ep in collector_.Blocks)
@@ -153,7 +152,9 @@ namespace IngameScript
                         item.value = new ValueType(ep.CurrentStoredPower, Multiplier.M, Unit.Wh);
                         item.min = new ValueType(0, Multiplier.M, Unit.Wh);
                         item.max = new ValueType(ep.MaxStoredPower, Multiplier.M, Unit.Wh);
-                        container.Add(item);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
                     }
                 }
             }
@@ -168,27 +169,27 @@ namespace IngameScript
                 DataCollectorBattery collector_ = null;
 
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return collector_.powerStoring_ - collector_.powerUsing_;
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(collector_.currentInput_ - collector_.currentOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
                     return new ValueType(-collector_.maxOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(collector_.maxInput_, Multiplier.M, Unit.W);
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
                     foreach (var battery in collector_.Blocks)
@@ -200,7 +201,9 @@ namespace IngameScript
                         item.value = new ValueType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.W);
                         item.min = new ValueType(battery.MaxOutput, Multiplier.M, Unit.W);
                         item.max = new ValueType(battery.MaxInput, Multiplier.M, Unit.W);
-                        container.Add(item);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
                     }
                 }
             }

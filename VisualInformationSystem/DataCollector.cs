@@ -142,24 +142,34 @@ namespace IngameScript
             }
 
 
-            TimeSpan lastUpdate_ = new TimeSpan();
-            TimeSpan maxInterval_ = TimeSpan.FromSeconds(1.0);
-            TimeSpan nextReconstruct_ = new TimeSpan();
+            TimeSpan lastUpdate_ = new TimeSpan(0);
+            TimeSpan maxInterval_ = Program.Default.DCUpdateInterval;
+            TimeSpan nextReconstruct_ = new TimeSpan(0);
 
 
             public override void tick(TimeSpan delta)
             {
-                // reconstruct
-                if (nextReconstruct_ <= Manager.Timer.Ticks)
-                {
-                    reconstruct();
-                    nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
-                }
-
-                if ((lastUpdate_ + maxInterval_) < Manager.Timer.Ticks)
+                if (!JobFinished)
                 {
                     update();
-                    lastUpdate_ = Manager.Timer.Ticks;
+
+                    if (JobFinished == true)
+                        finalizeJob();
+                }
+                else
+                {
+                    // reconstruct
+                    if (nextReconstruct_ <= Manager.Timer.Ticks)
+                    {
+                        reconstruct();
+                        nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                    }
+
+                    if ((lastUpdate_ + maxInterval_) < Manager.Timer.Ticks)
+                    {
+                        prepareJob();
+                        lastUpdate_ = Manager.Timer.Ticks;
+                    }
                 }
             }
 

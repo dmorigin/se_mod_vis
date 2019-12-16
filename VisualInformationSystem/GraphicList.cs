@@ -54,7 +54,7 @@ namespace IngameScript
                 gfx.showIcon_ = showIcon_;
                 gfx.showText_ = showText_;
                 gfx.barBackground_ = barBackground_;
-                gfx.barHight_ = barHight_;
+                gfx.barHeight_ = barHeight_;
                 gfx.autoScroll_ = autoScroll_;
 
                 return gfx;
@@ -66,8 +66,9 @@ namespace IngameScript
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
                 Vector2 fontSize = showText_ == true ? display.FontSize * Template.FontSize : new Vector2(0);
-                Vector2 barSize = showBar_ ? new Vector2(size.X, barHight_ == 0f ? fontSize.Y : barHight_) : new Vector2();
-                float lineHeight = fontSize.Y + barSize.Y;
+                Vector2 barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontSize.Y : barHeight_) : new Vector2();
+                float spacing = spacing_;
+                float lineHeight = fontSize.Y + barSize.Y + spacing;
 
                 if (lines_ > 0)
                 {
@@ -75,7 +76,7 @@ namespace IngameScript
 
                     fontSize *= scale;
                     barSize *= scale;
-                    lineHeight = fontSize.Y + barSize.Y;
+                    lineHeight = fontSize.Y + barSize.Y + spacing;
                 }
 
                 if (showIcon_ && !showText_)
@@ -87,7 +88,7 @@ namespace IngameScript
                 float iconPositionY = 0f;
 
                 // icon
-                Vector2 iconSize = new Vector2();
+                Vector2 iconSize = new Vector2(0f, 0f);
                 if (showIcon_)
                 {
                     // adjust bar size if no text
@@ -104,21 +105,47 @@ namespace IngameScript
 
                 float iconPositionX = position.X - (size.X * 0.5f) + (iconSize.X * 0.5f);
                 float barPositionX = position.X - (size.X * 0.5f) + (barSize.X * 0.5f);
-                float textLeftPositionX = position.X - (size.Y * 0.5f);
+                float textLeftPositionX = position.X - (size.Y * 0.5f) + iconSize.X;
                 float textRightPositionX = position.X + (size.Y * 0.5f);
 
-                // render name
                 List<DataRetriever.ListContainer> container;
-                DataRetriever.getList(out container);
-                for (int l = 0; l < lines; l++)
+                DataRetriever.list(out container, (item) => showMissing_ == false || item.value > 0);
+
+                //log(Console.LogType.Debug, $"container count:{container.Count}");
+
+                // auto scroll
+                if (autoScroll_ == true)
+                {
+                    if (lines >= container.Count)
+                        autoScrollLine_ = 0;
+                    else
+                    {
+                        autoScrollLine_ += autoScrollInc_;
+
+                        // toggle inc
+                        if (autoScrollLine_ >= (container.Count - lines) || autoScrollLine_ < 0)
+                        {
+                            autoScrollInc_ *= -1;
+                            autoScrollLine_ += autoScrollInc_;
+                        }
+                    }
+                }
+
+                if (Gradient.Count == 0)
+                    addGradientColor(0.0f, Template.FontColor);
+
+                // render name
+                for (int l = autoScrollLine_; l < (lines + autoScrollLine_) && l < container.Count; l++)
                 {
                     var entry = container[l];
+                    if (entry.value == 0.0 && !showMissing_)
+                        continue;
 
                     // draw icon
                     if (showIcon_)
                     {
                         string iconType = $"{entry.type.TypeId}/{entry.type.SubtypeId}";
-                        if (rt.spriteExist(iconType))
+                        if (RenderTarget.spriteExist(iconType))
                         {
                             MySprite icon = new MySprite(SpriteType.TEXTURE, iconType, new Vector2(iconPositionX, iconPositionY), iconSize, Color.White);
                             addSprite(icon);
@@ -129,7 +156,7 @@ namespace IngameScript
                     // draw bar
                     if (showBar_)
                     {
-                        renderBar(rt, addSprite, new Vector2(barPositionX, barPositionY), barSize, true, (float)entry.indicator, Gradient, barBackground_);
+                        renderBar(rt, addSprite, new Vector2(barPositionX, barPositionY), barSize, false, (float)entry.indicator, Gradient, barBackground_);
                         barPositionY += lineHeight;
                     }
 
@@ -139,9 +166,9 @@ namespace IngameScript
                         string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
 
                         renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
-                            Template.FontColor, entry.name, TextAlignment.LEFT);
+                            getGradientColor((float)entry.indicator), entry.name, TextAlignment.LEFT);
                         renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textRightPositionX, textPositionY),
-                            Template.FontColor, rightText, TextAlignment.RIGHT);
+                            getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
 
                         textPositionY += lineHeight;
                     }
@@ -154,20 +181,23 @@ namespace IngameScript
                 ConfigHandler config = base.getConfigHandler();
                 if (config != null)
                 {
-                    config.add("lines", configLines);
+                    config.add("setline", configSetLine);
                     config.add("showicon", configShowIcon);
                     config.add("showtext", configShowText);
                     config.add("showbar", configShowBar);
                     config.add("autoscroll", configAutoScroll);
+                    config.add("showmissing", configShowMissing);
                 }
 
                 return config;
             }
 
             int lines_ = 0; // if 0 the amount of lines will be automaticaly calculated
-            bool configLines(string key, string value, Configuration.Options options)
+            float spacing_ = 7f;
+            bool configSetLine(string key, string value, Configuration.Options options)
             {
-                lines_ = Configuration.asInteger(value, 0);
+                spacing_ = Configuration.asFloat(value, 7f);
+                lines_ = options.asInteger(0, 0);
                 return true;
             }
 
@@ -191,6 +221,8 @@ namespace IngameScript
             }
 
             bool autoScroll_ = true;
+            int autoScrollLine_ = 0;
+            int autoScrollInc_ = 1;
             bool configAutoScroll(string key, string value, Configuration.Options options)
             {
                 autoScroll_ = Configuration.asBoolean(value, true);
@@ -198,17 +230,24 @@ namespace IngameScript
             }
 
             bool showBar_ = false;
-            float barHight_ = 10f;
-            Color barBackground_ = Color.Black;
+            float barHeight_ = 0f;
+            Color barBackground_ = Program.Default.BarBackgroundColor;
             bool configShowBar(string key, string value, Configuration.Options options)
             {
                 showBar_ = Configuration.asBoolean(value, false);
 
                 if (options.Count > 0)
                 {
-                    barHight_ = Configuration.asFloat(options[0], 10f);
-                    barBackground_ = Configuration.asColor(options[1], Color.Black);
+                    barHeight_ = Configuration.asFloat(options[0], 0f);
+                    barBackground_ = Configuration.asColor(options[1], Template.BackgroundColor);
                 }
+                return true;
+            }
+
+            bool showMissing_ = false;
+            bool configShowMissing(string key, string value, Configuration.Options options)
+            {
+                showMissing_ = Configuration.asBoolean(value, false);
                 return true;
             }
             #endregion // Configuration

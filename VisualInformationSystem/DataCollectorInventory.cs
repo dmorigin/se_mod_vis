@@ -28,36 +28,43 @@ namespace IngameScript
             {
             }
 
-            string pattern = "^(MyObjectBuilder\\_[Ingot|Ore|PhysicalGunObject|Component|AmmoMagazine])\\/([0-9a-zA-Z]+)$";
+            bool compareItemTypes(MyItemType a, MyItemType b)
+            {
+                if (a.SubtypeId != "" && b.SubtypeId != "")
+                    return a.TypeId == b.TypeId && a.SubtypeId == b.SubtypeId;
+
+                return a.TypeId == b.TypeId;
+            }
+
+            string pattern = "^(MyObjectBuilder_[Ingot|Ore|PhysicalGunObject|Component|AmmoMagazine])[/]{0,1}([0-9a-zA-Z]+)$";
             void addInventoryBlock(IMyTerminalBlock block)
             {
-                if (block.InventoryCount > 0)
+                for (int i = 0; i < block.InventoryCount; i++)
                 {
-                    for (int i = 0; i < block.InventoryCount; i++)
-                    {
-                        IMyInventory inventory = block.GetInventory(i);
-                        bool accepted = true;
+                    IMyInventory inventory = block.GetInventory(i);
+                    bool accepted = false;
 
-                        if (itemTypes_.Count > 0)
+                    if (itemTypes_.Count > 0)
+                    {
+                        List<MyItemType> acceptedItems = new List<MyItemType>();
+                        inventory.GetAcceptedItems(acceptedItems);
+                        foreach (ItemType item in itemTypes_)
                         {
-                            List<MyItemType> itemTypes = new List<MyItemType>();
-                            inventory.GetAcceptedItems(itemTypes);
-                            foreach (ItemType item in itemTypes_)
+                            if (acceptedItems.Exists(x => compareItemTypes(x, item.type)))
                             {
-                                if (!itemTypes.Exists(x => x == item.type))
-                                {
-                                    accepted = false;
-                                    break;
-                                }
+                                accepted = true;
+                                break;
                             }
                         }
+                    }
+                    else
+                        accepted = true;
 
-                        if (accepted)
-                        {
-                            inventories_.Add(inventory);
-                            Blocks.Add(block);
-                            maxVolume_ = (double)inventory.MaxVolume;
-                        }
+                    if (accepted)
+                    {
+                        inventories_.Add(inventory);
+                        Blocks.Add(block);
+                        maxVolume_ = (double)inventory.MaxVolume;
                     }
                 }
             }
@@ -78,17 +85,20 @@ namespace IngameScript
                             case "ammo":
                                 itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", ""), defaultMaxAmountItems_));
                                 continue;
-                            case "components":
+                            case "component":
                                 itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", ""), defaultMaxAmountItems_));
                                 continue;
-                            case "handtools":
+                            case "handtool":
                                 itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", ""), defaultMaxAmountItems_));
                                 continue;
                             case "ore":
                                 itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", ""), defaultMaxAmountItems_));
                                 continue;
-                            case "ingots":
+                            case "ingot":
                                 itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", ""), defaultMaxAmountItems_));
+                                continue;
+                            case "ice":
+                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", "Ice"), defaultMaxAmountItems_));
                                 continue;
                         }
 
@@ -96,7 +106,15 @@ namespace IngameScript
                         if (System.Text.RegularExpressions.Regex.IsMatch(itemType, pattern))
                         {
                             string[] parts = itemType.Split('/');
-                            itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
+                            if (parts.Length == 1)
+                                itemTypes_.Add(new ItemType(new MyItemType(parts[0], ""), defaultMaxAmountItems_));
+                            else if (parts.Length == 2)
+                                itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
+                            else
+                            {
+                                log(Console.LogType.Error, $"Invalid item type:{itemType}");
+                                return false;
+                            }
                             maxItems_ += defaultMaxAmountItems_;
                         }
                         else if (int.TryParse(itemType, out amount))
@@ -136,9 +154,10 @@ namespace IngameScript
                     }
                 }
 
-                maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
+                if (inventories_.Count == 0)
+                    log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
 
-                update();
+                maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
                 Constructed = true;
                 return true;
             }
@@ -152,32 +171,44 @@ namespace IngameScript
                 return base.reconstruct();
             }
 
+            int updatesMax_ = 20;
+            int invIndex_ = 0;
+
+            protected override void prepareJob()
+            {
+                currentVolume_ = 0.0;
+                currentItems_ = 0;
+                invIndex_ = 0;
+                items_.Clear();
+                JobFinished = false;
+            }
+
             protected override void update()
             {
-                double currentVolume = 0.0;
-                long currentItems = 0;
-                items_.Clear();
-
-                foreach(IMyInventory inventory in inventories_)
+                for (int counter = updatesMax_; invIndex_ < inventories_.Count && counter > 0; invIndex_++, counter--)
                 {
-                    currentVolume += (double)inventory.CurrentVolume;
+                    IMyInventory inventory = inventories_[invIndex_];
+                    currentVolume_ += (double)inventory.CurrentVolume;
 
-                    List<MyInventoryItem> inventoryItems = new List<MyInventoryItem>();
-                    foreach (MyInventoryItem inventoryItem in inventoryItems)
+                    inventory.GetAcceptedItems(null, (itemType) =>
                     {
-                        int index = items_.FindIndex(x => x.type == inventoryItem.Type);
+                        int itemTypeIndex = itemTypes_.FindIndex(x => compareItemTypes(x.type, itemType));
+                        if (itemTypes_.Count > 0 && itemTypeIndex < 0)
+                            return false;
+
+                        var amount = inventory.GetItemAmount(itemType);
+                        int index = items_.FindIndex(x => compareItemTypes(x.type, itemType));
                         if (index >= 0)
                         {
-                            items_[index].currentAmount += (long)inventoryItem.Amount;
-                            currentItems += (long)inventoryItem.Amount;
+                            items_[index].currentAmount += (long)amount;
+                            currentItems_ += (long)amount;
                         }
                         else
                         {
                             InventoryItem item = new InventoryItem();
-                            item.currentAmount = (long)inventoryItem.Amount;
-                            item.type = inventoryItem.Type;
+                            item.currentAmount = (long)amount;
+                            item.type = itemType;
 
-                            int itemTypeIndex = itemTypes_.FindIndex(x => x.type == inventoryItem.Type);
                             if (itemTypeIndex >= 0)
                                 item.maxAmount = itemTypes_[itemTypeIndex].amount;
                             else
@@ -185,14 +216,18 @@ namespace IngameScript
 
                             items_.Add(item);
                         }
-                    }
+
+                        return false;
+                    });
                 }
 
-                currentVolume_ = currentVolume;
-                currentItems_ = currentItems;
-                volumeRation_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
-                itemRation_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
-                itemRation_ = itemRation_ > 1 ? 1 : itemRation_;
+                if (invIndex_ >= inventories_.Count)
+                {
+                    JobFinished = true;
+                    volumeRation_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
+                    itemRation_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
+                    itemRation_ = itemRation_ > 1 ? 1 : itemRation_;
+                }
             }
 
             public override string CollectorTypeName
@@ -254,41 +289,45 @@ namespace IngameScript
                     inv_ = inventory;
                 }
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return inv_.volumeRation_;
                 }
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
-                    return new ValueType(0, Multiplier.K, Unit.l);
+                    return new ValueType(0.0, Multiplier.K, Unit.l);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(inv_.maxVolume_, Multiplier.K, Unit.l);
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(inv_.currentVolume_, Multiplier.K, Unit.l);
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
 
                     // list of all inventories
                     foreach (var inventory in inv_.inventories_)
                     {
+                        double indicator = inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
+
                         ListContainer item = new ListContainer();
                         item.onoff = true;
-                        item.indicator = inventory.CurrentVolume.RawValue / inventory.MaxVolume.RawValue;
+                        item.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
                         item.min = new ValueType(0, Multiplier.K, Unit.l);
                         item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
                         item.value = new ValueType((double)inventory.CurrentVolume, Multiplier.K, Unit.l);
                         item.name = (inventory.Owner as IMyTerminalBlock).CustomName;
-                        container.Add(item);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
                     }
                 }
             }
@@ -301,42 +340,44 @@ namespace IngameScript
                     inv_ = inv;
                 }
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return inv_.itemRation_;
                 }
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
-                    return new ValueType(0);
+                    return new ValueType(0.0);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(inv_.maxItems_);
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(inv_.currentItems_);
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
                     foreach(var item in inv_.items_)
                     {
-                        ListContainer entry = new ListContainer();
-                        double indicator = item.currentAmount / item.maxAmount;
+                        double indicator = item.currentAmount / (double)item.maxAmount;
 
+                        ListContainer entry = new ListContainer();
                         entry.onoff = true;
-                        entry.indicator = indicator > 1 ? 1 : indicator;
-                        entry.min = new ValueType(0);
+                        entry.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
+                        entry.min = new ValueType(0.0);
                         entry.max = new ValueType(item.maxAmount);
                         entry.value = new ValueType(item.currentAmount);
                         entry.name = item.type.SubtypeId;
                         entry.type = item.type;
-                        container.Add(entry);
+
+                        if (filter == null || (filter != null && filter(entry)))
+                            container.Add(entry);
                     }
                 }
             }

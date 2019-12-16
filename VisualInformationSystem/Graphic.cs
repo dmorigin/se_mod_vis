@@ -49,26 +49,37 @@ namespace IngameScript
                 {
                     graphic_ = graphic;
 
+                    add("zposition", configZPosition);
                     add("position", configPosition);
                     add("size", configSize);
                     add("color", configColor);
+                    add("gradient", configGradient);
                     add("check", configCheck);
                 }
 
-
                 Graphic graphic_ = null;
 
+                protected virtual bool configZPosition(string key, string value, Configuration.Options options)
+                {
+                    graphic_.ZPosition = Configuration.asInteger(value, Program.Default.ZPosition);
+                    return true;
+                }
 
                 protected virtual bool configPosition(string key, string value, Configuration.Options options)
                 {
                     graphic_.Position = Configuration.asVector(value, Program.Default.Position);
-                    if (options.Count > 0)
+                    if (options.Count == 0)
                     {
                         string type = options[0].ToLower();
-                        if (type == "relative")
+                        if (type == "relative" || type == "r")
                             graphic_.PositionType = ValueType.Relative;
+                        else if (type == "absolute" || type == "a")
+                            graphic_.PositionType = ValueType.Absolute;
                         else
-                            graphic_.PositionType = ValueType.Absolut;
+                        {
+                            graphic_.log(Console.LogType.Error, $"Invalid position type:{type}");
+                            return false;
+                        }
                     }
 
                     return true;
@@ -77,13 +88,18 @@ namespace IngameScript
                 protected virtual bool configSize(string key, string value, Configuration.Options options)
                 {
                     graphic_.Size = Configuration.asVector(value, Program.Default.Size);
-                    if (options.Count > 0)
+                    if (options.Count == 1)
                     {
                         string type = options[0].ToLower();
-                        if (type == "relative")
+                        if (type == "relative" || type == "r")
                             graphic_.SizeType = ValueType.Relative;
+                        else if (type == "absolute" || type == "a")
+                            graphic_.SizeType = ValueType.Absolute;
                         else
-                            graphic_.SizeType = ValueType.Absolut;
+                        {
+                            graphic_.log(Console.LogType.Error, $"Invalid size type:{type}");
+                            return false;
+                        }
                     }
 
                     return true;
@@ -91,7 +107,8 @@ namespace IngameScript
 
                 protected virtual bool configColor(string key, string value, Configuration.Options options)
                 {
-                    graphic_.addGradientColor(1f, Configuration.asColor(value, Program.Default.Color));
+                    graphic_.colorGradient_.Clear();
+                    graphic_.addGradientColor(0f, Configuration.asColor(value, Program.Default.Color));
                     return true;
                 }
 
@@ -102,6 +119,7 @@ namespace IngameScript
                         float indicator = Configuration.asFloat(value, 0f);
                         Color color = options.asColor(0, Program.Default.Color);
                         graphic_.addGradientColor(indicator, color);
+                        return true;
                     }
                     return false;
                 }
@@ -140,7 +158,7 @@ namespace IngameScript
 
             public enum ValueType
             {
-                Absolut,
+                Absolute,
                 Relative
             }
 
@@ -183,6 +201,13 @@ namespace IngameScript
                 set { dataRetriever_ = value; }
             }
 
+            int zPosition_ = Program.Default.ZPosition;
+            public int ZPosition
+            {
+                get { return zPosition_; }
+                protected set { zPosition_ = value; }
+            }
+
             Vector2 position_ = Program.Default.Position;
             public Vector2 Position
             {
@@ -215,20 +240,25 @@ namespace IngameScript
 
             public Color Color
             {
-                get { return getGradientColor(1f); }
-                protected set { addGradientColor(1f, value); }
+                get { return getGradientColor(0f); }
+                protected set { addGradientColor(0f, value); }
             }
 
             Dictionary<float, Color> colorGradient_ = new Dictionary<float, Color>();
             public Color getGradientColor(float indicator)
             {
-                foreach (var pair in colorGradient_)
+                return getGradientColor(indicator, colorGradient_);
+            }
+
+            public Color getGradientColor(float indicator, Dictionary<float, Color> gradient)
+            {
+                foreach (var pair in gradient)
                 {
                     if (pair.Key <= indicator)
                         return pair.Value;
                 }
 
-                return Program.Default.Color;
+                return Template.FontColor;
             }
 
             public void addGradientColor(float indicator, Color color)
@@ -238,7 +268,7 @@ namespace IngameScript
                 else
                 {
                     colorGradient_.Add(indicator, color);
-                    colorGradient_ = colorGradient_.OrderBy(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
+                    colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
             }
 
@@ -262,7 +292,7 @@ namespace IngameScript
                 addSprite(sprite);
             }
 
-            protected static void renderBar(RenderTarget rt, AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, float ration,
+            protected static void renderBar(RenderTarget rt, AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, float ratio,
                 Dictionary<float, Color> gradient, Color backgroundColor)
             {
                 // draw background
@@ -272,29 +302,116 @@ namespace IngameScript
                     addSprite(bg);
                 }
 
-                float startRatio = 0f;
+                float startRatio = ratio;
                 KeyValuePair<float, Color>[] colors = gradient.ToArray();
-                for (int s = 0; s < colors.Length && startRatio <= ration; ++s)
+                for (int c = 0; c < colors.Length && startRatio > 0f; ++c)
                 {
-                    float curRatio = Math.Min(colors[s].Key, ration) - startRatio;
+                    if (colors[c].Key > startRatio)
+                        continue;
+
                     Vector2 barSize;
                     Vector2 barPosition;
+                    float curRatio = startRatio - colors[c].Key;
 
                     if (vertical)
                     {
                         barSize = new Vector2(size.X, size.Y * curRatio);
-                        barPosition = new Vector2(position.X, position.Y + ((size.Y - barSize.Y) * 0.5f) - (size.Y * startRatio));
+                        barPosition = new Vector2(position.X, position.Y - (colors[c].Key * size.Y) + ((size.Y - barSize.Y) * 0.5f));
                     }
                     else
                     {
                         barSize = new Vector2(size.X * curRatio, size.Y);
-                        barPosition = new Vector2(position.X - ((size.X - barSize.X) * 0.5f) + (size.X * startRatio), position.Y);
+                        barPosition = new Vector2(position.X + (colors[c].Key * size.X) - ((size.X - barSize.X) * 0.5f), position.Y);
                     }
 
-                    MySprite bar = new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, colors[s].Value);
+                    MySprite bar = new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, colors[c].Value);
                     addSprite(bar);
+                    startRatio -= curRatio;
+                }
+            }
 
-                    startRatio += curRatio;
+            protected class Icon
+            {
+                public delegate void Render(AddSpriteDelegate addSprite, string name,
+                    Vector2 position, Vector2 size, float rotation, Color color);
+
+                public static Render getIcon(string name)
+                {
+                    if (RenderTarget.spriteExist(name))
+                        return renderSEIcon;
+
+                    // custom icon
+                    switch(name)
+                    {
+                        case "Storage":
+                            return renderStorageIcon;
+                    }
+
+                    return null;
+                }
+
+                static void renderSEIcon(AddSpriteDelegate addSprite, string name,
+                    Vector2 position, Vector2 size, float rotation, Color color)
+                {
+                    addSprite(new MySprite(SpriteType.TEXTURE, name, position, size, color, rotation: rotation));
+                }
+
+                static void renderStorageIcon(AddSpriteDelegate addSprite, string name,
+                    Vector2 center, Vector2 size, float rotation, Color color)
+                {
+                    //size.Y = size.X;
+                    Vector2 offset = new Vector2(0f, 0f);
+                    Vector2 linesize = size;
+                    linesize.X = size.X * 0.05f;
+                    linesize.Y = size.Y * 0.5f;
+
+                    MySprite sprite;
+                    sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                        size: linesize,
+                        color: color
+                        );
+                    offset.Y = linesize.Y / 2f;
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = offset.X + linesize.Y * (float)Math.Cos(Math.PI / 6);
+                    offset.Y = offset.Y - linesize.Y * (float)Math.Sin(Math.PI / 6);
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = offset.X - linesize.Y * 2f * (float)Math.Cos(Math.PI / 6);
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
+                    offset.Y = linesize.Y * 3f / 2f * (float)Math.Sin(Math.PI / 6);
+                    sprite.RotationOrScale = (float)Math.PI / 3f;
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.Y = offset.Y - linesize.Y * 2f * (float)Math.Sin(Math.PI / 6);
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = -linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
+                    offset.Y = offset.Y - linesize.Y / 2f;
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = -linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
+                    offset.Y = linesize.Y * 3f / 2f * (float)Math.Sin(Math.PI / 6);
+                    sprite.RotationOrScale = -(float)Math.PI / 3f;
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.Y = offset.Y - linesize.Y * 2f * (float)Math.Sin(Math.PI / 6);
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
+
+                    offset.X = linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
+                    offset.Y = offset.Y - linesize.Y / 2f;
+                    sprite.Position = center + offset;
+                    addSprite(sprite);
                 }
             }
             #endregion // Render Helper

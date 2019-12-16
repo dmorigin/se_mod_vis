@@ -37,7 +37,6 @@ namespace IngameScript
                 foreach (IMyPowerProducer producer in Blocks)
                     maxOutput_ += producer.MaxOutput;
 
-                update();
                 Constructed = true;
                 return true;
             }
@@ -98,27 +97,27 @@ namespace IngameScript
                 DataCollectorEnergyProducer<T> collector_ = null;
 
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return collector_.powerUsing_;
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(collector_.currentOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
                     return new ValueType(0, Multiplier.M, Unit.W);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(collector_.maxOutput_, Multiplier.M, Unit.W);
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
                     foreach (IMyPowerProducer pp in collector_.Blocks)
@@ -130,7 +129,9 @@ namespace IngameScript
                         item.value = new ValueType(pp.CurrentOutput, Multiplier.M, Unit.W);
                         item.min = new ValueType(0, Multiplier.M, Unit.W);
                         item.max = new ValueType(pp.MaxOutput, Multiplier.M, Unit.W);
-                        container.Add(item);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
                     }
                 }
             }

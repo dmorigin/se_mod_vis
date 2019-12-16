@@ -128,7 +128,7 @@ namespace IngameScript
 
 
             static List<string> sprites_ = new List<string>();
-            public bool spriteExist(string name)
+            public static bool spriteExist(string name)
             {
                 return RenderTarget.sprites_.Exists(x => x == name);
             }

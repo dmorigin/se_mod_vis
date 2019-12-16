@@ -102,7 +102,7 @@ namespace IngameScript
                         float x, y, z;
                         float.TryParse(parts[0], out x);
                         float.TryParse(parts[1], out y);
-                        float.TryParse(parts[1], out z);
+                        float.TryParse(parts[2], out z);
 
                         return new Vector3(x, y, z);
                     }
@@ -122,8 +122,8 @@ namespace IngameScript
                         float x, y, z, w;
                         float.TryParse(parts[0], out x);
                         float.TryParse(parts[1], out y);
-                        float.TryParse(parts[1], out z);
-                        float.TryParse(parts[1], out w);
+                        float.TryParse(parts[2], out z);
+                        float.TryParse(parts[3], out w);
 
                         return new Vector4(x, y, z, w);
                     }
@@ -162,7 +162,7 @@ namespace IngameScript
                         int x, y, z;
                         int.TryParse(parts[0], out x);
                         int.TryParse(parts[1], out y);
-                        int.TryParse(parts[1], out z);
+                        int.TryParse(parts[2], out z);
 
                         return new Vector3I(x, y, z);
                     }
@@ -182,8 +182,8 @@ namespace IngameScript
                         int x, y, z, w;
                         int.TryParse(parts[0], out x);
                         int.TryParse(parts[1], out y);
-                        int.TryParse(parts[1], out z);
-                        int.TryParse(parts[1], out w);
+                        int.TryParse(parts[2], out z);
+                        int.TryParse(parts[3], out w);
 
                         return new Vector4I(x, y, z, w);
                     }

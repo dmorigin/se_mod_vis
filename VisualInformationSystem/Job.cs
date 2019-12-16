@@ -30,6 +30,22 @@ namespace IngameScript
             }
 
 
+            protected virtual void prepareJob()
+            {
+            }
+
+
+            protected virtual void finalizeJob()
+            {
+            }
+
+            bool finished_ = true;
+            public bool JobFinished
+            {
+                get { return finished_; }
+                protected set { finished_ = value; }
+            }
+
             JobManager jobManager_ = null;
             public JobManager JobManager
             {

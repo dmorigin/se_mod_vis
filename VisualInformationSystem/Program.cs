@@ -30,6 +30,13 @@ namespace IngameScript
             get { return manager_; }
         }
 
+        Statistics statistics_ = new Statistics();
+        void registerException(Exception exp)
+        {
+            statistics_.registerException(exp);
+        }
+
+
         public Program()
         {
             Program.App = this;
@@ -46,34 +53,12 @@ namespace IngameScript
                 manager_.onSave();
         }
 
-        char[] runSymbol_ = { '-', '\\', '|', '/' };
-        int runSymbolPos_ = 0;
-        int nextUpdate = 0;
-
-        string messages_ = "";
-        void addEchoMessageLine(string line)
-        {
-            messages_ += line.Trim() + "\n";
-        }
-
         public void Main(string argument, UpdateType updateSource)
         {
             if (manager_ != null)
                 manager_.onTick(argument, updateSource);
 
-            if (nextUpdate-- <= 0)
-            {
-                string msg = "Visual Information System\n===========================\n";
-                msg += $"Running: {runSymbol_[runSymbolPos_++]}\n";
-                msg += $"State: {Manager.CurrentState}\n";
-                msg += $"Messages:\n{messages_}";
-
-                Echo(msg);
-                if (runSymbolPos_ >= 4)
-                    runSymbolPos_ = 0;
-
-                nextUpdate = 0;
-            }
+            statistics_.tick(this, manager_);
         }
     }
 }

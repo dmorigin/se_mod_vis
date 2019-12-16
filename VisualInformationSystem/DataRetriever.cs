@@ -34,11 +34,11 @@ namespace IngameScript
                 public MyItemType type;
             }
 
-            public abstract double getIndicator();
-            public abstract ValueType getValue();
-            public abstract void getList(out List<ListContainer> container);
-            public abstract ValueType getMin();
-            public abstract ValueType getMax();
+            public abstract double indicator();
+            public abstract ValueType value();
+            public abstract void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null);
+            public abstract ValueType min();
+            public abstract ValueType max();
         }
     }
 }

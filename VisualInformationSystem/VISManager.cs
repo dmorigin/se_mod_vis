@@ -199,6 +199,7 @@ namespace IngameScript
 
 
             int initStateStage_ = 0;
+            int dpIndex_ = 0;
             void handleInitState()
             {
                 if (initStateStage_ == 0)
@@ -250,27 +251,30 @@ namespace IngameScript
 
                     log(Console.LogType.Info, "Init stage 2 successful");
                     initStateStage_ = 2;
+                    dpIndex_ = 0;
                 }
                 else if (initStateStage_ == 2)
                 {
-                    // init display providers
-                    foreach (var provider in displayProviders_)
+                    if (dpIndex_ >= displayProviders_.Count)
                     {
-                        if (!provider.Constructed)
-                        {
-                            if (!provider.construct())
-                            {
-                                log(Console.LogType.Error, $"Failed to construct provider {provider.Name}");
-                                initStateStage_ = 99; // >98 is error state
-                            }
-
-                            return;
-                        }
+                        log(Console.LogType.Info, "Init stage 3 successful");
+                        displayProviders_.Clear();
+                        initStateStage_ = 98; // 98 is success state
+                        return;
                     }
 
-                    log(Console.LogType.Info, "Init stage 3 successful");
-                    displayProviders_.Clear();
-                    initStateStage_ = 98; // 98 is success state
+                    // init display providers
+                    var provider = displayProviders_[dpIndex_++];
+                    if (!provider.Constructed)
+                    {
+                        if (!provider.construct())
+                        {
+                            log(Console.LogType.Error, $"Failed to construct provider {provider.Name}");
+                            initStateStage_ = 99; // >98 is error state
+                        }
+
+                        return;
+                    }
                 }
                 else if (initStateStage_ == 98)
                 {
@@ -358,7 +362,7 @@ namespace IngameScript
                 catch (Exception exp)
                 {
                     log(Console.LogType.Error, "VIS run into an exception -> shutdown");
-                    App.addEchoMessageLine(exp.ToString());
+                    App.registerException(exp);
                     App.Runtime.UpdateFrequency = UpdateFrequency.Update100;
                     switchState(State.Error);
                 }

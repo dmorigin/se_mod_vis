@@ -43,11 +43,6 @@ namespace IngameScript
                 }
             }
 
-            public void Echo(string line)
-            {
-                App.addEchoMessageLine(line);
-            }
-
             private int id_ = 0;
             public int Id
             {

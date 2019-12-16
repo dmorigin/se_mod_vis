@@ -36,7 +36,6 @@ namespace IngameScript
                 foreach (var tank in Blocks)
                     capacity_ += tank.Capacity;
 
-                update();
                 Constructed = true;
                 return true;
             }
@@ -92,27 +91,27 @@ namespace IngameScript
 
                 DataCollectorGasTank collector_ = null;
 
-                public override ValueType getMin()
+                public override ValueType min()
                 {
                     return new ValueType(0, unit: Unit.l);
                 }
 
-                public override ValueType getMax()
+                public override ValueType max()
                 {
                     return new ValueType(collector_.capacity_, unit: Unit.l);
                 }
 
-                public override ValueType getValue()
+                public override ValueType value()
                 {
                     return new ValueType(collector_.capacity_ * collector_.fillRation_, unit: Unit.l);
                 }
 
-                public override double getIndicator()
+                public override double indicator()
                 {
                     return collector_.fillRation_;
                 }
 
-                public override void getList(out List<ListContainer> container)
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
                     foreach (var tank in collector_.Blocks)
@@ -124,7 +123,9 @@ namespace IngameScript
                         item.min = new ValueType(0, unit:Unit.l);
                         item.max = new ValueType(tank.Capacity, unit: Unit.l);
                         item.value = new ValueType(tank.FilledRatio * tank.Capacity, unit: Unit.l);
-                        container.Add(item);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
                     }
                 }
             }

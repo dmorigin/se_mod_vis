@@ -53,8 +53,11 @@
     <Compile Include="DataCollectorBattery.cs" />
     <Compile Include="DataCollectorGasTank.cs" />
     <Compile Include="Graphic.cs" />
+    <Compile Include="GraphicBar.cs" />
     <Compile Include="GraphicBattery.cs" />
+    <Compile Include="GraphicIcon.cs" />
     <Compile Include="GraphicList.cs" />
+    <Compile Include="GraphicSlider.cs" />
     <Compile Include="GraphicText.cs" />
     <Compile Include="DataRetriever.cs" />
     <Compile Include="IDataCollector.cs" />
@@ -74,6 +77,7 @@
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="RenderTarget.cs" />
     <Compile Include="RuntimeObject.cs" />
+    <Compile Include="Statistics.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="TemplateManager.cs" />
     <Compile Include="Timer.cs" />

@@ -46,6 +46,7 @@ namespace IngameScript
 
                 foreach (var gfx in template.graphics_)
                     graphics_.Add(gfx.clone());
+                graphics_.OrderBy(x => x.ZPosition);
             }
 
             #region Properties
@@ -218,17 +219,28 @@ namespace IngameScript
                         case "list":
                             graphic = new GraphicList(tpl_, options);
                             break;
+                        case "bar":
+                            graphic = new GraphicBar(tpl_, options);
+                            break;
+                        case "icon":
+                            graphic = new GraphicIcon(tpl_, options);
+                            break;
                     }
 
                     if (graphic != null)
                     {
-                        graphic.construct();
-                        setSubHandler(graphic.getConfigHandler());
-                        tpl_.graphics_.Add(graphic);
-                        return true;
+                        if (graphic.construct())
+                        {
+                            setSubHandler(graphic.getConfigHandler());
+                            tpl_.graphics_.Add(graphic);
+                            tpl_.graphics_.OrderBy(x => x.ZPosition);
+                            return true;
+                        }
+                        else
+                            tpl_.log(Console.LogType.Error, $"Failed to construct graphic:{value}");
                     }
-
-                    tpl_.log(Console.LogType.Error, $"Invalid graphic type {value}");
+                    else
+                        tpl_.log(Console.LogType.Error, $"Invalid graphic type:{value}");
                     return false;
                 }
                 #endregion // Handler
