@@ -24,7 +24,12 @@ namespace IngameScript
         public interface IDataCollector
         {
             bool reconstruct();
+            void prepareUpdate();
+            void finalizeUpdate();
 
+            Job getUpdateJob();
+
+            bool UpdateFinished { get; }
             string CollectorTypeName { get; }
             string BlockName { get; }
             bool IsGroup { get; }

@@ -50,6 +50,7 @@ namespace IngameScript
             public static float UpdateIntervalInSec = 5.0f;
             public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(30.0);
             public static TimeSpan DCUpdateInterval = TimeSpan.FromSeconds(2.0);
+            public static int MaxInstructionCount = 7000;
         }
     }
 }

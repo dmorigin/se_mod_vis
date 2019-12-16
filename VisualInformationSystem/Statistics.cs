@@ -33,25 +33,6 @@ namespace IngameScript
                 return sym;
             }
 
-            string stateToString(VISManager.State state)
-            {
-                switch (state)
-                {
-                    case VISManager.State.Run:
-                        return "Run";
-                    case VISManager.State.Init:
-                        return "Init";
-                    case VISManager.State.Shutdown:
-                        return "Shutdown";
-                    case VISManager.State.Stopped:
-                        return "Stopped";
-                    case VISManager.State.Error:
-                        return "Error";
-                }
-
-                return "";
-            }
-
             string exception_ = "";
             public void registerException(Exception exp)
             {
@@ -59,10 +40,11 @@ namespace IngameScript
             }
 
             TimeSpan nextUpdate_ = new TimeSpan(0);
-            TimeSpan updateInterval_ = TimeSpan.FromSeconds(2.0);
+            TimeSpan updateInterval_ = TimeSpan.FromSeconds(1.0);
             TimeSpan ticks_ = new TimeSpan(0);
 
             long instructionCountLastUpdate_ = 0;
+            long callChainCountLastUpdate_ = 0;
             long ticksSinceLastUpdate_ = 0;
             double timeSinceLastUpdate_ = 0.0;
 
@@ -72,6 +54,7 @@ namespace IngameScript
 
                 // update
                 instructionCountLastUpdate_ += app.Runtime.CurrentInstructionCount;
+                callChainCountLastUpdate_ += app.Runtime.CurrentCallChainDepth;
                 timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs;
                 ticksSinceLastUpdate_++;
 
@@ -86,11 +69,12 @@ namespace IngameScript
                     string msg = "Visual Information System\n=============================\n";
                     msg += $"Running: {getRunSymbol()}\n";
                     msg += $"Statistic Interval: {updateInterval_.Seconds}s\n";
-                    msg += $"VIS State: {stateToString(vis.CurrentState)}\n";
+                    msg += $"VIS State: {app.Manager.stateToString(vis.CurrentState)}\n";
                     msg += $"Time: {ticks_}\n";
                     msg += $"Ticks: {ticksSinceLastUpdate_}\n";
                     msg += $"Avg Time/tick: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms\n";
-                    msg += $"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.0###")}\n";
+                    msg += $"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}\n";
+                    msg += $"Avg Call/tick: {(callChainCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxCallChainDepth}\n";
                     msg += $"Job (Timed): {jobTimed}\n";
                     msg += $"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}\n";
 
@@ -101,6 +85,7 @@ namespace IngameScript
 
                     nextUpdate_ = ticks_ + updateInterval_;
                     instructionCountLastUpdate_ = 0;
+                    callChainCountLastUpdate_ = 0;
                     ticksSinceLastUpdate_ = 0;
                     timeSinceLastUpdate_ = 0.0;
                 }

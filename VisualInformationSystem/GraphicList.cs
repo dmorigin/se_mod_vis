@@ -109,9 +109,7 @@ namespace IngameScript
                 float textRightPositionX = position.X + (size.Y * 0.5f);
 
                 List<DataRetriever.ListContainer> container;
-                DataRetriever.list(out container, (item) => showMissing_ == false || item.value > 0);
-
-                //log(Console.LogType.Debug, $"container count:{container.Count}");
+                DataRetriever.list(out container, (item) => showMissing_ || item.value > 0);
 
                 // auto scroll
                 if (autoScroll_ == true)

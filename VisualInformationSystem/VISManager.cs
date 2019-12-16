@@ -186,20 +186,43 @@ namespace IngameScript
                 Error
             }
 
+            public string stateToString(State state)
+            {
+                switch (state)
+                {
+                    case State.Run:
+                        return "Run";
+                    case State.Init:
+                        return "Init";
+                    case State.Shutdown:
+                        return "Shutdown";
+                    case State.Stopped:
+                        return "Stopped";
+                    case State.Error:
+                        return "Error";
+                }
+
+                return "";
+            }
+
             #region State Handler
             delegate void StateDelegate();
 
             void handleStoppedState()
             {
+                initStateStage_ = 0;
+                dpIndex_ = 0;
+                waitAfterInit_ = 6;
+
                 if (reboot_)
                     switchState(State.Init);
                 else
                     App.Runtime.UpdateFrequency = UpdateFrequency.Update100;
             }
 
-
             int initStateStage_ = 0;
             int dpIndex_ = 0;
+            int waitAfterInit_ = 6;
             void handleInitState()
             {
                 if (initStateStage_ == 0)
@@ -264,7 +287,7 @@ namespace IngameScript
                     }
 
                     // init display providers
-                    var provider = displayProviders_[dpIndex_++];
+                    var provider = displayProviders_[dpIndex_];
                     if (!provider.Constructed)
                     {
                         if (!provider.construct())
@@ -275,28 +298,30 @@ namespace IngameScript
 
                         return;
                     }
+                    else
+                        dpIndex_++;
                 }
                 else if (initStateStage_ == 98)
                 {
-                    log(Console.LogType.Info, "VIS Manager initiated");
-                    App.Runtime.UpdateFrequency = UpdateFrequency.Update1;
-                    switchState(State.Run);
+                    if (--waitAfterInit_ == 0)
+                    {
+                        log(Console.LogType.Info, "VIS Manager initiated");
+                        App.Runtime.UpdateFrequency = UpdateFrequency.Update1;
+                        switchState(State.Run);
+                    }
                 }
                 else
                 {
                     log(Console.LogType.Error, "Init runs into an error state");
-                    reboot_ = false;
-                    switchState(State.Shutdown);
+                    switchState(State.Error);
                 }
             }
-
 
             void handleRunState()
             {
                 // process job manager
                 jobManager_.tick(timer_.Delta);
             }
-
 
             void handleShutdownState()
             {
@@ -307,11 +332,10 @@ namespace IngameScript
                 switchState(State.Stopped);
             }
 
-
             void handleErrorState()
             {
                 reboot_ = false;
-                //switchState(State.Shutdown);
+                switchState(State.Shutdown);
             }
             #endregion // State Handler
 
@@ -326,9 +350,9 @@ namespace IngameScript
             bool reboot_ = true;
 
 
-            void switchState(State nextState)
+            public void switchState(State nextState)
             {
-                log(Console.LogType.Info, $"Switch to state:{nextState}");
+                log(Console.LogType.Info, $"Switch to state:{stateToString(nextState)}");
                 currentState_ = nextState;
             }
             #endregion // Application State System
@@ -350,7 +374,7 @@ namespace IngameScript
                         (updateSource & UpdateType.Trigger) != 0)
                     {
                         // process command line
-                        cmdLine_.process(args);
+                        //cmdLine_.process(args);
                     }
 
                     // process state

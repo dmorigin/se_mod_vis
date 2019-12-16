@@ -36,13 +36,17 @@ namespace IngameScript
                 return a.TypeId == b.TypeId;
             }
 
+            #region Construction Part
             string pattern = "^(MyObjectBuilder_[Ingot|Ore|PhysicalGunObject|Component|AmmoMagazine])[/]{0,1}([0-9a-zA-Z]+)$";
+            int constructStage_ = 0;
+            List<IMyTerminalBlock> construtBlocks_ = new List<IMyTerminalBlock>();
+            int constructIndex_ = 0;
+
             void addInventoryBlock(IMyTerminalBlock block)
             {
                 for (int i = 0; i < block.InventoryCount; i++)
                 {
                     IMyInventory inventory = block.GetInventory(i);
-                    bool accepted = false;
 
                     if (itemTypes_.Count > 0)
                     {
@@ -52,113 +56,137 @@ namespace IngameScript
                         {
                             if (acceptedItems.Exists(x => compareItemTypes(x, item.type)))
                             {
-                                accepted = true;
+                                inventories_.Add(inventory);
+                                Blocks.Add(block);
+                                maxVolume_ += (double)inventory.MaxVolume;
                                 break;
                             }
                         }
                     }
                     else
-                        accepted = true;
-
-                    if (accepted)
                     {
                         inventories_.Add(inventory);
                         Blocks.Add(block);
-                        maxVolume_ = (double)inventory.MaxVolume;
+                        maxVolume_ += (double)inventory.MaxVolume;
                     }
                 }
             }
 
             public override bool construct()
             {
-                BlockName = Options[0];
-                IsGroup = Options.asBoolean(1, false);
-
-                // process item type
-                if (Options.Count > 2)
+                if (constructStage_ == 0)
                 {
-                    for (int it = 2; it < Options.Count; ++it)
-                    {
-                        string itemType = Options[it];
-                        switch (itemType.ToLower())
-                        {
-                            case "ammo":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", ""), defaultMaxAmountItems_));
-                                continue;
-                            case "component":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", ""), defaultMaxAmountItems_));
-                                continue;
-                            case "handtool":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", ""), defaultMaxAmountItems_));
-                                continue;
-                            case "ore":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", ""), defaultMaxAmountItems_));
-                                continue;
-                            case "ingot":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", ""), defaultMaxAmountItems_));
-                                continue;
-                            case "ice":
-                                itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", "Ice"), defaultMaxAmountItems_));
-                                continue;
-                        }
+                    BlockName = Options[0];
+                    IsGroup = Options.asBoolean(1, false);
 
-                        int amount = 0;
-                        if (System.Text.RegularExpressions.Regex.IsMatch(itemType, pattern))
+                    // process item type
+                    if (Options.Count > 2)
+                    {
+                        for (int it = 2; it < Options.Count; ++it)
                         {
-                            string[] parts = itemType.Split('/');
-                            if (parts.Length == 1)
-                                itemTypes_.Add(new ItemType(new MyItemType(parts[0], ""), defaultMaxAmountItems_));
-                            else if (parts.Length == 2)
-                                itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
+                            string itemType = Options[it];
+                            switch (itemType.ToLower())
+                            {
+                                case "ammo":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", ""), defaultMaxAmountItems_));
+                                    continue;
+                                case "component":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", ""), defaultMaxAmountItems_));
+                                    continue;
+                                case "handtool":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", ""), defaultMaxAmountItems_));
+                                    continue;
+                                case "ore":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", ""), defaultMaxAmountItems_));
+                                    continue;
+                                case "ingot":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", ""), defaultMaxAmountItems_));
+                                    continue;
+                                case "ice":
+                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", "Ice"), defaultMaxAmountItems_));
+                                    continue;
+                            }
+
+                            int amount = 0;
+                            if (System.Text.RegularExpressions.Regex.IsMatch(itemType, pattern))
+                            {
+                                string[] parts = itemType.Split('/');
+                                if (parts.Length == 1)
+                                    itemTypes_.Add(new ItemType(new MyItemType(parts[0], ""), defaultMaxAmountItems_));
+                                else if (parts.Length == 2)
+                                    itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
+                                else
+                                {
+                                    log(Console.LogType.Error, $"Invalid item type:{itemType}");
+                                    return false;
+                                }
+                                maxItems_ += defaultMaxAmountItems_;
+                            }
+                            else if (int.TryParse(itemType, out amount))
+                            {
+                                if (itemTypes_.Count > 0)
+                                {
+                                    itemTypes_[itemTypes_.Count - 1].amount = amount;
+                                    maxItems_ -= defaultMaxAmountItems_ - amount;
+                                }
+                                else
+                                    defaultMaxAmountItems_ = amount;
+                            }
                             else
                             {
-                                log(Console.LogType.Error, $"Invalid item type:{itemType}");
+                                log(Console.LogType.Error, $"Invalid item type {itemType}");
                                 return false;
                             }
-                            maxItems_ += defaultMaxAmountItems_;
                         }
-                        else if (int.TryParse(itemType, out amount))
+                    }
+
+                    constructStage_ = 1;
+                }
+                else if (constructStage_ == 1)
+                {
+                    if (BlockName != "")
+                    {
+                        getBlocks<IMyTerminalBlock>(BlockName, IsGroup, (block) =>
                         {
-                            if (itemTypes_.Count > 0)
-                            {
-                                itemTypes_[itemTypes_.Count - 1].amount = amount;
-                                maxItems_ -= defaultMaxAmountItems_ - amount;
-                            }
-                            else
-                                defaultMaxAmountItems_ = amount;
-                        }
-                        else
+                            if (block.HasInventory)
+                                construtBlocks_.Add(block);
+                        }, TypeID);
+                    }
+                    else
+                    {
+                        if (!getBlocks<IMyTerminalBlock>((block) =>
                         {
-                            log(Console.LogType.Error, $"Invalid item type {itemType}");
+                            if (block.HasInventory)
+                                construtBlocks_.Add(block);
+                        }, TypeID))
+                        {
+                            log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
                             return false;
                         }
                     }
-                }
 
-                if (BlockName != "")
+                    constructStage_ = 2;
+                }
+                else if (constructStage_ == 2)
                 {
-                    getBlocks<IMyTerminalBlock>(BlockName, IsGroup, (block) =>
-                    {
-                        addInventoryBlock(block);
-                    }, TypeID);
+                    for (; constructIndex_ < construtBlocks_.Count && 
+                        App.Runtime.CurrentInstructionCount < Program.Default.MaxInstructionCount; 
+                        constructIndex_++)
+                        addInventoryBlock(construtBlocks_[constructIndex_]);
+
+                    if (constructIndex_ >= construtBlocks_.Count)
+                        constructStage_ = 3;
                 }
-                else
+                else if (constructStage_ == 3)
                 {
-                    if (!getBlocks<IMyTerminalBlock>((block) =>
-                    {
-                        addInventoryBlock(block);
-                    }, TypeID))
-                    {
-                        log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
-                        return false;
-                    }
+                    construtBlocks_.Clear();
+                    if (inventories_.Count == 0)
+                        log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
+
+                    maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
+                    Constructed = true;
                 }
 
-                if (inventories_.Count == 0)
-                    log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
-
-                maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
-                Constructed = true;
                 return true;
             }
 
@@ -168,24 +196,30 @@ namespace IngameScript
                 maxVolume_ = 0.0;
                 itemTypes_.Clear();
                 inventories_.Clear();
+                constructStage_ = 0;
+                constructIndex_ = 0;
+                construtBlocks_.Clear();
                 return base.reconstruct();
             }
+            #endregion // Construction Part
 
-            int updatesMax_ = 20;
+            #region Update Part
             int invIndex_ = 0;
 
-            protected override void prepareJob()
+            public override void prepareUpdate()
             {
                 currentVolume_ = 0.0;
                 currentItems_ = 0;
                 invIndex_ = 0;
                 items_.Clear();
-                JobFinished = false;
+                UpdateFinished = false;
             }
 
             protected override void update()
             {
-                for (int counter = updatesMax_; invIndex_ < inventories_.Count && counter > 0; invIndex_++, counter--)
+                for (; invIndex_ < inventories_.Count && 
+                    App.Runtime.CurrentInstructionCount < Program.Default.MaxInstructionCount; 
+                    invIndex_++)
                 {
                     IMyInventory inventory = inventories_[invIndex_];
                     currentVolume_ += (double)inventory.CurrentVolume;
@@ -223,12 +257,13 @@ namespace IngameScript
 
                 if (invIndex_ >= inventories_.Count)
                 {
-                    JobFinished = true;
+                    UpdateFinished = true;
                     volumeRation_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
                     itemRation_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
                     itemRation_ = itemRation_ > 1 ? 1 : itemRation_;
                 }
             }
+            #endregion // Update Part
 
             public override string CollectorTypeName
             {
@@ -246,6 +281,7 @@ namespace IngameScript
                 public MyItemType type;
                 public long amount;
             }
+
             List<ItemType> itemTypes_ = new List<ItemType>();
             List<IMyInventory> inventories_ = new List<IMyInventory>();
             double currentVolume_ = 0;
@@ -265,7 +301,7 @@ namespace IngameScript
             }
             List<InventoryItem> items_ = new List<InventoryItem>();
 
-
+            #region Data Retriever
             public override DataRetriever getDataRetriever(string name)
             {
                 switch (name.ToLower())
@@ -312,8 +348,6 @@ namespace IngameScript
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-
-                    // list of all inventories
                     foreach (var inventory in inv_.inventories_)
                     {
                         double indicator = inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
@@ -381,6 +415,7 @@ namespace IngameScript
                     }
                 }
             }
+            #endregion // Data Retriever
         }
     }
 }

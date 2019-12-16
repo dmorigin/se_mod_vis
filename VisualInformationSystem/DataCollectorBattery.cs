@@ -47,7 +47,6 @@ namespace IngameScript
                 return true;
             }
 
-
             protected override void update()
             {
                 float currentInput = 0f;
@@ -70,12 +69,10 @@ namespace IngameScript
                 powerLeft_ = currentStored_ / maxStored_;
             }
 
-
             public override string CollectorTypeName
             {
                 get { return "battery"; }
             }
-
 
             float maxInput_ = 0f; // MW
             float maxStored_ = 0f; // MWh

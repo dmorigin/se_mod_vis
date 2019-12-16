@@ -77,6 +77,38 @@ namespace IngameScript
                 constructed_ = true;
                 return true;
             }
+
+            public virtual Job getConstructionJob()
+            {
+                return new ConstructJob(this);
+            }
+
+            public class ConstructJob : Job
+            {
+                public ConstructJob(VISObject obj)
+                {
+                    obj_ = obj;
+                }
+
+                VISObject obj_ = null;
+
+                public override void prepareJob()
+                {
+                    obj_.Constructed = false;
+                    JobFinished = false;
+                }
+
+                public override void tick(TimeSpan delta)
+                {
+                    if (!obj_.construct())
+                    {
+                        log(Console.LogType.Error, $"Construction job failed");
+                        Manager.switchState(VISManager.State.Error);
+                    }
+
+                    JobFinished = obj_.Constructed;
+                }
+            }
         }
     }
 }

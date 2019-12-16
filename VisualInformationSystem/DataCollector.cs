@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public abstract class DataCollector<T> : Job, IDataCollector where T : class
+        public abstract class DataCollector<T> : VISObject, IDataCollector where T : class
         {
             public DataCollector(string typeId, Configuration.Options options)
             {
@@ -33,7 +33,6 @@ namespace IngameScript
                 typeId_ = typeId;
                 nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
             }
-
 
             public override bool construct()
             {
@@ -65,15 +64,43 @@ namespace IngameScript
                 return true;
             }
 
-
             public virtual bool reconstruct()
             {
                 blocks_.Clear();
                 Constructed = false;
-                return construct();
+                return true;
             }
 
+            #region Update System
+            bool updateFinished_ = false;
+            public bool UpdateFinished
+            {
+                get { return updateFinished_; }
+                protected set { updateFinished_ = value; }
+            }
 
+            public virtual void prepareUpdate()
+            {
+                updateFinished_ = true;
+            }
+
+            public virtual void finalizeUpdate()
+            {
+            }
+
+            protected virtual void update()
+            {
+            }
+
+            public virtual Job getUpdateJob()
+            {
+                if (nextUpdate_ <= Manager.Timer.Ticks)
+                    return new UpdateJob(this);
+                return null;
+            }
+            #endregion // Update System
+
+            #region Properties
             public virtual string CollectorTypeName
             {
                 get;
@@ -115,6 +142,7 @@ namespace IngameScript
             {
                 return data;
             }
+            #endregion // Properties
 
             public virtual bool isSameCollector(IDataCollector other)
             {
@@ -129,47 +157,74 @@ namespace IngameScript
                 return CollectorTypeName == name && Options == options;
             }
 
-
             public abstract DataRetriever getDataRetriever(string name);
 
-
-            /*!
-             * Internal method which is called if this object needs to be
-             * updateing it's state.
-             */
-            protected virtual void update()
-            {
-            }
-
-
-            TimeSpan lastUpdate_ = new TimeSpan(0);
+            TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan maxInterval_ = Program.Default.DCUpdateInterval;
             TimeSpan nextReconstruct_ = new TimeSpan(0);
 
 
-            public override void tick(TimeSpan delta)
+            class UpdateJob : Job
             {
-                if (!JobFinished)
+                public UpdateJob(DataCollector<T> dc)
                 {
-                    update();
-
-                    if (JobFinished == true)
-                        finalizeJob();
+                    dc_ = dc;
                 }
-                else
+
+                DataCollector<T> dc_ = null;
+
+                public override void prepareJob()
                 {
-                    // reconstruct
-                    if (nextReconstruct_ <= Manager.Timer.Ticks)
+                    dc_.prepareUpdate();
+                    JobFinished = false;
+                }
+
+                public override void finalizeJob()
+                {
+                    dc_.finalizeUpdate();
+                    dc_.nextUpdate_ = dc_.maxInterval_ + Manager.Timer.Ticks;
+
+                    if (dc_.nextReconstruct_ <= Manager.Timer.Ticks)
+                        JobManager.queueJob(new ReconstructJob(dc_));
+                }
+
+                public override void tick(TimeSpan delta)
+                {
+                    dc_.update();
+                    JobFinished = dc_.UpdateFinished;
+                }
+            }
+
+
+            class ReconstructJob : Job
+            {
+                public ReconstructJob(DataCollector<T> dc)
+                {
+                    dc_ = dc;
+                }
+
+                DataCollector<T> dc_ = null;
+
+                public override void prepareJob()
+                {
+                    dc_.reconstruct();
+                    JobFinished = false;
+                }
+
+                public override void finalizeJob()
+                {
+                    dc_.nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                }
+
+                public override void tick(TimeSpan delta)
+                {
+                    if (dc_.construct() == false)
                     {
-                        reconstruct();
-                        nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                        log(Console.LogType.Error, "Reconstruction job failed");
+                        Manager.switchState(VISManager.State.Error);
                     }
 
-                    if ((lastUpdate_ + maxInterval_) < Manager.Timer.Ticks)
-                    {
-                        prepareJob();
-                        lastUpdate_ = Manager.Timer.Ticks;
-                    }
+                    JobFinished = dc_.Constructed;
                 }
             }
 

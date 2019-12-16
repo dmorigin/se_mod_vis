@@ -26,10 +26,10 @@ namespace IngameScript
             #region String to Type conversion
             public static bool asBoolean(string data, bool defaultValue = true)
             {
-                int integer = Configuration.asInteger(data, 1);
-                if (data == "true" || integer == 1)
+                data = data.ToLower();
+                if (data == "true")
                     return true;
-                if (data == "false" || integer == 0)
+                if (data == "false")
                     return false;
 
                 return defaultValue;

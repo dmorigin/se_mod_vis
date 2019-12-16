@@ -46,58 +46,38 @@ namespace IngameScript
             private IDataCollector createDataCollector(string name, Configuration.Options options)
             {
                 IDataCollector dataCollector = null;
-                bool constructed = false;
-
                 switch (name)
                 {
                     case "hydrogen":
-                        DataCollectorGasTank hydrogenTanks = new DataCollectorGasTank("MyObjectBuilder_HydrogenTank", options);
-                        constructed = hydrogenTanks.construct();
-                        dataCollector = hydrogenTanks;
+                        dataCollector = new DataCollectorGasTank("MyObjectBuilder_HydrogenTank", options);
                         break;
                     case "oxygen":
-                        DataCollectorGasTank oxygenTanks = new DataCollectorGasTank("MyObjectBuilder_OxygenTank", options);
-                        constructed = oxygenTanks.construct();
-                        dataCollector = oxygenTanks;
+                        dataCollector = new DataCollectorGasTank("MyObjectBuilder_OxygenTank", options);
                         break;
                     case "inventory":
-                        DataCollectorInventory inventory = new DataCollectorInventory(options);
-                        constructed = inventory.construct();
-                        dataCollector = inventory;
+                        dataCollector = new DataCollectorInventory(options);
                         break;
                     case "battery":
-                        DataCollectorBattery battery = new DataCollectorBattery(options);
-                        constructed = battery.construct();
-                        dataCollector = battery;
+                        dataCollector = new DataCollectorBattery(options);
                         break;
                     case "solar":
-                        DataCollectorEnergyProducer<IMySolarPanel> solar = new DataCollectorEnergyProducer<IMySolarPanel>(options);
-                        constructed = solar.construct();
-                        dataCollector = solar;
+                        dataCollector = new DataCollectorEnergyProducer<IMySolarPanel>(options);
                         break;
                     case "reactor":
-                        DataCollectorEnergyProducer<IMyReactor> reactor = new DataCollectorEnergyProducer<IMyReactor>(options);
-                        constructed = reactor.construct();
-                        dataCollector = reactor;
+                        dataCollector = new DataCollectorEnergyProducer<IMyReactor>(options);
                         break;
                     case "generator":
-                        DataCollectorEnergyProducer<IMyGasGenerator> generator = new DataCollectorEnergyProducer<IMyGasGenerator>(options);
-                        constructed = generator.construct();
-                        dataCollector = generator;
+                        dataCollector = new DataCollectorEnergyProducer<IMyGasGenerator>(options);
                         break;
                     case "energyproducer":
-                        DataCollectorEnergyProducer<IMyPowerProducer> energyproducer = new DataCollectorEnergyProducer<IMyPowerProducer>(options);
-                        constructed = energyproducer.construct();
-                        dataCollector = energyproducer;
+                        dataCollector = new DataCollectorEnergyProducer<IMyPowerProducer>(options);
                         break;
                 }
 
                 if (dataCollector != null)
                 {
-                    if (constructed)
-                        return dataCollector;
-                    else
-                        log(Console.LogType.Error, $"Cannot construct data collector {name}");
+                    Manager.JobManager.queueJob((dataCollector as VISObject).getConstructionJob());
+                    return dataCollector;
                 }
                 else
                     log(Console.LogType.Error, $"Invalid data collector name {name}");

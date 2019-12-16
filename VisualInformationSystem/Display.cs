@@ -33,7 +33,8 @@ namespace IngameScript
             {
                 if (Manager.JobManager.registerTimedJob(this))
                 {
-                    log(Console.LogType.Info, $"Display constructed");
+                    log(Console.LogType.Info, $"Display {GroupID} constructed");
+                    Constructed = true;
                     return true;
                 }
 
@@ -50,7 +51,7 @@ namespace IngameScript
                     foreach (var graphic in template_.getGraphics())
                     {
                         if (graphic.DataCollector != null)
-                            JobManager.queueJob(graphic.DataCollector as Job);
+                            JobManager.queueJob(graphic.DataCollector.getUpdateJob());
                     }
 
                     // queue render job

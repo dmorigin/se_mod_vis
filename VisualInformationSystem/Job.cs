@@ -30,12 +30,12 @@ namespace IngameScript
             }
 
 
-            protected virtual void prepareJob()
+            public virtual void prepareJob()
             {
             }
 
 
-            protected virtual void finalizeJob()
+            public virtual void finalizeJob()
             {
             }
 

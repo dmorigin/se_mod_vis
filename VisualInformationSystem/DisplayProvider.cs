@@ -59,11 +59,8 @@ namespace IngameScript
                         log(Console.LogType.Error, $"Faild to read Provider({block.CustomName}) config");
                 }
                 else
-                {
                     log(Console.LogType.Error, $"Invalid provider block");
-                }
 
-                log(Console.LogType.Error, "SE Terminal block invalid");
                 return false;
             }
 

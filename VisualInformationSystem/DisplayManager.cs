@@ -52,7 +52,8 @@ namespace IngameScript
                     return null;
                 }
 
-                display.construct();
+                //display.construct();
+                Manager.JobManager.queueJob(display.getConstructionJob());
                 displays_.Add(display);
                 return display;
             }
