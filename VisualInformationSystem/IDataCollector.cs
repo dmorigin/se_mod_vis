@@ -35,6 +35,7 @@ namespace IngameScript
             bool IsGroup { get; }
             Configuration.Options Options { get; }
             string TypeID { get; }
+            TimeSpan MaxUpdateInterval { get; set; }
 
             string getText(string data);
             bool isSameCollector(IDataCollector other);

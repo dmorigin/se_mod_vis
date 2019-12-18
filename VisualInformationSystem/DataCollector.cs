@@ -138,6 +138,15 @@ namespace IngameScript
                 protected set { blockName_ = value; }
             }
 
+            TimeSpan nextUpdate_ = new TimeSpan(0);
+            TimeSpan nextReconstruct_ = new TimeSpan(0);
+            TimeSpan maxInterval_ = Program.Default.DCUpdateInterval;
+            public TimeSpan MaxUpdateInterval
+            {
+                get { return maxInterval_; }
+                set { maxInterval_ = value; }
+            }
+
             public virtual string getText(string data)
             {
                 return data;
@@ -158,10 +167,6 @@ namespace IngameScript
             }
 
             public abstract DataRetriever getDataRetriever(string name);
-
-            TimeSpan nextUpdate_ = new TimeSpan(0);
-            TimeSpan maxInterval_ = Program.Default.DCUpdateInterval;
-            TimeSpan nextReconstruct_ = new TimeSpan(0);
 
 
             class UpdateJob : Job

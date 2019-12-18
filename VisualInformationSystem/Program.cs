@@ -22,6 +22,8 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        const string VERSION = "0.10";
+
         static Program App = null;
 
         VISManager manager_ = null;

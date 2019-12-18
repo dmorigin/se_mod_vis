@@ -32,7 +32,6 @@ namespace IngameScript
             public override Graphic clone()
             {
                 GraphicText gfx = new GraphicText(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -52,6 +51,7 @@ namespace IngameScript
                 gfx.alignment_ = alignment_;
                 gfx.text_.AddList(text_);
 
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 

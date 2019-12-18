@@ -40,7 +40,6 @@ namespace IngameScript
             public override Graphic clone()
             {
                 GraphicBattery gfx = new GraphicBattery(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -56,6 +55,7 @@ namespace IngameScript
                 gfx.rows_ = rows_;
                 gfx.cols_ = cols_;
 
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 

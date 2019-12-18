@@ -28,10 +28,14 @@ namespace IngameScript
             {
             }
 
+            public override bool construct()
+            {
+                return base.construct();
+            }
+
             public override Graphic clone()
             {
                 GraphicSlider gfx = new GraphicSlider(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -44,6 +48,12 @@ namespace IngameScript
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
 
+                gfx.sliderColor_ = sliderColor_;
+                gfx.sliderOrientation_ = sliderOrientation_;
+                gfx.sliderWidth_ = sliderWidth_;
+                gfx.doubleSided_ = doubleSided_;
+
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 
@@ -63,7 +73,57 @@ namespace IngameScript
                 ratio = ratio < -1f ? -1f : (ratio > 1f ? 1f : ratio);
 
                 // draw slider
+                renderSlider(addSprite, position, size, doubleSided_, ratio, Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
+
+            #region Configuration
+            public override ConfigHandler getConfigHandler()
+            {
+                var config = base.getConfigHandler();
+                config.add("setslider", configSetSlider);
+
+                return config;
+            }
+
+            SliderOrientation sliderOrientation_ = SliderOrientation.Top;
+            float sliderWidth_ = 0.03f;
+            Color sliderColor_ = Color.WhiteSmoke;
+            bool doubleSided_ = true;
+            bool configSetSlider(string key, string value, Configuration.Options options)
+            {
+                switch (value.ToLower())
+                {
+                    case "top":
+                    case "t":
+                        sliderOrientation_ = SliderOrientation.Top;
+                        break;
+                    case "left":
+                    case "l":
+                        sliderOrientation_ = SliderOrientation.Left;
+                        break;
+                    case "bottom":
+                    case "b":
+                        sliderOrientation_ = SliderOrientation.Bottom;
+                        break;
+                    case "right":
+                    case "r":
+                        sliderOrientation_ = SliderOrientation.Right;
+                        break;
+                    default:
+                        return false;
+                }
+
+                if (options.Count == 2)
+                {
+                    sliderWidth_ = options.asFloat(0, 0.03f);
+                    sliderColor_ = options.asColor(1, Color.WhiteSmoke);
+                }
+                else
+                    return false;
+
+                return true;
+            }
+            #endregion // Configuration
         }
     }
 }

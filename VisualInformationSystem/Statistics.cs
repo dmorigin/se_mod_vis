@@ -66,7 +66,7 @@ namespace IngameScript
                     vis.JobManager.getStatistic(ref jobTimed, ref jobQueued, ref jobQueuedExec);
 
                     // print statistic
-                    string msg = "Visual Information System\n=============================\n";
+                    string msg = $"Visual Information System ({Program.VERSION})\n=============================\n";
                     msg += $"Running: {getRunSymbol()}\n";
                     msg += $"Statistic Interval: {updateInterval_.Seconds}s\n";
                     msg += $"VIS State: {app.Manager.stateToString(vis.CurrentState)}\n";

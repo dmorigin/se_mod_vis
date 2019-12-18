@@ -36,7 +36,6 @@ namespace IngameScript
             public override Graphic clone()
             {
                 GraphicIcon gfx = new GraphicIcon(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -57,6 +56,7 @@ namespace IngameScript
                 gfx.blink_ = blink_;
                 gfx.blinkToggle_ = blinkToggle_;
 
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 

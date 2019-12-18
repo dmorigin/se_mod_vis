@@ -36,7 +36,6 @@ namespace IngameScript
             public override Graphic clone()
             {
                 GraphicList gfx = new GraphicList(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -57,6 +56,7 @@ namespace IngameScript
                 gfx.barHeight_ = barHeight_;
                 gfx.autoScroll_ = autoScroll_;
 
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 
@@ -154,7 +154,7 @@ namespace IngameScript
                     // draw bar
                     if (showBar_)
                     {
-                        renderBar(rt, addSprite, new Vector2(barPositionX, barPositionY), barSize, false, (float)entry.indicator, Gradient, barBackground_);
+                        renderBar(addSprite, new Vector2(barPositionX, barPositionY), barSize, false, (float)entry.indicator, Gradient, barBackground_);
                         barPositionY += lineHeight;
                     }
 

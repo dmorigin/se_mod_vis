@@ -31,7 +31,6 @@ namespace IngameScript
             public override Graphic clone()
             {
                 GraphicBar gfx = new GraphicBar(Template, Options);
-                gfx.construct();
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataRetriever = DataRetriever;
@@ -47,6 +46,7 @@ namespace IngameScript
                 gfx.vertical_ = vertical_;
                 gfx.backgroundColor_ = backgroundColor_;
 
+                Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
 
@@ -65,7 +65,7 @@ namespace IngameScript
                     ratio = (float)DataRetriever.indicator();
                 ratio = ratio < 0f ? 0f : (ratio > 1f ? 1f : ratio);
 
-                Graphic.renderBar(rt, addSprite, position, size, vertical_, ratio, Gradient, backgroundColor_);
+                Graphic.renderBar(addSprite, position, size, vertical_, ratio, Gradient, backgroundColor_);
             }
 
             #region Configuration

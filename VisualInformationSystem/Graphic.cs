@@ -133,6 +133,7 @@ namespace IngameScript
                         if (dataCollector != null)
                         {
                             graphic_.DataCollector = dataCollector;
+                            graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
                             DataRetriever retriever = dataCollector.getDataRetriever(graphic_.DataRetrieverName);
                             if (retriever != null)
                             {
@@ -147,6 +148,15 @@ namespace IngameScript
                         graphic_.log(Console.LogType.Error, $"Check type {value} isn't supported");
 
                     return false;
+                }
+
+                bool configDCUpdateInterval(string key, string value, Configuration.Options options)
+                {
+                    float interval = Configuration.asFloat(value, Program.Default.DCUpdateIntervalInSec);
+                    graphic_.MaxDCUpdateInterval = TimeSpan.FromSeconds(interval);
+                    if (graphic_.DataCollector != null)
+                        graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
+                    return true;
                 }
             }
 
@@ -199,6 +209,13 @@ namespace IngameScript
             {
                 get { return dataRetriever_; }
                 set { dataRetriever_ = value; }
+            }
+
+            TimeSpan maxDCUpdateInterval_ = Program.Default.DCUpdateInterval;
+            public TimeSpan MaxDCUpdateInterval
+            {
+                get { return maxDCUpdateInterval_; }
+                protected set { maxDCUpdateInterval_ = value; }
             }
 
             int zPosition_ = Program.Default.ZPosition;
@@ -292,15 +309,12 @@ namespace IngameScript
                 addSprite(sprite);
             }
 
-            protected static void renderBar(RenderTarget rt, AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, float ratio,
+            protected static void renderBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, float ratio,
                 Dictionary<float, Color> gradient, Color backgroundColor)
             {
                 // draw background
                 if (backgroundColor.A > 0)
-                {
-                    MySprite bg = new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, backgroundColor);
-                    addSprite(bg);
-                }
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, backgroundColor));
 
                 float startRatio = ratio;
                 KeyValuePair<float, Color>[] colors = gradient.ToArray();
@@ -330,6 +344,133 @@ namespace IngameScript
                 }
             }
 
+            protected enum SliderOrientation
+            {
+                Left,
+                Right,
+                Top,
+                Bottom
+            };
+            protected void renderSlider(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool doubleSided, float ratio, 
+                Dictionary<float, Color> barGradient, SliderOrientation sliderOrientation, float sliderWidth, Color sliderColor)
+            {
+                ratio = !doubleSided ? ((ratio * 2f) - 1f) * 0.5f : ratio * 0.5f;
+
+                bool vertical = sliderOrientation == SliderOrientation.Left || sliderOrientation == SliderOrientation.Right;
+                Vector2 sliderSize;
+                Vector2 sliderPosition;
+                Vector2 barPosition;
+                Vector2 barSize;
+
+                if (vertical)
+                {
+                    sliderSize = new Vector2(size.X * 0.8f, sliderWidth * size.Y);
+                    barSize = new Vector2(size.X * 0.7f, size.Y - sliderSize.Y);
+
+                    if (sliderOrientation == SliderOrientation.Left)
+                    {
+                        barPosition = new Vector2(position.X + (size.X - barSize.X) * 0.5f, position.Y);
+                        sliderPosition = new Vector2(position.X - (size.X - sliderSize.X) * 0.5f, position.Y - ratio * barSize.Y);
+                    }
+                    else
+                    {
+                        barPosition = new Vector2(position.X - (size.X - barSize.X) * 0.5f, position.Y);
+                        sliderPosition = new Vector2(position.X + (size.X - sliderSize.X) * 0.5f, position.Y - ratio * barSize.Y);
+                    }
+                }
+                else
+                {
+                    sliderSize = new Vector2(sliderWidth * size.X, size.Y * 0.8f);
+                    barSize = new Vector2(size.X - sliderSize.X, size.Y * 0.7f);
+
+                    if (sliderOrientation == SliderOrientation.Top)
+                    {
+                        barPosition = new Vector2(position.X, position.Y + (size.Y - barSize.Y) * 0.5f);
+                        sliderPosition = new Vector2(position.X + ratio * barSize.X, position.Y - (size.Y - sliderSize.Y) * 0.5f);
+                    }
+                    else
+                    {
+                        barPosition = new Vector2(position.X, position.Y - (size.Y - barSize.Y) * 0.5f);
+                        sliderPosition = new Vector2(position.X + ratio * barSize.X, position.Y + (size.Y - sliderSize.Y) * 0.5f);
+                    }
+                }
+
+                if (doubleSided == true)
+                {
+                    Dictionary<float, Color> clamped = new Dictionary<float, Color>();
+                    foreach (var pair in barGradient)
+                        clamped.Add((pair.Key * 0.5f) + 0.5f, pair.Value);
+
+                    renderBar(addSprite, barPosition, barSize, vertical, 1f, clamped, new Color(0, 0, 0, 0));
+                }
+                else
+                    renderBar(addSprite, barPosition, barSize, vertical, 1f, barGradient, new Color(0, 0, 0, 0));
+
+                // draw slider
+                if (vertical)
+                {
+                    if (sliderOrientation == SliderOrientation.Left)
+                    {
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                            new Vector2(sliderPosition.X - sliderSize.X, sliderPosition.Y),
+                            new Vector2(sliderSize.X - sliderSize.Y * 1.5f, sliderSize.Y),
+                            sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Circle", 
+                            new Vector2(sliderPosition.X - sliderSize.X * 0.5f + sliderSize.Y * 0.5f, sliderPosition.Y),
+                            new Vector2(sliderSize.X), sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Triangle",
+                            new Vector2(sliderPosition.X + sliderSize.X * 0.5f + sliderSize.Y, sliderPosition.Y),
+                            new Vector2(sliderSize.Y, sliderSize.Y * 2f),
+                            sliderColor, rotation:(float)(Math.PI * 0.5f)));
+                    }
+                    else
+                    {
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                            new Vector2(sliderPosition.X + sliderSize.X, sliderPosition.Y),
+                            new Vector2(sliderSize.X - sliderSize.Y * 1.5f, sliderSize.Y),
+                            sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Circle",
+                            new Vector2(sliderPosition.X + sliderSize.X * 0.5f - sliderSize.Y * 0.5f, sliderPosition.Y),
+                            new Vector2(sliderSize.X), sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Triangle",
+                            new Vector2(sliderPosition.X - sliderSize.X * 0.5f + sliderSize.Y, sliderPosition.Y),
+                            new Vector2(sliderSize.Y, sliderSize.Y * 2f),
+                            sliderColor, rotation: (float)(Math.PI * 1.5f)));
+                    }
+                }
+                else
+                {
+                    if (sliderOrientation == SliderOrientation.Top)
+                    {
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                            new Vector2(sliderPosition.X, sliderPosition.Y - sliderSize.X),
+                            new Vector2(sliderSize.X, sliderSize.Y - sliderSize.X * 1.5f),
+                            sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Circle",
+                            new Vector2(sliderPosition.X, sliderPosition.Y - sliderSize.Y * 0.5f + sliderSize.X * 0.5f),
+                            new Vector2(sliderSize.X), sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Triangle",
+                            new Vector2(sliderPosition.X, sliderPosition.Y + sliderSize.Y * 0.5f - sliderSize.X),
+                            new Vector2(sliderSize.X * 2f, sliderSize.X),
+                            sliderColor, rotation: (float)(Math.PI)));
+                    }
+                    else
+                    {
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                            new Vector2(sliderPosition.X, sliderPosition.Y + sliderSize.X),
+                            new Vector2(sliderSize.X, sliderSize.Y - sliderSize.X * 1.5f),
+                            sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Circle",
+                            new Vector2(sliderPosition.X, sliderPosition.Y + sliderSize.Y * 0.5f - sliderSize.X * 0.5f),
+                            new Vector2(sliderSize.X), sliderColor));
+                        addSprite(new MySprite(SpriteType.TEXTURE, "Triangle",
+                            new Vector2(sliderPosition.X, sliderPosition.Y - sliderSize.Y * 0.5f + sliderSize.X),
+                            new Vector2(sliderSize.X * 2f, sliderSize.X),
+                            sliderColor));
+                    }
+                }
+            }
+
             protected class Icon
             {
                 public delegate void Render(AddSpriteDelegate addSprite, string name,
@@ -345,6 +486,8 @@ namespace IngameScript
                     {
                         case "Storage":
                             return renderStorageIcon;
+                        case "Delimiter":
+                            return renderDelimiter;
                     }
 
                     return null;
@@ -354,6 +497,20 @@ namespace IngameScript
                     Vector2 position, Vector2 size, float rotation, Color color)
                 {
                     addSprite(new MySprite(SpriteType.TEXTURE, name, position, size, color, rotation: rotation));
+                }
+
+                static void renderDelimiter(AddSpriteDelegate addSprite, string name,
+                    Vector2 position, Vector2 size, float rotation, Color color)
+                {
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position - size.Y, size, color, rotation:rotation));
+
+                    Vector2 posEndLeft = new Vector2(position.X - size.X * 0.5f + size.Y * 0.5f, position.Y);
+                    posEndLeft.Rotate(rotation);
+                    addSprite(new MySprite(SpriteType.TEXTURE, "Circle", posEndLeft, new Vector2(size.Y, size.Y), color));
+
+                    Vector2 posEndRight = new Vector2(position.X + size.X * 0.5f - size.Y * 0.5f, position.Y);
+                    posEndRight.Rotate(rotation);
+                    addSprite(new MySprite(SpriteType.TEXTURE, "Circle", posEndRight, new Vector2(size.Y), color));
                 }
 
                 static void renderStorageIcon(AddSpriteDelegate addSprite, string name,

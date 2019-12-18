@@ -46,10 +46,11 @@ namespace IngameScript
             public static int DisplayID = 0;
             public static string EmptyDisplayGroupID = "";
 
-            public static TimeSpan UpdateInterval = TimeSpan.FromSeconds(5.0);
             public static float UpdateIntervalInSec = 5.0f;
+            public static TimeSpan UpdateInterval = TimeSpan.FromSeconds(UpdateIntervalInSec);
             public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(30.0);
-            public static TimeSpan DCUpdateInterval = TimeSpan.FromSeconds(2.0);
+            public static float DCUpdateIntervalInSec = 5.0f;
+            public static TimeSpan DCUpdateInterval = TimeSpan.FromSeconds(DCUpdateIntervalInSec);
             public static int MaxInstructionCount = 7000;
         }
     }
