@@ -51,7 +51,6 @@ namespace IngameScript
                 gfx.sliderColor_ = sliderColor_;
                 gfx.sliderOrientation_ = sliderOrientation_;
                 gfx.sliderWidth_ = sliderWidth_;
-                gfx.doubleSided_ = doubleSided_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
@@ -68,12 +67,16 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
                 float ratio = 0f;
+                bool doubleSided = true;
                 if (DataRetriever != null)
+                {
                     ratio = (float)DataRetriever.indicator();
+                    doubleSided = DataRetriever.min() < 0.0 ? true : false;
+                }
                 ratio = ratio < -1f ? -1f : (ratio > 1f ? 1f : ratio);
 
                 // draw slider
-                renderSlider(addSprite, position, size, doubleSided_, ratio, Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
+                renderSlider(addSprite, position, size, doubleSided, ratio, Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
 
             #region Configuration
@@ -88,7 +91,6 @@ namespace IngameScript
             SliderOrientation sliderOrientation_ = SliderOrientation.Top;
             float sliderWidth_ = 0.03f;
             Color sliderColor_ = Color.WhiteSmoke;
-            bool doubleSided_ = true;
             bool configSetSlider(string key, string value, Configuration.Options options)
             {
                 switch (value.ToLower())

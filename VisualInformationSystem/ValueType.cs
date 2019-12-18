@@ -71,9 +71,15 @@ namespace IngameScript
                 set { unit_ = value; }
             }
 
+            public static implicit operator int(ValueType vt) => (int)vt.value_;
             public static implicit operator long(ValueType vt) => (long)vt.value_;
             public static implicit operator double(ValueType vt) => vt.value_;
             public static implicit operator float(ValueType vt) => (float)vt.value_;
+
+            public static bool operator >(ValueType vt, double d) => vt.value_ > d;
+            public static bool operator <(ValueType vt, double d) => vt.value_ < d;
+            public static bool operator >=(ValueType vt, double d) => vt.value_ >= d;
+            public static bool operator <=(ValueType vt, double d) => vt.value_ <= d;
 
             public override string ToString()
             {
