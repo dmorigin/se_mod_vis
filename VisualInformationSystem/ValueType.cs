@@ -27,7 +27,8 @@ namespace IngameScript
             W,
             Wh,
             l,
-            g
+            g,
+            Percent
         }
 
         public enum Multiplier
@@ -85,11 +86,12 @@ namespace IngameScript
             {
                 string unit = UnitToString(unit_);
                 string multiplier = MultiplierToString(multiplier_);
+                double value = value_;
 
                 // fix g
                 if (unit_ == Unit.g)
                 {
-                    switch(multiplier_)
+                    switch (multiplier_)
                     {
                         case Multiplier.M:
                             unit = "T";
@@ -105,8 +107,10 @@ namespace IngameScript
                             break;
                     }
                 }
+                else if (unit_ == Unit.Percent)
+                    value *= 100.0;
 
-                return $"{value_.ToString(Program.Default.StringFormat)}{multiplier}{unit}";
+                return $"{value.ToString(Program.Default.StringFormat)}{multiplier}{unit}";
             }
 
             public string UnitToString(Unit unit)
@@ -121,6 +125,8 @@ namespace IngameScript
                         return "L";
                     case Unit.g:
                         return "g";
+                    case Unit.Percent:
+                        return "%";
                 }
 
                 return "";

@@ -149,7 +149,9 @@ namespace IngameScript
 
             public virtual string getText(string data)
             {
-                return data;
+                return data.Replace("%blocks%", Blocks.Count.ToString())
+                    .Replace("%blockname%", BlockName)
+                    .Replace("%isgroup%", IsGroup ? "true" : "false");
             }
             #endregion // Properties
 

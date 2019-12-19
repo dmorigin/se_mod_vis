@@ -41,6 +41,7 @@
     <Compile Include="Commandline.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Console.cs" />
+    <Compile Include="DataCollectorAirVent.cs" />
     <Compile Include="DataCollectorEnergyProducer.cs" />
     <Compile Include="DataCollectorInventory.cs" />
     <Compile Include="DataCollectorManager.cs" />
