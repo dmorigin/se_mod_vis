@@ -323,74 +323,71 @@ namespace IngameScript
             public class Handler
             {
                 public delegate bool KeyHandler(string key, string value, Options options);
-                Dictionary<string, KeyHandler> handler_ = new Dictionary<string, KeyHandler>();
-                Handler subHandler_ = null;
-
+                Dictionary<string, KeyHandler> handlers_ = new Dictionary<string, KeyHandler>();
+                Handler sub_ = null;
+                Handler parent_ = null;
 
                 public void setSubHandler(Handler subHandler)
                 {
-                    subHandler_ = subHandler;
+                    sub_ = subHandler;
+                    sub_.parent_ = this;
                 }
-
 
                 public void add(string key, KeyHandler handler)
                 {
-                    if (handler_.ContainsKey(key))
+                    if (handlers_.ContainsKey(key))
                         return;
 
-                    handler_[key] = handler;
+                    handlers_[key] = handler;
                 }
-
 
                 public void remove(string key)
                 {
-                    handler_.Remove(key);
+                    handlers_.Remove(key);
                 }
-
 
                 public bool exists(string key)
                 {
-                    if (subHandler_ != null)
-                        return subHandler_.exists(key);
-                    return handler_.ContainsKey(key);
+                    return handlers_.ContainsKey(key);
                 }
 
+
+                Handler last()
+                {
+                    return sub_ != null ? sub_.last() : this;
+                }
+
+                KeyHandler get(Handler use, string key)
+                {
+                    if (use.handlers_.ContainsKey(key))
+                        return use.handlers_[key];
+
+                    if (use.parent_ != null)
+                    {
+                        Handler parent = use.parent_;
+                        use.parent_ = null;
+                        parent.sub_ = null;
+                        return get(parent, key);
+                    }
+
+                    return handlers_["*"];
+                }
 
                 public KeyHandler this[string key]
                 {
                     get
                     {
-                        if (subHandler_ != null)
-                        {
-                            if (subHandler_.exists(key))
-                                return subHandler_[key];
-
-                            // if not, clear sub handler
-                            subHandler_ = null;
-                        }
-
-                        if (exists(key))
-                            return handler_[key];
-                        return handler_["*"];
+                        return get(last(), key);
                     }
                 }
-
-
-                bool commentHandler(string key, string value, Options options)
-                {
-                    return true;
-                }
-
 
                 bool wildcardHandler(string key, string value, Options options)
                 {
                     return false;
                 }
 
-
                 public Handler()
                 {
-                    add("#", commentHandler);
                     add("*", wildcardHandler);
                 }
             }
@@ -402,8 +399,12 @@ namespace IngameScript
                 List<string> lines = config.Trim().Split('\n').ToList();
                 foreach (var line in lines)
                 {
+                    string trim = line.Trim();
+                    if (trim.Length == 0 || trim[0] == '#')
+                        continue;
+
                     // split in segments
-                    List<string> segments = line.Trim().Split(':').ToList();
+                    List<string> segments = trim.Split(':').ToList();
                     if (segments.Count > 0)
                     {
                         string key = segments[0].Trim().ToLower();

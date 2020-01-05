@@ -33,11 +33,9 @@ namespace IngameScript
 
             public IDataCollector getDataCollector(string name, Configuration.Options options)
             {
-                foreach (IDataCollector collector in dataCollectors_)
-                {
-                    if (collector.isSameCollector(name, options) == true)
-                        return collector;
-                }
+                IDataCollector collector = dataCollectors_.Find(x => x.isSameCollector(name, options));
+                if (collector != null)
+                    return collector;
 
                 return createDataCollector(name, options);
             }

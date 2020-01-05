@@ -309,8 +309,8 @@ namespace IngameScript
                     case "":
                     case "capacity":
                         return new Capacity(this);
-                    case "count":
-                        return new Count(this);
+                    case "items":
+                        return new Items(this);
                 }
 
                 log(Console.LogType.Error, $"Invalid data retriever {name}");
@@ -366,10 +366,10 @@ namespace IngameScript
                 }
             }
 
-            class Count : DataRetriever
+            class Items : DataRetriever
             {
                 DataCollectorInventory inv_ = null;
-                public Count(DataCollectorInventory inv)
+                public Items(DataCollectorInventory inv)
                 {
                     inv_ = inv;
                 }

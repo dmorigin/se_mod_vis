@@ -54,6 +54,7 @@ namespace IngameScript
 
                 gfx.rows_ = rows_;
                 gfx.cols_ = cols_;
+                gfx.margin_ = margin_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
@@ -62,17 +63,23 @@ namespace IngameScript
 
             #region Configuration
             int cols_ = 0;
-            int rows_ = 0;
-
             bool configColumns(string key, string value, Configuration.Options options)
             {
                 cols_ = Configuration.asInteger(value, 0);
                 return true;
             }
 
+            int rows_ = 0;
             bool configRows(string key, string value, Configuration.Options options)
             {
                 rows_ = Configuration.asInteger(value, 0);
+                return true;
+            }
+
+            float margin_ = 4f;
+            bool configMargin(string key, string value, Configuration.Options options)
+            {
+                margin_ = Configuration.asFloat(value, 4f);
                 return true;
             }
 
@@ -81,6 +88,7 @@ namespace IngameScript
                 ConfigHandler config = base.getConfigHandler();
                 config.add("cols", configColumns);
                 config.add("rows", configRows);
+                config.add("margin", configMargin);
                 return config;
             }
             #endregion // Configuration
@@ -105,6 +113,7 @@ namespace IngameScript
                 int cols = cols_;
                 float scale = 0.0f;
                 Vector2 size = new Vector2();
+                Vector2 batterySize = batterySize_ + margin_;
 
                 // full automatic
                 if (rows_ <= 0 && cols_ <= 0)
@@ -114,7 +123,7 @@ namespace IngameScript
                         // padding == 2pixel
                         int curRows = (int)Math.Ceiling((double)capacityList.Count / curCols);
                         Vector2 curSize = new Vector2((renderSize.X - (curCols * 2)) / curCols, (renderSize.Y - (curRows * 2)) / curRows);
-                        float curScale = Math.Min(curSize.X / batterySize_.X, curSize.Y / batterySize_.Y);
+                        float curScale = Math.Min(curSize.X / batterySize.X, curSize.Y / batterySize.Y);
 
                         if (curScale < scale)
                             break;
@@ -135,13 +144,13 @@ namespace IngameScript
                         cols = (int)Math.Ceiling((double)capacityList.Count / rows);
 
                     size = new Vector2((renderSize.X - (cols * 2)) / cols, (renderSize.Y - (rows * 2)) / rows);
-                    scale = Math.Min(size.X / batterySize_.X, size.Y / batterySize_.Y);
+                    scale = Math.Min(size.X / batterySize.X, size.Y / batterySize.Y);
                 }
 
-                float positionX = renderPosition.X + rt.DisplayOffset.X + 2f - (renderSize.X * 0.5f) + (size.X * 0.5f);
-                float positionY = renderPosition.Y + rt.DisplayOffset.Y + 2f - (renderSize.Y * 0.5f) + (size.Y * 0.5f);
-                float offsetX = size.X + 2f;
-                float offsetY = size.Y + 2f;
+                float positionX = renderPosition.X + rt.DisplayOffset.X - (renderSize.X * 0.5f) + (size.X * 0.5f);
+                float positionY = renderPosition.Y + rt.DisplayOffset.Y - (renderSize.Y * 0.5f) + (size.Y * 0.5f);
+                float offsetX = size.X;
+                float offsetY = size.Y;
 
                 // draw batteries
                 for (int r = 0; r < rows; r++)

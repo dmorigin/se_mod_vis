@@ -23,7 +23,7 @@ namespace IngameScript
     {
         public class JobTimed : Job
         {
-            TimeSpan interval_ = Program.Default.UpdateInterval;
+            TimeSpan interval_ = Program.Default.Refresh;
             public virtual TimeSpan Interval
             {
                 get { return interval_; }

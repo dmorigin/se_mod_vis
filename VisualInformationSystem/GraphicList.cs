@@ -75,7 +75,7 @@ namespace IngameScript
                     float scale = (size.Y / lines_) / lineHeight;
 
                     fontSize *= scale;
-                    barSize *= scale;
+                    barSize.Y *= scale;
                     lineHeight = fontSize.Y + barSize.Y + spacing;
                 }
 
@@ -105,8 +105,8 @@ namespace IngameScript
 
                 float iconPositionX = position.X - (size.X * 0.5f) + (iconSize.X * 0.5f);
                 float barPositionX = position.X - (size.X * 0.5f) + (barSize.X * 0.5f);
-                float textLeftPositionX = position.X - (size.Y * 0.5f) + iconSize.X;
-                float textRightPositionX = position.X + (size.Y * 0.5f);
+                float textLeftPositionX = position.X - (size.X * 0.5f) + iconSize.X;
+                float textRightPositionX = position.X + (size.X * 0.5f);
 
                 List<DataRetriever.ListContainer> container;
                 DataRetriever.list(out container, (item) => showMissing_ || item.value > 0);

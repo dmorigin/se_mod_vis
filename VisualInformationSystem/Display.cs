@@ -65,7 +65,7 @@ namespace IngameScript
                 get
                 {
                     if (template_ != null)
-                        return template_.UpdateInterval;
+                        return template_.Refresh;
                     return base.Interval;
                 }
 

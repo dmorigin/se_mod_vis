@@ -81,19 +81,15 @@ namespace IngameScript
 
             public Template loadTemplate(string name)
             {
-                foreach(var template in templates_)
-                {
-                    if (template.TemplateName == name)
-                        return template;
-                }
-
-                return null;
+                var tpl = templates_.Find(x => x.TemplateName == name);
+                return tpl != null ? tpl : null;
             }
 
             public bool saveTemplate(Template template)
             {
                 if (loadTemplate(template.TemplateName) == null)
                 {
+                    log(Console.LogType.Info, $"Template {template.TemplateName} stored");
                     templates_.Add(template);
                     return true;
                 }

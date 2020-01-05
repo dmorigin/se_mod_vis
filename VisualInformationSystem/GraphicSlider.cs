@@ -115,13 +115,11 @@ namespace IngameScript
                         return false;
                 }
 
-                if (options.Count == 2)
-                {
+                if (options.Count >= 1)
                     sliderWidth_ = options.asFloat(0, 0.03f);
+
+                if (options.Count >= 2)
                     sliderColor_ = options.asColor(1, Color.WhiteSmoke);
-                }
-                else
-                    return false;
 
                 return true;
             }

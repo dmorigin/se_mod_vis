@@ -37,7 +37,7 @@ namespace IngameScript
 
             public virtual void merge(Template template)
             {
-                updateInterval_ = template.updateInterval_;
+                refresh_ = template.refresh_;
                 backgroundColor_ = template.backgroundColor_;
                 font_ = template.font_;
                 fontSize_ = template.fontSize_;
@@ -63,11 +63,11 @@ namespace IngameScript
                 set { templateName_ = value; }
             }
 
-            TimeSpan updateInterval_ = Program.Default.UpdateInterval;
-            public TimeSpan UpdateInterval
+            TimeSpan refresh_ = Program.Default.Refresh;
+            public TimeSpan Refresh
             {
-                get { return updateInterval_; }
-                protected set { updateInterval_ = value; }
+                get { return refresh_; }
+                protected set { refresh_ = value; }
             }
 
             Color backgroundColor_ = Program.Default.BackgroundColor;
@@ -132,7 +132,7 @@ namespace IngameScript
 
                     // fill up handler
                     add("usetemplate", configUseTemplate);
-                    add("updateinterval", configUpdateInterval);
+                    add("refresh", configRefresh);
                     add("backgroundcolor", configBackgroundColor);
                     add("font", configFont);
                     add("alignment", configAlignment);
@@ -159,10 +159,10 @@ namespace IngameScript
                     return false;
                 }
 
-                bool configUpdateInterval(string key, string value, Configuration.Options options)
+                bool configRefresh(string key, string value, Configuration.Options options)
                 {
-                    float seconds = Configuration.asFloat(value, Program.Default.UpdateIntervalInSec);
-                    tpl_.UpdateInterval = TimeSpan.FromSeconds(seconds);
+                    float seconds = Configuration.asFloat(value, Program.Default.RefreshInSec);
+                    tpl_.Refresh = TimeSpan.FromSeconds(seconds);
                     return true;
                 }
 
@@ -224,6 +224,9 @@ namespace IngameScript
                             break;
                         case "icon":
                             graphic = new GraphicIcon(tpl_, options);
+                            break;
+                        case "slider":
+                            graphic = new GraphicSlider(tpl_, options);
                             break;
                     }
 

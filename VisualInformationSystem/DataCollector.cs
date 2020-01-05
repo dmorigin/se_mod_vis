@@ -140,7 +140,7 @@ namespace IngameScript
 
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan nextReconstruct_ = new TimeSpan(0);
-            TimeSpan maxInterval_ = Program.Default.DCUpdateInterval;
+            TimeSpan maxInterval_ = Program.Default.DCRefresh;
             public TimeSpan MaxUpdateInterval
             {
                 get { return maxInterval_; }
