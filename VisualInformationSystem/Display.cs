@@ -28,7 +28,6 @@ namespace IngameScript
                 groupId_ = groupId;
             }
 
-
             public override bool construct()
             {
                 if (Manager.JobManager.registerTimedJob(this))
@@ -42,6 +41,25 @@ namespace IngameScript
                 return false;
             }
 
+            public Vector2 measureLineInPixels(string line, string font, float fontSize)
+            {
+                int width = 0;
+
+                if (font.ToLower() != "monospace")
+                {
+                    foreach (char c in line)
+                    {
+                        int value;
+                        if (!Default.CharWidths.TryGetValue(c, out value))
+                            value = Default.CharWidthMonospace;
+                        width += value;
+                    }
+                }
+                else
+                    width = line.Length * Default.CharWidthMonospace;
+
+                return new Vector2(width * fontSize, Default.CharHeight * fontSize);
+            }
 
             public override void tick(TimeSpan delta)
             {
@@ -59,7 +77,6 @@ namespace IngameScript
                 }
             }
 
-
             public override TimeSpan Interval
             {
                 get
@@ -72,13 +89,11 @@ namespace IngameScript
                 set { base.Interval = value; }
             }
 
-
             string groupId_ = "";
             public string GroupID
             {
                 get { return groupId_; }
             }
-
 
             Template template_ = null;
             public Template Template
@@ -123,16 +138,6 @@ namespace IngameScript
                 }
             }
 
-            public Vector2 FontSize
-            {
-                get
-                {
-                    if (reference_ != null)
-                        return reference_.FontSize;
-                    return new Vector2(0f, 0f);
-                }
-            }
-
             List<RenderTarget> renderTargets_ = new List<RenderTarget>();
             RenderTarget reference_ = null;
 
@@ -162,7 +167,6 @@ namespace IngameScript
                 return false;
             }
 
-
             public RenderTarget getRenderTarget(Vector2I coordinate)
             {
                 foreach (var rt in renderTargets_)
@@ -174,7 +178,6 @@ namespace IngameScript
                 return null;
             }
 
-
             RenderTarget getReferenceRT()
             {
                 if (renderTargets_.Count == 1)
@@ -182,7 +185,6 @@ namespace IngameScript
 
                 return getRenderTarget(Program.Default.DisplayCoordinate);
             }
-
 
             public void render()
             {

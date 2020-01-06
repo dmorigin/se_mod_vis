@@ -42,7 +42,7 @@ namespace IngameScript
         public Program()
         {
             Program.App = this;
-            manager_ = new VISManager(this);
+            manager_ = new VISManager();
             if (manager_.construct())
                 Runtime.UpdateFrequency = UpdateFrequency.Update100;
             else

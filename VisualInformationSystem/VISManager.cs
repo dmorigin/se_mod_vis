@@ -23,9 +23,8 @@ namespace IngameScript
     {
         public class VISManager
         {
-            public VISManager(Program app)
+            public VISManager()
             {
-                app_ = app;
                 config_ = new ConfigHandler(this);
 
                 console_ = new Console();
@@ -79,13 +78,6 @@ namespace IngameScript
                 }
 
                 return false;
-            }
-
-
-            Program app_ = null;
-            public Program App
-            {
-                get { return app_; }
             }
 
             JobManager jobManager_ = null;
@@ -205,6 +197,16 @@ namespace IngameScript
                 return "";
             }
 
+            public UpdateFrequency UpdateFrequency
+            {
+                get { return App.Runtime.UpdateFrequency; }
+                private set
+                {
+                    App.statistics_.setSensitivity(value);
+                    App.Runtime.UpdateFrequency = value;
+                }
+            }
+
             #region State Handler
             delegate void StateDelegate();
 
@@ -217,7 +219,7 @@ namespace IngameScript
                 if (reboot_)
                     switchState(State.Init);
                 else
-                    App.Runtime.UpdateFrequency = UpdateFrequency.Update100;
+                    UpdateFrequency = UpdateFrequency.Update100;
             }
 
             int initStateStage_ = 0;
@@ -228,7 +230,7 @@ namespace IngameScript
                 if (initStateStage_ == 0)
                 {
                     log(Console.LogType.Info, "Init system");
-                    App.Runtime.UpdateFrequency = UpdateFrequency.Update10;
+                    UpdateFrequency = UpdateFrequency.Update10;
 
                     // read configuration
                     bool readConfigFailed = false;
@@ -306,7 +308,7 @@ namespace IngameScript
                     if (--waitAfterInit_ == 0)
                     {
                         log(Console.LogType.Info, "VIS Manager initiated");
-                        App.Runtime.UpdateFrequency = UpdateFrequency.Update1;
+                        UpdateFrequency = UpdateFrequency.Update1;
                         switchState(State.Run);
                     }
                 }
@@ -326,7 +328,7 @@ namespace IngameScript
             void handleShutdownState()
             {
                 log(Console.LogType.Info, "Shutdown system");
-                App.Runtime.UpdateFrequency = UpdateFrequency.Update100;
+                UpdateFrequency = UpdateFrequency.Update100;
 
                 // switch to stopped state
                 switchState(State.Stopped);
@@ -387,7 +389,7 @@ namespace IngameScript
                 {
                     log(Console.LogType.Error, "VIS run into an exception -> shutdown");
                     App.registerException(exp);
-                    App.Runtime.UpdateFrequency = UpdateFrequency.Update100;
+                    UpdateFrequency = UpdateFrequency.Update100;
                     switchState(State.Error);
                 }
             }

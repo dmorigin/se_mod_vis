@@ -37,12 +37,6 @@ namespace IngameScript
                 get { return renderSize_; }
             }
 
-            Vector2 fontSize_ = new Vector2();
-            public Vector2 FontSize
-            {
-                get { return fontSize_; }
-            }
-
             Vector2I coordinate_ = new Vector2I();
             public Vector2I Coordinate
             {
@@ -89,18 +83,8 @@ namespace IngameScript
                 if (RenderTarget.sprites_.Count == 0)
                     surface_.GetSprites(RenderTarget.sprites_);
 
-                adjustFontSize(Program.Default.Font, 1f);
                 drawInitScreen();
             }
-
-
-            public Vector2 adjustFontSize(string font, float fontSize)
-            {
-                //fontSize_ = surface_.MeasureStringInPixels(new StringBuilder("M"), font, fontSize);
-                fontSize_ = new Vector2(21f, 22f) * fontSize;
-                return fontSize_;
-            }
-
 
             public void releaseSurface()
             {
@@ -120,12 +104,10 @@ namespace IngameScript
                 surface_ = null;
             }
 
-
             public MySpriteDrawFrame getRenderFrame()
             {
                 return surface_.DrawFrame();
             }
-
 
             static List<string> sprites_ = new List<string>();
             public static bool spriteExist(string name)
@@ -133,13 +115,12 @@ namespace IngameScript
                 return RenderTarget.sprites_.Exists(x => x == name);
             }
 
-
             void drawInitScreen()
             {
                 using (MySpriteDrawFrame frame = getRenderFrame())
                 {
                     MySprite textInit = MySprite.CreateText("Initilize screen", "debug", Color.LawnGreen, 1f, TextAlignment.LEFT);
-                    textInit.Position = new Vector2(5f, fontSize_.Y) + renderPosition_;
+                    textInit.Position = new Vector2(5f, Default.CharHeight) + renderPosition_;
                     frame.Add(textInit);
                 }
             }

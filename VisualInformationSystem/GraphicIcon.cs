@@ -88,6 +88,7 @@ namespace IngameScript
                 config.add("icon", configIcon);
                 config.add("showon", configShowOn);
                 config.add("blink", configBlink);
+                config.add("rotation", configRotation);
 
                 return config;
             }

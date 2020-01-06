@@ -28,9 +28,25 @@ namespace IngameScript
             char getRunSymbol()
             {
                 char sym = runSymbol_[runSymbolIndex_++];
-                if (runSymbolIndex_ >= 4)
-                    runSymbolIndex_ = 0;
+                runSymbolIndex_ %= 4;
                 return sym;
+            }
+
+            double sensitivity_ = 0.01;
+            public void setSensitivity(UpdateFrequency uf)
+            {
+                switch(uf)
+                {
+                    case UpdateFrequency.Update1:
+                        sensitivity_ = 1;
+                        return;
+                    case UpdateFrequency.Update10:
+                        sensitivity_ = 0.1;
+                        return;
+                    case UpdateFrequency.Update100:
+                        sensitivity_ = 0.01;
+                        return;
+                }
             }
 
             string exception_ = "";
@@ -42,6 +58,8 @@ namespace IngameScript
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan updateInterval_ = TimeSpan.FromSeconds(1.0);
             TimeSpan ticks_ = new TimeSpan(0);
+
+            StringBuilder sb_ = new StringBuilder();
 
             long instructionCountLastUpdate_ = 0;
             long callChainCountLastUpdate_ = 0;
@@ -55,7 +73,7 @@ namespace IngameScript
                 // update
                 instructionCountLastUpdate_ += app.Runtime.CurrentInstructionCount;
                 callChainCountLastUpdate_ += app.Runtime.CurrentCallChainDepth;
-                timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs;
+                timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs * sensitivity_;
                 ticksSinceLastUpdate_++;
 
                 if (nextUpdate_ <= ticks_)
@@ -66,22 +84,22 @@ namespace IngameScript
                     vis.JobManager.getStatistic(ref jobTimed, ref jobQueued, ref jobQueuedExec);
 
                     // print statistic
-                    string msg = $"Visual Information System ({Program.VERSION})\n=============================\n";
-                    msg += $"Running: {getRunSymbol()}\n";
-                    msg += $"Statistic Interval: {updateInterval_.Seconds}s\n";
-                    msg += $"VIS State: {app.Manager.stateToString(vis.CurrentState)}\n";
-                    msg += $"Time: {ticks_}\n";
-                    msg += $"Ticks: {ticksSinceLastUpdate_}\n";
-                    msg += $"Avg Time/tick: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms\n";
-                    msg += $"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}\n";
-                    msg += $"Avg Call/tick: {(callChainCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxCallChainDepth}\n";
-                    msg += $"Job (Timed): {jobTimed}\n";
-                    msg += $"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}\n";
+                    sb_.Clear();
+                    sb_.AppendLine($"Visual Information System ({Program.VERSION})\n=============================");
+                    sb_.AppendLine($"Running: {getRunSymbol()}");
+                    sb_.AppendLine($"VIS State: {app.Manager.stateToString(vis.CurrentState)}");
+                    sb_.AppendLine($"Time: {ticks_}");
+                    sb_.AppendLine($"Ticks: {ticksSinceLastUpdate_}");
+                    sb_.AppendLine($"Avg Time/tick: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms");
+                    sb_.AppendLine($"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}");
+                    sb_.AppendLine($"Avg Call/tick: {(callChainCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxCallChainDepth}");
+                    sb_.AppendLine($"Job (Timed): {jobTimed}");
+                    sb_.AppendLine($"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}");
 
                     if (exception_ != "")
-                        msg += $"\nException:\n{exception_}\n";
+                        sb_.Append($"\nException:\n{exception_}\n");
 
-                    app.Echo(msg);
+                    app.Echo(sb_.ToString());
 
                     nextUpdate_ = ticks_ + updateInterval_;
                     instructionCountLastUpdate_ = 0;

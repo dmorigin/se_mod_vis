@@ -156,11 +156,17 @@ namespace IngameScript
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 float fontSize = FontSize;
-                int maxLength = 0;
+                Vector2 maxSize = new Vector2(0f, 0f);
+                List<string> lines = new List<string>();
+
                 foreach(string text in text_)
                 {
-                    if (text.Length > maxLength)
-                        maxLength = text.Length;
+                    string line = DataCollector != null ? DataCollector.getText(text) : text;
+                    Vector2 lineSize = display.measureLineInPixels(line, Font, fontSize);
+
+                    maxSize.X = lineSize.X > maxSize.X ? lineSize.X : maxSize.X;
+                    maxSize.Y = lineSize.Y > maxSize.Y ? lineSize.Y : maxSize.Y;
+                    lines.Add(line);
                 }
 
                 if (!useFontSize_)
@@ -168,19 +174,19 @@ namespace IngameScript
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
                     // scale font over size
-                    float length = display.FontSize.X * maxLength;
-                    float height = display.FontSize.Y * text_.Count;
+                    float length = maxSize.X;
+                    float height = maxSize.Y * text_.Count;
 
                     fontSize = Math.Min(size.X / length, size.Y / height);
                 }
 
                 Vector2 renderPosition = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                float positionY = renderPosition.Y - ((rt.FontSize.Y * (text_.Count - 1)) * 0.5f);
+                float positionY = renderPosition.Y - ((maxSize.Y * (lines.Count - 1)) * 0.5f);
 
-                for (int c = 0; c < text_.Count; c++)
+                for (int c = 0; c < lines.Count; c++)
                 {
                     Graphic.renderTextLine(display, rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), 
-                        FontColor, DataCollector != null ? DataCollector.getText(text_[c]) : text_[c], TextAlignment);
+                        FontColor, lines[c], TextAlignment);
                 }
             }
         }

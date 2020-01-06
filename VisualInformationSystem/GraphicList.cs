@@ -65,26 +65,26 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
-                Vector2 fontSize = showText_ == true ? display.FontSize * Template.FontSize : new Vector2(0);
-                Vector2 barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontSize.Y : barHeight_) : new Vector2();
+                float fontHeight = showText_ == true ? Default.CharHeight * Template.FontSize : 0f;
+                Vector2 barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontHeight : barHeight_) : new Vector2();
                 float spacing = spacing_;
-                float lineHeight = fontSize.Y + barSize.Y + spacing;
+                float lineHeight = fontHeight + barSize.Y + spacing;
 
                 if (lines_ > 0)
                 {
                     float scale = (size.Y / lines_) / lineHeight;
 
-                    fontSize *= scale;
+                    fontHeight *= scale;
                     barSize.Y *= scale;
-                    lineHeight = fontSize.Y + barSize.Y + spacing;
+                    lineHeight = fontHeight + barSize.Y + spacing;
                 }
 
                 if (showIcon_ && !showText_)
                     barSize.X -= barSize.Y;
 
                 int lines = (int)(size.Y / lineHeight);
-                float textPositionY = position.Y - (size.Y * 0.5f) + (fontSize.Y * 0.5f);
-                float barPositionY = position.Y - (size.Y * 0.5f) + (barSize.Y * 0.5f) + fontSize.Y;
+                float textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
+                float barPositionY = position.Y - (size.Y * 0.5f) + (barSize.Y * 0.5f) + fontHeight;
                 float iconPositionY = 0f;
 
                 // icon
@@ -98,7 +98,7 @@ namespace IngameScript
                         iconSize = new Vector2(barSize.Y, barSize.Y);
                     }
                     else
-                        iconSize = new Vector2(fontSize.Y, fontSize.Y);
+                        iconSize = new Vector2(fontHeight, fontHeight);
 
                     iconPositionY = position.Y - (size.Y * 0.5f) + (iconSize.Y * 0.5f);
                 }
