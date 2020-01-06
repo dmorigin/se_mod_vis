@@ -304,7 +304,7 @@ namespace IngameScript
                 string font, float fontSize, Vector2 position, Color fontColor, string textLine, TextAlignment alignment)
             {
                 // fix font position
-                Vector2 offset = new Vector2(rt.DisplayOffset.X, rt.DisplayOffset.Y - (0.75f * (fontSize * Default.CharHeight)));
+                Vector2 offset = new Vector2(rt.DisplayOffset.X, rt.DisplayOffset.Y - (0.61f * (fontSize * Default.CharHeight)));
                 MySprite sprite = MySprite.CreateText(textLine, font, fontColor, fontSize, alignment);
                 sprite.Position = position + offset;
                 addSprite(sprite);

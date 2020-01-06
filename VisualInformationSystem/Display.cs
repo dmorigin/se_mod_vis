@@ -43,8 +43,10 @@ namespace IngameScript
 
             public Vector2 measureLineInPixels(string line, string font, float fontSize)
             {
-                int width = 0;
+                if (line.Length == 0)
+                    return new Vector2(0f, 0f);
 
+                int width = 0;
                 if (font.ToLower() != "monospace")
                 {
                     foreach (char c in line)
@@ -58,6 +60,7 @@ namespace IngameScript
                 else
                     width = line.Length * Default.CharWidthMonospace;
 
+                width += Default.CharSpaceWidth * (line.Length - 1);
                 return new Vector2(width * fontSize, Default.CharHeight * fontSize);
             }
 

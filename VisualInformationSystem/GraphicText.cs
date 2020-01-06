@@ -172,21 +172,20 @@ namespace IngameScript
                 if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
-
-                    // scale font over size
-                    float length = maxSize.X;
-                    float height = maxSize.Y * text_.Count;
-
-                    fontSize = Math.Min(size.X / length, size.Y / height);
+                    fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * lines.Count));
                 }
 
                 Vector2 renderPosition = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 float positionY = renderPosition.Y - ((maxSize.Y * (lines.Count - 1)) * 0.5f);
 
+                Color fontColor = FontColor;
+                if (Gradient.Count > 0)
+                    fontColor = DataRetriever != null ? getGradientColor((float)DataRetriever.indicator()) : Color;
+
                 for (int c = 0; c < lines.Count; c++)
                 {
                     Graphic.renderTextLine(display, rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), 
-                        FontColor, lines[c], TextAlignment);
+                        fontColor, lines[c], TextAlignment);
                 }
             }
         }

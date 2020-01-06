@@ -53,9 +53,9 @@ namespace IngameScript
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
 
-            public static int CharHeight = 22;
+            public static int CharHeight = 29;
             public static int CharWidthMonospace = 24 + 1;
-            public static int CharSpaceWidth = 8;
+            public static int CharSpaceWidth = 1;
             public static Dictionary<char, int> CharWidths = new Dictionary<char, int>()
             {
                 { '.', 9 },
@@ -68,7 +68,7 @@ namespace IngameScript
                 { '\'', 6 },
                 { '+', 18 },
                 { '-', 10 },
-                { ' ', 2 },
+                { ' ', 14 },
 
                 { '(', 9 },
                 { ')', 9 },

@@ -34,7 +34,6 @@ namespace IngameScript
                 renderTarget_.setupSurface(App.Me.GetSurface(0));
                 renderTarget_.BackgroundColor = Color.Black;
 
-                //float lineCount = (renderTarget_.Size.Y / renderTarget_.adjustFontSize(font_, fontSize_).Y);
                 float lineCount = (renderTarget_.Size.Y / (Default.CharHeight * fontSize_));
                 lineHeight_ = renderTarget_.Size.Y / (int)lineCount;
                 lineCorrection_ = (lineCount - (int)lineCount) * (int)(lineCount + 1);
@@ -62,7 +61,6 @@ namespace IngameScript
 
 
             string font_ = "DEBUG";
-            //Color fontColor_ = Color.LightGreen;
             float fontSize_ = 0.5f;
             float lineHeight_ = 0f;
             float lineCorrection_ = 0f;
