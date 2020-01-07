@@ -149,7 +149,7 @@ namespace IngameScript
 
             public virtual string getText(string data)
             {
-                return data.Replace("%blocks%", Blocks.Count.ToString())
+                return data.Replace("%blockcount%", Blocks.Count.ToString())
                     .Replace("%blockname%", BlockName)
                     .Replace("%isgroup%", IsGroup ? "true" : "false");
             }
@@ -311,7 +311,7 @@ namespace IngameScript
                 return false;
             }
 
-            protected static bool isOn(IMyTerminalBlock block)
+            public static bool isOn(IMyTerminalBlock block)
             {
                 return block.GetValue<bool>("OnOff") && block.IsFunctional;
             }

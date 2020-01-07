@@ -104,7 +104,6 @@ namespace IngameScript
                         item.value = new ValueType(airvent.CanPressurize && !airvent.Depressurize ? 1.0 : 0.0);
                         item.indicator = item.value.Value;
                         item.name = airvent.CustomName;
-                        item.onoff = DataCollector<IMyAirVent>.isOn(airvent);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);
@@ -151,7 +150,6 @@ namespace IngameScript
                         item.value = new ValueType(airvent.GetOxygenLevel(), unit: Unit.Percent);
                         item.indicator = airvent.GetOxygenLevel();
                         item.name = airvent.CustomName;
-                        item.onoff = DataCollector<IMyAirVent>.isOn(airvent);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

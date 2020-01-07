@@ -117,7 +117,6 @@ namespace IngameScript
                     foreach (var tank in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.onoff = DataCollector<IMyGasTank>.isOn(tank);
                         item.name = tank.CustomName;
                         item.indicator = (float)tank.FilledRatio;
                         item.min = new ValueType(0, unit:Unit.l);

@@ -83,12 +83,53 @@ namespace IngameScript
                 return true;
             }
 
+            Color[] barColors_ =
+            {
+                Color.Red,          // 0% capacity
+                Color.Green,        // 100% capacity
+            };
+
+            Color[] borderColors_ =
+            {
+                Color.Red,              // off
+                Color.Red,              // discharging (load)
+                Color.Green,            // charging (load)
+                new Color(254, 69, 7),  // charge mode == Recharge
+                Color.Blue,             // charge mode == Discharge
+            };
+            bool configBatteryColors(string key, string value, Configuration.Options options)
+            {
+                switch (value.ToLower())
+                {
+                    case "onoff":
+                        borderColors_[0] = options.asColor(0, Color.Red);
+                        break;
+                    case "charging":
+                        borderColors_[1] = options.asColor(0, Color.Red);
+                        borderColors_[2] = options.asColor(1, Color.Green);
+                        break;
+                    case "mode":
+                        borderColors_[3] = options.asColor(0, new Color(254, 69, 7));
+                        borderColors_[4] = options.asColor(1, Color.Blue);
+                        break;
+                    case "bar":
+                        barColors_[0] = options.asColor(0, Color.Red);
+                        barColors_[1] = options.asColor(1, Color.Green);
+                        break;
+                    default:
+                        return false;
+                }
+
+                return true;
+            }
+
             public override ConfigHandler getConfigHandler()
             {
                 ConfigHandler config = base.getConfigHandler();
                 config.add("cols", configColumns);
                 config.add("rows", configRows);
                 config.add("margin", configMargin);
+                config.add("batterycolors", configBatteryColors);
                 return config;
             }
             #endregion // Configuration
@@ -96,18 +137,14 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                DataCollectorBattery batteries = DataCollector as DataCollectorBattery;
-                if (batteries == null)
+                DataCollectorBattery dcBattery = DataCollector as DataCollectorBattery;
+                if (dcBattery == null)
                     return;
 
+                var batteries = dcBattery.Batteries;
                 Vector2 renderSize = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
                 Vector2 renderPosition = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
-                List<DataRetriever.ListContainer> capacityList;
-                List<DataRetriever.ListContainer> inoutList;
-                batteries.getDataRetriever("capacity").list(out capacityList);
-                batteries.getDataRetriever("inout").list(out inoutList);
-                    
                 // calculate rows and cols size
                 int rows = rows_;
                 int cols = cols_;
@@ -118,11 +155,11 @@ namespace IngameScript
                 // full automatic
                 if (rows_ <= 0 && cols_ <= 0)
                 {
-                    for(int curCols = capacityList.Count; curCols > 0; curCols--)
+                    for(int curCols = batteries.Count; curCols > 0; curCols--)
                     {
                         // padding == 2pixel
-                        int curRows = (int)Math.Ceiling((double)capacityList.Count / curCols);
-                        Vector2 curSize = new Vector2((renderSize.X - (curCols * 2)) / curCols, (renderSize.Y - (curRows * 2)) / curRows);
+                        int curRows = (int)Math.Ceiling((double)batteries.Count / curCols);
+                        Vector2 curSize = new Vector2(renderSize.X / curCols, renderSize.Y / curRows);
                         float curScale = Math.Min(curSize.X / batterySize.X, curSize.Y / batterySize.Y);
 
                         if (curScale < scale)
@@ -138,12 +175,12 @@ namespace IngameScript
                 {
                     // calculate rows
                     if (rows <= 0)
-                        rows = (int)Math.Ceiling((double)capacityList.Count / cols);
+                        rows = (int)Math.Ceiling((double)batteries.Count / cols);
                     // calculate cols
                     else if (cols <= 0)
-                        cols = (int)Math.Ceiling((double)capacityList.Count / rows);
+                        cols = (int)Math.Ceiling((double)batteries.Count / rows);
 
-                    size = new Vector2((renderSize.X - (cols * 2)) / cols, (renderSize.Y - (rows * 2)) / rows);
+                    size = new Vector2(renderSize.X / cols, renderSize.Y / rows);
                     scale = Math.Min(size.X / batterySize.X, size.Y / batterySize.Y);
                 }
 
@@ -158,12 +195,16 @@ namespace IngameScript
                     for (int c = 0; c < cols; c++)
                     {
                         int index = (cols * r) + c;
-                        if (index >= capacityList.Count)
+                        if (index >= batteries.Count)
                             break;
 
+                        IMyBatteryBlock battery = batteries[index];
                         Vector2 position = new Vector2(positionX + (offsetX * c), positionY + (offsetY * r));
-                        drawSingleBattery(position, scale, (float)capacityList[index].indicator,
-                            (float)inoutList[index].indicator, inoutList[index].onoff, addSprite);
+                        drawSingleBattery(position, scale,
+                            battery.CurrentStoredPower / battery.MaxStoredPower,
+                            (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput),
+                            DataCollector<IMyBatteryBlock>.isOn(battery),
+                            battery.ChargeMode, addSprite);
                     }
                 }
             }
@@ -171,7 +212,7 @@ namespace IngameScript
             Vector2 batterySize_ = new Vector2(60f, 120f);
             int capacitySegments_ = 6;
 
-            void drawSingleBattery(Vector2 position, float scale, float capacity, float load, bool onoff, AddSpriteDelegate addSprite)
+            void drawSingleBattery(Vector2 position, float scale, float capacity, float load, bool onoff, ChargeMode chargeMode, AddSpriteDelegate addSprite)
             {
                 float borderSize = 8f * scale;
                 float capacityBorder = borderSize * 0.5f;
@@ -180,25 +221,25 @@ namespace IngameScript
                 Vector2 backgroundSize = new Vector2(batterySize_.X * scale, (batterySize_.Y * scale) - poleSize.Y);
                 Vector2 InnerSectionSize = backgroundSize - borderSize;
 
-                Color borderColor = load <= 0f || onoff == false ? Color.Red : Color.Green;
+                Color borderColor = onoff == false ? borderColors_[0] : 
+                    (chargeMode == ChargeMode.Recharge ? borderColors_[3] : 
+                    (chargeMode == ChargeMode.Discharge ? borderColors_[4] :
+                    (load <= 0f ? borderColors_[1] : borderColors_[2])));
 
                 // draw plus pole
-                MySprite sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
                     new Vector2(position.X, position.Y - backgroundSize.Y * 0.5f),
-                    poleSize, borderColor);
-                addSprite(sprite);
+                    poleSize, borderColor));
 
                 // draw background
-                sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
                     new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
-                    backgroundSize, borderColor);
-                addSprite(sprite);
+                    backgroundSize, borderColor));
 
                 // draw inner section
-                sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
                     new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
-                    InnerSectionSize, Template.BackgroundColor);
-                addSprite(sprite);
+                    InnerSectionSize, Template.BackgroundColor));
 
                 // react on on/off state
                 if (onoff == true)
@@ -215,20 +256,36 @@ namespace IngameScript
                         if (capacity <= lerp)
                             break;
 
-                        sprite = new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
                             new Vector2(position.X, capacityYPosition - (capacityYOffset * s)),
-                            capacitySize, Color.Lerp(Color.Red, Color.Green, lerp));
-                        addSprite(sprite);
+                            capacitySize, Color.Lerp(barColors_[0], barColors_[1], lerp)));
                     }
+
+                    if (chargeMode == ChargeMode.Recharge)
+                        drawChargeModeIndicator(addSprite, new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
+                            InnerSectionSize.X * 1.3f, (float)(Math.PI * 1.5), borderColor);
+                    else if (chargeMode == ChargeMode.Discharge)
+                        drawChargeModeIndicator(addSprite, new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
+                            InnerSectionSize.X * 1.3f, (float)(Math.PI * 0.5), borderColor);
                 }
                 else
                 {
-                    sprite = new MySprite(SpriteType.TEXTURE, "Cross",
+                    addSprite(new MySprite(SpriteType.TEXTURE, "Cross",
                         new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
                         new Vector2(InnerSectionSize.X, InnerSectionSize.X) * 0.9f,
-                        Color.Red);
-                    addSprite(sprite);
+                        Color.Red));
                 }
+            }
+
+            void drawChargeModeIndicator(AddSpriteDelegate addSprite, Vector2 position, float size, float rotation, Color color)
+            {
+                addSprite(new MySprite(SpriteType.TEXTURE, "AH_BoreSight",
+                    new Vector2(position.X, position.Y - size * 0.2f),
+                    new Vector2(size, size), color, rotation: rotation));
+
+                addSprite(new MySprite(SpriteType.TEXTURE, "AH_BoreSight",
+                    new Vector2(position.X, position.Y + size * 0.2f),
+                    new Vector2(size, size), color, rotation: rotation));
             }
         }
     }

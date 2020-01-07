@@ -33,14 +33,14 @@ namespace IngameScript
                 if (!base.construct())
                     return false;
 
-                maxOutput_ = 0f;
-                maxInput_ = 0f;
-                maxStored_ = 0f;
+                maxAvailableOutput_ = 0f;
+                maxAvailableInput_ = 0f;
+                maxAvailableStored_ = 0f;
                 foreach(var battery in Blocks)
                 {
-                    maxOutput_ += battery.MaxOutput;
-                    maxInput_ += battery.MaxInput;
-                    maxStored_ += battery.MaxStoredPower;
+                    maxAvailableOutput_ += battery.MaxOutput;
+                    maxAvailableInput_ += battery.MaxInput;
+                    maxAvailableStored_ += battery.MaxStoredPower;
                 }
 
                 Constructed = true;
@@ -49,24 +49,20 @@ namespace IngameScript
 
             protected override void update()
             {
-                float currentInput = 0f;
-                float currentOutput = 0f;
-                float currentStored = 0f;
+                currentInput_ = 0f;
+                currentOutput_ = 0f;
+                currentStored_ = 0f;
 
                 foreach (var battery in Blocks)
                 {
-                    currentInput += battery.CurrentInput;
-                    currentOutput += battery.CurrentOutput;
-                    currentStored += battery.CurrentStoredPower;
+                    currentInput_ += battery.CurrentInput;
+                    currentOutput_ += battery.CurrentOutput;
+                    currentStored_ += battery.CurrentStoredPower;
                 }
 
-                currentInput_ = currentInput;
-                currentOutput_ = currentOutput;
-                currentStored_ = currentStored;
-
-                powerUsing_ = currentOutput_ / maxOutput_;
-                powerStoring_ = currentInput_ / maxInput_;
-                powerLeft_ = currentStored_ / maxStored_;
+                powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
+                powerAvailableStoring_ = currentInput_ / maxAvailableInput_;
+                powerAvailableLeft_ = currentStored_ / maxAvailableStored_;
             }
 
             public override string CollectorTypeName
@@ -74,21 +70,26 @@ namespace IngameScript
                 get { return "battery"; }
             }
 
-            float maxInput_ = 0f; // MW
-            float maxStored_ = 0f; // MWh
+            public List<IMyBatteryBlock> Batteries
+            {
+                get { return Blocks; }
+            }
+
+            float maxAvailableInput_ = 0f; // MW
+            float maxAvailableStored_ = 0f; // MWh
             float currentInput_ = 0f; // MW
             float currentStored_ = 0f; //MWh
 
-            float powerLeft_ = 0f;
-            float powerStoring_ = 0f;
+            float powerAvailableLeft_ = 0f;
+            float powerAvailableStoring_ = 0f;
 
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", powerLeft_.ToString(Program.Default.StringFormat))
-                    .Replace("%powerstoring%", powerStoring_.ToString(Program.Default.StringFormat))
-                    .Replace("%maxinput%", (new ValueType(maxInput_, Multiplier.M, Unit.W)).pack().ToString())
-                    .Replace("%maxstored%", (new ValueType(maxStored_, Multiplier.M, Unit.Wh)).pack().ToString())
+                    .Replace("%powerleft%", powerAvailableLeft_.ToString(Program.Default.StringFormat))
+                    .Replace("%powerstoring%", powerAvailableStoring_.ToString(Program.Default.StringFormat))
+                    .Replace("%maxinput%", (new ValueType(maxAvailableInput_, Multiplier.M, Unit.W)).pack().ToString())
+                    .Replace("%maxstored%", (new ValueType(maxAvailableStored_, Multiplier.M, Unit.Wh)).pack().ToString())
                     .Replace("%currentinput%", (new ValueType(currentInput_, Multiplier.M, Unit.W)).pack().ToString())
                     .Replace("%currentstored%", (new ValueType(currentStored_, Multiplier.M, Unit.Wh)).pack().ToString());
             }
@@ -119,7 +120,7 @@ namespace IngameScript
 
                 public override double indicator()
                 {
-                    return collector_.powerLeft_;
+                    return collector_.powerAvailableLeft_;
                 }
 
                 public override ValueType value()
@@ -134,7 +135,7 @@ namespace IngameScript
 
                 public override ValueType max()
                 {
-                    return new ValueType(collector_.maxStored_, Multiplier.M, Unit.Wh);
+                    return new ValueType(collector_.maxAvailableStored_, Multiplier.M, Unit.Wh);
                 }
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
@@ -143,7 +144,6 @@ namespace IngameScript
                     foreach (var ep in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.onoff = DataCollector<IMyBatteryBlock>.isOn(ep);
                         item.name = ep.CustomName;
                         item.indicator = ep.CurrentStoredPower / ep.MaxStoredPower;
                         item.value = new ValueType(ep.CurrentStoredPower, Multiplier.M, Unit.Wh);
@@ -168,7 +168,7 @@ namespace IngameScript
 
                 public override double indicator()
                 {
-                    return collector_.powerStoring_ - collector_.powerUsing_;
+                    return collector_.powerAvailableStoring_ - collector_.powerAvailableUsing_;
                 }
 
                 public override ValueType value()
@@ -178,12 +178,12 @@ namespace IngameScript
 
                 public override ValueType min()
                 {
-                    return new ValueType(-collector_.maxOutput_, Multiplier.M, Unit.W);
+                    return new ValueType(-collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
                 }
 
                 public override ValueType max()
                 {
-                    return new ValueType(collector_.maxInput_, Multiplier.M, Unit.W);
+                    return new ValueType(collector_.maxAvailableInput_, Multiplier.M, Unit.W);
                 }
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
@@ -192,7 +192,6 @@ namespace IngameScript
                     foreach (var battery in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.onoff = DataCollector<IMyBatteryBlock>.isOn(battery);
                         item.name = battery.CustomName;
                         item.indicator = (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput);
                         item.value = new ValueType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.W);

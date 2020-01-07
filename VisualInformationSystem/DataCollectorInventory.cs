@@ -353,7 +353,6 @@ namespace IngameScript
                         double indicator = inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
 
                         ListContainer item = new ListContainer();
-                        item.onoff = true;
                         item.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
                         item.min = new ValueType(0, Multiplier.K, Unit.l);
                         item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
@@ -402,7 +401,6 @@ namespace IngameScript
                         double indicator = item.currentAmount / (double)item.maxAmount;
 
                         ListContainer entry = new ListContainer();
-                        entry.onoff = true;
                         entry.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
                         entry.min = new ValueType(0.0);
                         entry.max = new ValueType(item.maxAmount);

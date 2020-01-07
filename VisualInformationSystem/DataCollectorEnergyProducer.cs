@@ -33,9 +33,9 @@ namespace IngameScript
                 if (!base.construct())
                     return false;
 
-                maxOutput_ = 0f;
-                foreach (IMyPowerProducer producer in Blocks)
-                    maxOutput_ += producer.MaxOutput;
+                maxAvailableOutput_ = 0f;
+                foreach (IMyPowerProducer pp in Blocks)
+                    maxAvailableOutput_ += pp.MaxOutput;
 
                 Constructed = true;
                 return true;
@@ -44,13 +44,12 @@ namespace IngameScript
 
             protected override void update()
             {
-                float currentOutput = 0f;
+                currentOutput_ = 0f;
 
                 foreach (IMyPowerProducer pp in Blocks)
-                    currentOutput += pp.CurrentOutput;
+                    currentOutput_ += pp.CurrentOutput;
 
-                currentOutput_ = currentOutput;
-                powerUsing_ = currentOutput_ / maxOutput_;
+                powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
             }
 
 
@@ -63,15 +62,15 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerusing%", powerUsing_.ToString(Program.Default.StringFormat))
-                    .Replace("%maxoutput%", (new ValueType(maxOutput_, Multiplier.M, Unit.W)).pack().ToString())
+                    .Replace("%using%", powerAvailableUsing_.ToString(Program.Default.StringFormat))
+                    .Replace("%maxoutput%", (new ValueType(maxAvailableOutput_, Multiplier.M, Unit.W)).pack().ToString())
                     .Replace("%currentoutput%", (new ValueType(currentOutput_, Multiplier.M, Unit.W)).pack().ToString());
             }
 
 
-            protected float maxOutput_ = 0f; // MW
+            protected float maxAvailableOutput_ = 0f; // MW
             protected float currentOutput_ = 0f; // MW
-            protected float powerUsing_ = 0f;
+            protected float powerAvailableUsing_ = 0f;
 
 
             public override DataRetriever getDataRetriever(string name)
@@ -99,7 +98,7 @@ namespace IngameScript
 
                 public override double indicator()
                 {
-                    return collector_.powerUsing_;
+                    return collector_.powerAvailableUsing_;
                 }
 
                 public override ValueType value()
@@ -114,7 +113,7 @@ namespace IngameScript
 
                 public override ValueType max()
                 {
-                    return new ValueType(collector_.maxOutput_, Multiplier.M, Unit.W);
+                    return new ValueType(collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
                 }
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
@@ -123,7 +122,6 @@ namespace IngameScript
                     foreach (IMyPowerProducer pp in collector_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.onoff = DataCollector<T>.isOn(pp);
                         item.name = pp.CustomName;
                         item.indicator = pp.CurrentOutput / pp.MaxOutput;
                         item.value = new ValueType(pp.CurrentOutput, Multiplier.M, Unit.W);
@@ -134,7 +132,7 @@ namespace IngameScript
                             container.Add(item);
                     }
                 }
-            }
+            } // Using
         }
     }
 }
