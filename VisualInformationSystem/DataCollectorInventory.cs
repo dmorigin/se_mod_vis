@@ -170,7 +170,7 @@ namespace IngameScript
                 else if (constructStage_ == 2)
                 {
                     for (; constructIndex_ < construtBlocks_.Count && 
-                        App.Runtime.CurrentInstructionCount < Program.Default.MaxInstructionCount; 
+                        App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
                         constructIndex_++)
                         addInventoryBlock(construtBlocks_[constructIndex_]);
 
@@ -218,7 +218,7 @@ namespace IngameScript
             protected override void update()
             {
                 for (; invIndex_ < inventories_.Count && 
-                    App.Runtime.CurrentInstructionCount < Program.Default.MaxInstructionCount; 
+                    App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
                     invIndex_++)
                 {
                     IMyInventory inventory = inventories_[invIndex_];
@@ -291,7 +291,7 @@ namespace IngameScript
             long currentItems_ = 0;
             double itemRation_ = 0;
 
-            long defaultMaxAmountItems_ = Program.Default.AmountItems;
+            long defaultMaxAmountItems_ = Default.AmountItems;
 
             class InventoryItem
             {

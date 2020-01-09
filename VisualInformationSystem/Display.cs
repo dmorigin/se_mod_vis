@@ -186,7 +186,7 @@ namespace IngameScript
                 if (renderTargets_.Count == 1)
                     return renderTargets_[0];
 
-                return getRenderTarget(Program.Default.DisplayCoordinate);
+                return getRenderTarget(Default.DisplayCoordinate);
             }
 
             public void render()

@@ -63,42 +63,42 @@ namespace IngameScript
                 set { templateName_ = value; }
             }
 
-            TimeSpan refresh_ = Program.Default.Refresh;
+            TimeSpan refresh_ = Default.Refresh;
             public TimeSpan Refresh
             {
                 get { return refresh_; }
                 protected set { refresh_ = value; }
             }
 
-            Color backgroundColor_ = Program.Default.BackgroundColor;
+            Color backgroundColor_ = Default.BackgroundColor;
             public Color BackgroundColor
             {
                 get { return backgroundColor_; }
                 protected set { backgroundColor_ = value; }
             }
 
-            string font_ = Program.Default.Font;
+            string font_ = Default.Font;
             public string Font
             {
                 get { return font_; }
                 protected set { font_ = value; }
             }
 
-            float fontSize_ = Program.Default.FontSize;
+            float fontSize_ = Default.FontSize;
             public float FontSize
             {
                 get { return fontSize_; }
                 protected set { fontSize_ = value; }
             }
 
-            Color fontColor_ = Program.Default.FontColor;
+            Color fontColor_ = Default.FontColor;
             public Color FontColor
             {
                 get { return fontColor_; }
                 protected set { fontColor_ = value; }
             }
 
-            TextAlignment alignment_ = Program.Default.FontAlignment;
+            TextAlignment alignment_ = Default.FontAlignment;
             public TextAlignment TextAlignment
             {
                 get { return alignment_; }
@@ -161,22 +161,22 @@ namespace IngameScript
 
                 bool configRefresh(string key, string value, Configuration.Options options)
                 {
-                    float seconds = Configuration.asFloat(value, Program.Default.RefreshInSec);
+                    float seconds = Configuration.asFloat(value, Default.RefreshInSec);
                     tpl_.Refresh = TimeSpan.FromSeconds(seconds);
                     return true;
                 }
 
                 bool configBackgroundColor(string key, string value, Configuration.Options options)
                 {
-                    tpl_.BackgroundColor = Configuration.asColor(value, Program.Default.BackgroundColor);
+                    tpl_.BackgroundColor = Configuration.asColor(value, Default.BackgroundColor);
                     return true;
                 }
 
                 bool configFont(string key, string value, Configuration.Options options)
                 {
-                    tpl_.Font = value != string.Empty ? value : Program.Default.Font;
-                    tpl_.FontSize = options.asFloat(0, Program.Default.FontSize);
-                    tpl_.FontColor = options.asColor(1, Program.Default.FontColor);
+                    tpl_.Font = value != string.Empty ? value : Default.Font;
+                    tpl_.FontSize = options.asFloat(0, Default.FontSize);
+                    tpl_.FontColor = options.asColor(1, Default.FontColor);
                     return true;
                 }
 

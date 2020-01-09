@@ -68,7 +68,7 @@ namespace IngameScript
                 surface_.WriteText("");
                 surface_.Script = "";
                 surface_.ContentType = ContentType.SCRIPT;
-                surface_.Font = Program.Default.Font;
+                surface_.Font = Default.Font;
                 surface_.FontSize = 1f;
                 surface_.TextPadding = 0f;
 

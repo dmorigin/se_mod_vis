@@ -110,7 +110,7 @@ namespace IngameScript
                 else if (unit_ == Unit.Percent)
                     value *= 100.0;
 
-                return $"{value.ToString(Program.Default.StringFormat)}{multiplier}{unit}";
+                return $"{value.ToString(Default.StringFormat)}{multiplier}{unit}";
             }
 
             public string UnitToString(Unit unit)

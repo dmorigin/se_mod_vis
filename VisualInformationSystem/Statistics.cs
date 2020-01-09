@@ -61,7 +61,6 @@ namespace IngameScript
 
             StringBuilder sb_ = new StringBuilder();
 
-            long instructionCountLastUpdate_ = 0;
             long callChainCountLastUpdate_ = 0;
             long ticksSinceLastUpdate_ = 0;
             double timeSinceLastUpdate_ = 0.0;
@@ -71,7 +70,6 @@ namespace IngameScript
                 ticks_ += app.Runtime.TimeSinceLastRun;
 
                 // update
-                instructionCountLastUpdate_ += app.Runtime.CurrentInstructionCount;
                 callChainCountLastUpdate_ += app.Runtime.CurrentCallChainDepth;
                 timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs * sensitivity_;
                 ticksSinceLastUpdate_++;
@@ -91,7 +89,6 @@ namespace IngameScript
                     sb_.AppendLine($"Time: {ticks_}");
                     sb_.AppendLine($"Ticks: {ticksSinceLastUpdate_}");
                     sb_.AppendLine($"Avg Time/tick: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms");
-                    sb_.AppendLine($"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}");
                     sb_.AppendLine($"Avg Call/tick: {(callChainCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxCallChainDepth}");
                     sb_.AppendLine($"Job (Timed): {jobTimed}");
                     sb_.AppendLine($"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}");
@@ -102,7 +99,6 @@ namespace IngameScript
                     app.Echo(sb_.ToString());
 
                     nextUpdate_ = ticks_ + updateInterval_;
-                    instructionCountLastUpdate_ = 0;
                     callChainCountLastUpdate_ = 0;
                     ticksSinceLastUpdate_ = 0;
                     timeSinceLastUpdate_ = 0.0;

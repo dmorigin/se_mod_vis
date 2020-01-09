@@ -35,7 +35,7 @@ namespace IngameScript
             {
                 Display display;
 
-                if (groupId == Program.Default.EmptyDisplayGroupID)
+                if (groupId == Default.EmptyDisplayGroupID)
                 {
                     groupId = $"genericDisplayGroup_{++genericDisplayGroupId_}";
                     log(Console.LogType.Info, $"Create new display: group({groupId})");

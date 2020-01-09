@@ -31,7 +31,7 @@ namespace IngameScript
                     options_ = options;
 
                 typeId_ = typeId;
-                nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
             }
 
             public override bool construct()
@@ -140,7 +140,7 @@ namespace IngameScript
 
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan nextReconstruct_ = new TimeSpan(0);
-            TimeSpan maxInterval_ = Program.Default.DCRefresh;
+            TimeSpan maxInterval_ = Default.DCRefresh;
             public TimeSpan MaxUpdateInterval
             {
                 get { return maxInterval_; }
@@ -220,7 +220,7 @@ namespace IngameScript
 
                 public override void finalizeJob()
                 {
-                    dc_.nextReconstruct_ = Manager.Timer.Ticks + Program.Default.ReconstructInterval;
+                    dc_.nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
                 }
 
                 public override void tick(TimeSpan delta)

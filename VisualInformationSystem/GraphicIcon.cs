@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicIcon gfx = new GraphicIcon(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
                 gfx.DataRetrieverName = DataRetrieverName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -55,6 +55,7 @@ namespace IngameScript
                 gfx.thresholdOnMax_ = thresholdOnMax_;
                 gfx.blink_ = blink_;
                 gfx.blinkToggle_ = blinkToggle_;
+                gfx.rotation_ = rotation_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;

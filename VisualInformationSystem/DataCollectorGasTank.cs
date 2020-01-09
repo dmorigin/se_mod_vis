@@ -75,7 +75,7 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return data.Replace("%capacity%", (new ValueType(capacity_, unit: Unit.l)).pack().ToString())
-                    .Replace("%fillration%", fillRation_.ToString(Program.Default.StringFormat))
+                    .Replace("%fillration%", fillRation_.ToString(Default.StringFormat))
                     .Replace("%fillvalue", (new ValueType(fillRation_ * capacity_, unit: Unit.l)).pack().ToString());
             }
 

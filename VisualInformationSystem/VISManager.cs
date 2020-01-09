@@ -139,7 +139,7 @@ namespace IngameScript
             class ConfigHandler : Configuration.Handler
             {
                 // default configuration
-                public string vDisplayNameTag_ = Program.Default.DisplayNameTag;
+                public string vDisplayNameTag_ = Default.DisplayNameTag;
 
 
                 VISManager manager_ = null;

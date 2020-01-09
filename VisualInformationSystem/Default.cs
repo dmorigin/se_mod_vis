@@ -38,7 +38,12 @@ namespace IngameScript
             public static Graphic.ValueType SizeType = Graphic.ValueType.Relative;
 
             public static long AmountItems = 20000;
+
+            public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
+            public static Color BarBorderColor = new Color(179, 237, 255);
+            public static float BarBorderSize = 0f;
+            public static float BarTileSpace = 4f;
             public static bool BarVertical = true;
 
             public static string DisplayNameTag = "[VIS]";

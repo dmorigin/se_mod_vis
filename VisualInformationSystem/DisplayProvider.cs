@@ -79,9 +79,9 @@ namespace IngameScript
                 bool configDisplay(string key, string value, Configuration.Options options)
                 {
                     // set surface index
-                    int displayId = Configuration.asInteger(value, Program.Default.DisplayID);
-                    string groupId = Program.Default.EmptyDisplayGroupID;
-                    Vector2I coordinate = Program.Default.DisplayCoordinate;
+                    int displayId = Configuration.asInteger(value, Default.DisplayID);
+                    string groupId = Default.EmptyDisplayGroupID;
+                    Vector2I coordinate = Default.DisplayCoordinate;
 
                     // extract group id
                     if (options.Count == 2)
@@ -90,13 +90,13 @@ namespace IngameScript
                         groupId = options[0];
 
                         // extract coordinates
-                        coordinate = options.asVector(1, Program.Default.DisplayCoordinate);
+                        coordinate = options.asVector(1, Default.DisplayCoordinate);
                     }
 
                     Display display = null;
 
                     // create as group
-                    if (groupId != Program.Default.EmptyDisplayGroupID)
+                    if (groupId != Default.EmptyDisplayGroupID)
                     {
                         display = provider_.Manager.DisplayManager.getDisplayGroup(groupId);
                         if (display == null)
@@ -112,7 +112,7 @@ namespace IngameScript
                     }
                     else
                     {
-                        display = provider_.Manager.DisplayManager.createDisplay(Program.Default.EmptyDisplayGroupID);
+                        display = provider_.Manager.DisplayManager.createDisplay(Default.EmptyDisplayGroupID);
                         if (display == null)
                         {
                             provider_.log(Console.LogType.Error, $"Failed to create display");

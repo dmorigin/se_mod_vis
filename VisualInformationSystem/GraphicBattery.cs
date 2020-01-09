@@ -42,7 +42,7 @@ namespace IngameScript
                 GraphicBattery gfx = new GraphicBattery(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
                 gfx.DataRetrieverName = DataRetrieverName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -55,6 +55,15 @@ namespace IngameScript
                 gfx.rows_ = rows_;
                 gfx.cols_ = cols_;
                 gfx.margin_ = margin_;
+
+                gfx.barColors_[0] = barColors_[0];
+                gfx.barColors_[1] = barColors_[1];
+
+                gfx.borderColors_[0] = borderColors_[0];
+                gfx.borderColors_[1] = borderColors_[1];
+                gfx.borderColors_[2] = borderColors_[2];
+                gfx.borderColors_[3] = borderColors_[3];
+                gfx.borderColors_[4] = borderColors_[4];
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
@@ -109,7 +118,7 @@ namespace IngameScript
                         borderColors_[2] = options.asColor(1, Color.Green);
                         break;
                     case "mode":
-                        borderColors_[3] = options.asColor(0, new Color(254, 69, 7));
+                        borderColors_[3] = options.asColor(0, new Color(192, 29, 0));
                         borderColors_[4] = options.asColor(1, Color.Blue);
                         break;
                     case "bar":

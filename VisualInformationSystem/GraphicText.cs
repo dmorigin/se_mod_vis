@@ -34,7 +34,7 @@ namespace IngameScript
                 GraphicText gfx = new GraphicText(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
                 gfx.DataRetrieverName = DataRetrieverName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -48,6 +48,7 @@ namespace IngameScript
                 gfx.useFontSize_ = useFontSize_;
                 gfx.useDefaultAlignment_ = useDefaultAlignment_;
                 gfx.font_ = font_;
+                gfx.fontSize_ = fontSize_;
                 gfx.alignment_ = alignment_;
                 gfx.text_.AddList(text_);
 
@@ -58,14 +59,14 @@ namespace IngameScript
 
             bool useDefaultFont_ = true;
             bool useFontSize_ = false;
-            float fontSize_ = Program.Default.FontSize;
+            float fontSize_ = Default.FontSize;
             public float FontSize
             {
                 get { return useDefaultFont_ ? Template.FontSize : fontSize_; }
             }
 
 
-            string font_ = Program.Default.Font;
+            string font_ = Default.Font;
             public string Font
             {
                 get { return useDefaultFont_ ? Template.Font : font_; }
@@ -79,7 +80,7 @@ namespace IngameScript
 
 
             bool useDefaultAlignment_ = true;
-            TextAlignment alignment_ = Program.Default.FontAlignment;
+            TextAlignment alignment_ = Default.FontAlignment;
             public TextAlignment TextAlignment
             {
                 get { return useDefaultAlignment_ ? Template.TextAlignment : alignment_; }
@@ -92,14 +93,14 @@ namespace IngameScript
             #region Configuration
             bool configFont(string key, string value, Configuration.Options options)
             {
-                font_ = value != string.Empty ? value : Program.Default.Font;
+                font_ = value != string.Empty ? value : Default.Font;
                 fontSize_ = options.asFloat(0, 0f);
                 if (fontSize_ == 0f)
                     useFontSize_ = false;
                 else
                     useFontSize_ = true;
 
-                Color = options.asColor(1, Program.Default.FontColor);
+                Color = options.asColor(1, Default.FontColor);
                 useDefaultFont_ = false;
                 return true;
             }

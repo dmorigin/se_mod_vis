@@ -86,8 +86,8 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", powerAvailableLeft_.ToString(Program.Default.StringFormat))
-                    .Replace("%powerstoring%", powerAvailableStoring_.ToString(Program.Default.StringFormat))
+                    .Replace("%powerleft%", powerAvailableLeft_.ToString(Default.StringFormat))
+                    .Replace("%powerstoring%", powerAvailableStoring_.ToString(Default.StringFormat))
                     .Replace("%maxinput%", (new ValueType(maxAvailableInput_, Multiplier.M, Unit.W)).pack().ToString())
                     .Replace("%maxstored%", (new ValueType(maxAvailableStored_, Multiplier.M, Unit.Wh)).pack().ToString())
                     .Replace("%currentinput%", (new ValueType(currentInput_, Multiplier.M, Unit.W)).pack().ToString())

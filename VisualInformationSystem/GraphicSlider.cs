@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicSlider gfx = new GraphicSlider(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
                 gfx.DataRetrieverName = DataRetrieverName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -63,20 +63,18 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
+                if (DataRetriever == null)
+                    return;
+
+                if (Gradient.Count == 0)
+                    addGradientColor(0f, Default.BarColor);
+
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
-                float ratio = 0f;
-                bool doubleSided = true;
-                if (DataRetriever != null)
-                {
-                    ratio = (float)DataRetriever.indicator();
-                    doubleSided = DataRetriever.min() < 0.0 ? true : false;
-                }
-                ratio = ratio < -1f ? -1f : (ratio > 1f ? 1f : ratio);
-
                 // draw slider
-                renderSlider(addSprite, position, size, doubleSided, ratio, Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
+                renderSlider(addSprite, position, size, DataRetriever.min() < 0.0, (float)DataRetriever.indicator(),
+                    Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
 
             #region Configuration

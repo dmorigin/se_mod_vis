@@ -35,9 +35,9 @@ namespace IngameScript
 
             public abstract double indicator();
             public abstract ValueType value();
-            public abstract void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null);
             public abstract ValueType min();
             public abstract ValueType max();
+            public abstract void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null);
         }
     }
 }

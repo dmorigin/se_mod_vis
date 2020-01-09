@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicList gfx = new GraphicList(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = DataRetriever;
+                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
                 gfx.DataRetrieverName = DataRetrieverName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -49,9 +49,11 @@ namespace IngameScript
                     gfx.addGradientColor(color.Key, color.Value);
 
                 gfx.lines_ = lines_;
+                gfx.spacing_ = spacing_;
                 gfx.showBar_ = showBar_;
                 gfx.showIcon_ = showIcon_;
                 gfx.showText_ = showText_;
+                gfx.showMissing_ = showMissing_;
                 gfx.barBackground_ = barBackground_;
                 gfx.barHeight_ = barHeight_;
                 gfx.autoScroll_ = autoScroll_;
@@ -154,7 +156,8 @@ namespace IngameScript
                     // draw bar
                     if (showBar_)
                     {
-                        renderBar(addSprite, new Vector2(barPositionX, barPositionY), barSize, false, (float)entry.indicator, Gradient, barBackground_);
+                        renderSimpleBar(addSprite, new Vector2(barPositionX, barPositionY), barSize, false, false, 0, 0f,
+                            (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
                         barPositionY += lineHeight;
                     }
 
@@ -229,7 +232,7 @@ namespace IngameScript
 
             bool showBar_ = false;
             float barHeight_ = 0f;
-            Color barBackground_ = Program.Default.BarBackgroundColor;
+            Color barBackground_ = Default.BarBackgroundColor;
             bool configShowBar(string key, string value, Configuration.Options options)
             {
                 showBar_ = Configuration.asBoolean(value, false);

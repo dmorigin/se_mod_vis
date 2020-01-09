@@ -62,13 +62,13 @@ namespace IngameScript
 
                 protected virtual bool configZPosition(string key, string value, Configuration.Options options)
                 {
-                    graphic_.ZPosition = Configuration.asInteger(value, Program.Default.ZPosition);
+                    graphic_.ZPosition = Configuration.asInteger(value, Default.ZPosition);
                     return true;
                 }
 
                 protected virtual bool configPosition(string key, string value, Configuration.Options options)
                 {
-                    graphic_.Position = Configuration.asVector(value, Program.Default.Position);
+                    graphic_.Position = Configuration.asVector(value, Default.Position);
                     if (options.Count == 0)
                     {
                         string type = options[0].ToLower();
@@ -88,7 +88,7 @@ namespace IngameScript
 
                 protected virtual bool configSize(string key, string value, Configuration.Options options)
                 {
-                    graphic_.Size = Configuration.asVector(value, Program.Default.Size);
+                    graphic_.Size = Configuration.asVector(value, Default.Size);
                     if (options.Count == 1)
                     {
                         string type = options[0].ToLower();
@@ -109,7 +109,7 @@ namespace IngameScript
                 protected virtual bool configColor(string key, string value, Configuration.Options options)
                 {
                     graphic_.colorGradient_.Clear();
-                    graphic_.addGradientColor(0f, Configuration.asColor(value, Program.Default.Color));
+                    graphic_.addGradientColor(0f, Configuration.asColor(value, Default.Color));
                     return true;
                 }
 
@@ -118,7 +118,7 @@ namespace IngameScript
                     if (options.Count == 1)
                     {
                         float indicator = Configuration.asFloat(value, 0f);
-                        Color color = options.asColor(0, Program.Default.Color);
+                        Color color = options.asColor(0, Default.Color);
                         graphic_.addGradientColor(indicator, color);
                         return true;
                     }
@@ -153,7 +153,7 @@ namespace IngameScript
 
                 bool configDCRefresh(string key, string value, Configuration.Options options)
                 {
-                    float interval = Configuration.asFloat(value, Program.Default.DCRefreshInSec);
+                    float interval = Configuration.asFloat(value, Default.DCRefreshInSec);
                     graphic_.MaxDCUpdateInterval = TimeSpan.FromSeconds(interval);
                     if (graphic_.DataCollector != null)
                         graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
@@ -212,21 +212,21 @@ namespace IngameScript
                 set { dataRetriever_ = value; }
             }
 
-            TimeSpan maxDCUpdateInterval_ = Program.Default.DCRefresh;
+            TimeSpan maxDCUpdateInterval_ = Default.DCRefresh;
             public TimeSpan MaxDCUpdateInterval
             {
                 get { return maxDCUpdateInterval_; }
                 protected set { maxDCUpdateInterval_ = value; }
             }
 
-            int zPosition_ = Program.Default.ZPosition;
+            int zPosition_ = Default.ZPosition;
             public int ZPosition
             {
                 get { return zPosition_; }
                 protected set { zPosition_ = value; }
             }
 
-            Vector2 position_ = Program.Default.Position;
+            Vector2 position_ = Default.Position;
             public Vector2 Position
             {
                 get { return position_; }
@@ -234,7 +234,7 @@ namespace IngameScript
             }
 
 
-            ValueType positionType_ = Program.Default.PositionType;
+            ValueType positionType_ = Default.PositionType;
             public ValueType PositionType
             {
                 get { return positionType_; }
@@ -242,14 +242,14 @@ namespace IngameScript
             }
 
 
-            Vector2 size_ = Program.Default.Size;
+            Vector2 size_ = Default.Size;
             public Vector2 Size
             {
                 get { return size_; }
                 protected set { size_ = value; }
             }
 
-            ValueType sizeType_ = Program.Default.SizeType;
+            ValueType sizeType_ = Default.SizeType;
             public ValueType SizeType
             {
                 get { return sizeType_; }
@@ -265,18 +265,55 @@ namespace IngameScript
             Dictionary<float, Color> colorGradient_ = new Dictionary<float, Color>();
             public Color getGradientColor(float indicator)
             {
-                return getGradientColor(indicator, colorGradient_);
+                Color color;
+                if (getGradientColor(indicator, colorGradient_, out color))
+                    return color;
+                else
+                    return Template.FontColor;
             }
 
-            public Color getGradientColor(float indicator, Dictionary<float, Color> gradient)
+            public static bool getGradientColor(float indicator, Dictionary<float, Color> gradient, out Color color)
             {
+                color = Default.Color;
                 foreach (var pair in gradient)
                 {
                     if (pair.Key <= indicator)
-                        return pair.Value;
+                    {
+                        color = pair.Value;
+                        return true;
+                    }
                 }
 
-                return Template.FontColor;
+                return false;
+            }
+
+            public static bool getGradientColorLerp(float indicator, Dictionary<float, Color> gradient, out Color color)
+            {
+                color = Default.Color;
+                if (gradient.Count == 0)
+                    return false;
+
+                KeyValuePair<float, Color> lower = gradient.First();
+                KeyValuePair<float, Color> upper = gradient.First();
+
+                if (gradient.Count >= 2)
+                {
+                    KeyValuePair<float, Color> prev = upper;
+                    foreach (var pair in gradient)
+                    {
+                        if (pair.Key <= indicator)
+                        {
+                            upper = prev;
+                            lower = pair;
+                            break;
+                        }
+
+                        prev = pair;
+                    }
+                }
+
+                color = Color.Lerp(lower.Value, upper.Value, (indicator - lower.Key) / (upper.Key - lower.Key));
+                return true;
             }
 
             public void addGradientColor(float indicator, Color color)
@@ -310,14 +347,77 @@ namespace IngameScript
                 addSprite(sprite);
             }
 
-            protected static void renderBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, float ratio,
-                Dictionary<float, Color> gradient, Color backgroundColor)
+            protected static void renderSimpleBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, bool doubleSided,
+                int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient, float borderSize, Color borderColor, Color backgroundColor)
             {
-                // draw background
-                if (backgroundColor.A > 0)
-                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, backgroundColor));
+                Vector2 innerSize = size - (borderSize * 2f);
+
+                if (borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, borderColor));
+                if (backgroundColor.A > 0 || borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, innerSize, backgroundColor));
+
+                Vector2 barSize;
+                Vector2 barPosition;
+
+                if (vertical)
+                {
+                    if (doubleSided)
+                    {
+                        barSize = new Vector2(innerSize.X, innerSize.Y * ratio * 0.5f);
+                        barPosition = new Vector2(position.X, position.Y - barSize.Y * 0.5f);
+                    }
+                    else
+                    {
+                        barSize = new Vector2(innerSize.X, innerSize.Y * ratio);
+                        barPosition = new Vector2(position.X, position.Y + (innerSize.Y * 0.5f) - barSize.Y * 0.5f);
+                    }
+                }
+                else
+                {
+                    if (doubleSided)
+                    {
+                        barSize = new Vector2(innerSize.X * ratio * 0.5f, innerSize.Y);
+                        barPosition = new Vector2(position.X + barSize.X * 0.5f, position.Y);
+                    }
+                    else
+                    {
+                        barSize = new Vector2(innerSize.X * ratio, innerSize.Y);
+                        barPosition = new Vector2(position.X - (innerSize.X * 0.5f) + barSize.X * 0.5f, position.Y);
+                    }
+                }
+
+                Color color;
+                getGradientColorLerp(ratio, gradient, out color);
+                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, color));
+            }
+
+            protected static void renderSegmentedBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, bool doubleSided,
+                int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient, float borderSize, Color borderColor, Color backgroundColor)
+            {
+                Vector2 innerSize = size - (borderSize * 2f);
+
+                if (borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, borderColor));
+                if (backgroundColor.A > 0 || borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, innerSize, backgroundColor));
 
                 float startRatio = ratio;
+                if (doubleSided)
+                {
+                    startRatio = ratio >= 0f ? ratio : 0f;
+                    if (vertical)
+                    {
+                        position.Y -= innerSize.Y * 0.25f;
+                        innerSize.Y *= 0.5f;
+                    }
+                    else
+                    {
+                        position.X += innerSize.X * 0.25f;
+                        innerSize.X *= 0.5f;
+                    }
+                }
+
                 KeyValuePair<float, Color>[] colors = gradient.ToArray();
                 for (int c = 0; c < colors.Length && startRatio > 0f; ++c)
                 {
@@ -330,18 +430,109 @@ namespace IngameScript
 
                     if (vertical)
                     {
-                        barSize = new Vector2(size.X, size.Y * curRatio);
-                        barPosition = new Vector2(position.X, position.Y - (colors[c].Key * size.Y) + ((size.Y - barSize.Y) * 0.5f));
+                        barSize = new Vector2(innerSize.X, innerSize.Y * curRatio);
+                        barPosition = new Vector2(position.X, position.Y - (colors[c].Key * innerSize.Y) + ((innerSize.Y - barSize.Y) * 0.5f));
                     }
                     else
                     {
-                        barSize = new Vector2(size.X * curRatio, size.Y);
-                        barPosition = new Vector2(position.X + (colors[c].Key * size.X) - ((size.X - barSize.X) * 0.5f), position.Y);
+                        barSize = new Vector2(innerSize.X * curRatio, innerSize.Y);
+                        barPosition = new Vector2(position.X + (colors[c].Key * innerSize.X) - ((innerSize.X - barSize.X) * 0.5f), position.Y);
                     }
 
-                    MySprite bar = new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, colors[c].Value);
-                    addSprite(bar);
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, colors[c].Value));
                     startRatio -= curRatio;
+                }
+
+                for (int d = 0; d < colors.Length && startRatio > ratio; d++)
+                {
+                    if (colors[d].Key >= 0f)
+                        continue;
+
+                    float curRatio = (colors[d].Key < ratio ? ratio : colors[d].Key) - startRatio;
+                    Vector2 barSize;
+                    Vector2 barPosition;
+
+                    if (vertical)
+                    {
+                        barSize = new Vector2(innerSize.X, innerSize.Y * curRatio);
+                        barPosition = new Vector2(position.X, position.Y - (startRatio * innerSize.Y) + ((innerSize.Y - barSize.Y) * 0.5f));
+                    }
+                    else
+                    {
+                        barSize = new Vector2(innerSize.X * curRatio, innerSize.Y);
+                        barPosition = new Vector2(position.X + (startRatio * innerSize.X) - ((innerSize.X - barSize.X) * 0.5f), position.Y);
+                    }
+
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", barPosition, barSize, colors[d].Value));
+                    startRatio += curRatio;
+                }
+            }
+
+            protected static void renderTiledBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, bool doubleSided,
+                int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient, float borderSize, Color borderColor, Color backgroundColor)
+            {
+                Vector2 innerSize = size - (borderSize * 2f);
+
+                if (borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, size, borderColor));
+                if (backgroundColor.A > 0 || borderSize > 0f)
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", position, innerSize, backgroundColor));
+
+                Vector2 tileSize;
+                float tileStep;
+                if (vertical)
+                {
+                    if (doubleSided) innerSize.Y *= 0.5f;
+                    tileSize = new Vector2(innerSize.X - (borderSize > 0f ? tileSpace * 2f : 0f),
+                        (innerSize.Y - (tileSpace * (tiles + (borderSize > 0f ? 1 : 0)))) / tiles);
+                    if (doubleSided)
+                        position.Y -= tileSize.Y * 0.5f + tileSpace;
+                    else
+                        position.Y += innerSize.Y * 0.5f - tileSize.Y * 0.5f - tileSpace;
+                    tileStep = tileSize.Y + tileSpace;
+                }
+                else
+                {
+                    if (doubleSided) innerSize.X *= 0.5f;
+                    tileSize = new Vector2((innerSize.X - (tileSpace * (tiles + (borderSize > 0f ? 1 : 0)))) / tiles,
+                        innerSize.Y - (borderSize > 0f ? tileSpace * 2f : 0f));
+                    if (doubleSided)
+                        position.X += tileSize.X * 0.5f + tileSpace;
+                    else
+                        position.X -= innerSize.X * 0.5f - tileSize.X * 0.5f - tileSpace;
+                    tileStep = tileSize.X + tileSpace;
+                }
+
+                float step = 1f / tiles;
+                if (ratio >= 0f)
+                {
+                    for (int t = 0; t < Math.Round(ratio / step); t++)
+                    {
+                        Vector2 tilePosition;
+                        if (vertical)
+                            tilePosition = new Vector2(position.X, position.Y - (t * tileStep));
+                        else
+                            tilePosition = new Vector2(position.X + (t * tileStep), position.Y);
+
+                        Color color;
+                        getGradientColorLerp(t * step, gradient, out color);
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", tilePosition, tileSize, color));
+                    }
+                }
+                else
+                {
+                    for (int t = 1; t <= -Math.Round(ratio / step); t++)
+                    {
+                        Vector2 tilePosition;
+                        if (vertical)
+                            tilePosition = new Vector2(position.X, position.Y + (t * tileStep));
+                        else
+                            tilePosition = new Vector2(position.X - (t * tileStep), position.Y);
+
+                        Color color;
+                        getGradientColorLerp(t * step, gradient, out color);
+                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", tilePosition, tileSize, color));
+                    }
                 }
             }
 
@@ -405,10 +596,10 @@ namespace IngameScript
                     foreach (var pair in barGradient)
                         clamped.Add((pair.Key * 0.5f) + 0.5f, pair.Value);
 
-                    renderBar(addSprite, barPosition, barSize, vertical, 1f, clamped, new Color(0, 0, 0, 0));
+                    renderSegmentedBar(addSprite, barPosition, barSize, vertical, false, 0, 0f, 1f, clamped, 0f, Color.White, new Color(0, 0, 0, 0));
                 }
                 else
-                    renderBar(addSprite, barPosition, barSize, vertical, 1f, barGradient, new Color(0, 0, 0, 0));
+                    renderSegmentedBar(addSprite, barPosition, barSize, vertical, false, 0, 0f, 1f, barGradient, 0f, Color.White, new Color(0, 0, 0, 0));
 
                 // draw slider
                 if (vertical)
