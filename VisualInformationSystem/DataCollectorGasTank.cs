@@ -51,7 +51,7 @@ namespace IngameScript
                 foreach (var tank in Blocks)
                     fillRation += tank.FilledRatio;
 
-                fillRation_ = (float)(fillRation / Blocks.Count);
+                fillRatio_ = (float)(fillRation / Blocks.Count);
             }
 
             public override string CollectorTypeName
@@ -75,11 +75,11 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return data.Replace("%capacity%", (new ValueType(capacity_, unit: Unit.l)).pack().ToString())
-                    .Replace("%fillration%", fillRation_.ToString(Default.StringFormat))
-                    .Replace("%fillvalue", (new ValueType(fillRation_ * capacity_, unit: Unit.l)).pack().ToString());
+                    .Replace("%fillratio%", fillRatio_.ToString(Default.StringFormat))
+                    .Replace("%fillvalue", (new ValueType(fillRatio_ * capacity_, unit: Unit.l)).pack().ToString());
             }
 
-            float fillRation_ = 0f;
+            float fillRatio_ = 0f;
             float capacity_ = 0f;
 
             public class Capacity : DataRetriever
@@ -103,12 +103,12 @@ namespace IngameScript
 
                 public override ValueType value()
                 {
-                    return new ValueType(collector_.capacity_ * collector_.fillRation_, unit: Unit.l);
+                    return new ValueType(collector_.capacity_ * collector_.fillRatio_, unit: Unit.l);
                 }
 
                 public override double indicator()
                 {
-                    return collector_.fillRation_;
+                    return collector_.fillRatio_;
                 }
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
