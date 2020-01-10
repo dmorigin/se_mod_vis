@@ -133,7 +133,7 @@ namespace IngameScript
                     // fill up handler
                     add("usetemplate", configUseTemplate);
                     add("refresh", configRefresh);
-                    add("backgroundcolor", configBackgroundColor);
+                    add("bgcolor", configBackgroundColor);
                     add("font", configFont);
                     add("alignment", configAlignment);
                     add("graphic", configGraphic);

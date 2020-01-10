@@ -31,9 +31,9 @@ namespace IngameScript
             public override bool construct()
             {
                 // create default templates
-                createDefaultTemplate("Base", "font:debug:0.8:179,237,255\nalignment:left\nbackgroundcolor:0,88,151");
-                createDefaultTemplate("BaseBlack", "font:debug:0.8:255,255,255\nalignment:left\nbackgroundcolor:0,0,0");
-                createDefaultTemplate("Transparent", "font:debug:0.8:0,88,151\nbackgroundcolor:0,0,0");
+                createDefaultTemplate("Base", "font:debug:0.8:179,237,255\nalignment:left\nbgcolor:0,88,151");
+                createDefaultTemplate("BaseBlack", "font:debug:0.8:255,255,255\nalignment:left\nbgcolor:0,0,0");
+                createDefaultTemplate("Transparent", "font:debug:0.8:0,88,151\bgcolor:0,0,0");
 
                 return base.construct();
             }

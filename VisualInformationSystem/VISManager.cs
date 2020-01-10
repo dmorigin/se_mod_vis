@@ -46,10 +46,6 @@ namespace IngameScript
                     stateHandlers_[State.Shutdown] = handleShutdownState;
                     stateHandlers_[State.Error] = handleErrorState;
 
-                    // setup configuration
-                    config_.add("displaytag", config_.configDisplayNameTag);
-                    config_.add("template", config_.configTemplate);
-
                     if (collectorManager_.construct())
                     {
                         if (templateManager_.construct())
@@ -146,6 +142,10 @@ namespace IngameScript
                 public ConfigHandler(VISManager manager)
                 {
                     manager_ = manager;
+
+                    // setup configuration
+                    add("displaytag", configDisplayNameTag);
+                    add("template", configTemplate);
                 }
 
 
@@ -163,7 +163,7 @@ namespace IngameScript
                 {
                     // create new template
 
-                    return true;
+                    return false;
                 }
             }
             #endregion // Configuration
