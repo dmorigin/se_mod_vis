@@ -153,42 +153,59 @@ namespace IngameScript
                 return true;
             }
 
-
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            #region Rendering
+            struct RenderData
             {
-                float fontSize = FontSize;
-                Vector2 maxSize = new Vector2(0f, 0f);
-                List<string> lines = new List<string>();
+                public float fontSize;
+                public Color fontColor;
 
-                foreach(string text in text_)
+                public Vector2 position;
+                public List<string> lines;
+            }
+
+            RenderData renderData_ = new RenderData();
+
+            public override void prepareRendering(Display display)
+            {
+                renderData_.fontSize = FontSize;
+                renderData_.lines = new List<string>();
+                Vector2 maxSize = new Vector2(0f, 0f);
+
+                foreach (string text in text_)
                 {
                     string line = DataCollector != null ? DataCollector.getText(text) : text;
-                    Vector2 lineSize = display.measureLineInPixels(line, Font, fontSize);
+                    Vector2 lineSize = display.measureLineInPixels(line, Font, renderData_.fontSize);
 
                     maxSize.X = lineSize.X > maxSize.X ? lineSize.X : maxSize.X;
                     maxSize.Y = lineSize.Y > maxSize.Y ? lineSize.Y : maxSize.Y;
-                    lines.Add(line);
+                    renderData_.lines.Add(line);
                 }
 
                 if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
-                    fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * lines.Count));
+                    renderData_.fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * renderData_.lines.Count));
                 }
 
-                Vector2 renderPosition = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                float positionY = renderPosition.Y - ((maxSize.Y * (lines.Count - 1)) * 0.5f);
+                Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                renderData_.position = new Vector2(position.X, position.Y - ((maxSize.Y * (renderData_.lines.Count - 1)) * 0.5f));
 
-                Color fontColor = FontColor;
                 if (Gradient.Count > 0)
-                    fontColor = DataRetriever != null ? getGradientColor((float)DataRetriever.indicator()) : Color;
+                    renderData_.fontColor = DataRetriever != null ? getGradientColor((float)DataRetriever.indicator()) : Color;
+                else
+                    renderData_.fontColor = FontColor;
+            }
 
-                for (int c = 0; c < lines.Count; c++)
+            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            {
+                for (int c = 0; c < renderData_.lines.Count; c++)
                 {
-                    Graphic.renderTextLine(display, rt, addSprite, Font, fontSize, new Vector2(renderPosition.X, positionY + (c * fontSize)), 
-                        fontColor, lines[c], TextAlignment);
+                    Graphic.renderTextLine(display, rt, addSprite, Font, renderData_.fontSize, 
+                        new Vector2(renderData_.position.X, renderData_.position.Y + (c * renderData_.fontSize)), 
+                        renderData_.fontColor, renderData_.lines[c], TextAlignment);
                 }
             }
+            #endregion // Rendering
         }
     }
 }

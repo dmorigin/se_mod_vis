@@ -73,7 +73,7 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
                 // draw slider
-                renderSlider(addSprite, position, size, DataRetriever.min() < 0.0, (float)DataRetriever.indicator(),
+                renderSlider(addSprite, rt, position, size, DataRetriever.min() < 0.0, (float)DataRetriever.indicator(),
                     Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
 

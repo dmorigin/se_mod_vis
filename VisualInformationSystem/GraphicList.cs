@@ -62,68 +62,85 @@ namespace IngameScript
                 return gfx;
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            #region Rendering
+            struct RenderData
+            {
+                public int lines;
+                public float lineHeight;
+
+                public Vector2 iconPosition;
+                public Vector2 iconSize;
+
+                public Vector2 barPosition;
+                public Vector2 barSize;
+
+                public float textLeftPositionX;
+                public float textRightPositionX;
+                public float textPositionY;
+
+                public List<DataRetriever.ListContainer> container;
+            }
+
+            RenderData renderData_ = new RenderData();
+
+            public override void prepareRendering(Display display)
             {
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
                 float fontHeight = showText_ == true ? Default.CharHeight * Template.FontSize : 0f;
-                Vector2 barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontHeight : barHeight_) : new Vector2();
-                float spacing = spacing_;
-                float lineHeight = fontHeight + barSize.Y + spacing;
+                renderData_.barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontHeight : barHeight_) : new Vector2();
+                renderData_.lineHeight = fontHeight + renderData_.barSize.Y + spacing_;
 
                 if (lines_ > 0)
                 {
-                    float scale = (size.Y / lines_) / lineHeight;
+                    float scale = (size.Y / lines_) / renderData_.lineHeight;
 
                     fontHeight *= scale;
-                    barSize.Y *= scale;
-                    lineHeight = fontHeight + barSize.Y + spacing;
+                    renderData_.barSize.Y *= scale;
+                    renderData_.lineHeight = fontHeight + renderData_.barSize.Y + spacing_;
                 }
 
                 if (showIcon_ && !showText_)
-                    barSize.X -= barSize.Y;
+                    renderData_.barSize.X -= renderData_.barSize.Y;
 
-                int lines = (int)(size.Y / lineHeight);
-                float textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
-                float barPositionY = position.Y - (size.Y * 0.5f) + (barSize.Y * 0.5f) + fontHeight;
-                float iconPositionY = 0f;
+                renderData_.lines = (int)Math.Ceiling(size.Y / renderData_.lineHeight);
+                renderData_.textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
+                renderData_.barPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.barSize.Y * 0.5f) + fontHeight;
 
                 // icon
-                Vector2 iconSize = new Vector2(0f, 0f);
                 if (showIcon_)
                 {
                     // adjust bar size if no text
                     if (showText_ == false)
                     {
-                        barSize.X -= barSize.Y;
-                        iconSize = new Vector2(barSize.Y, barSize.Y);
+                        renderData_.barSize.X -= renderData_.barSize.Y;
+                        renderData_.iconSize = new Vector2(renderData_.barSize.Y, renderData_.barSize.Y);
                     }
                     else
-                        iconSize = new Vector2(fontHeight, fontHeight);
+                        renderData_.iconSize = new Vector2(fontHeight, fontHeight);
 
-                    iconPositionY = position.Y - (size.Y * 0.5f) + (iconSize.Y * 0.5f);
+                    renderData_.iconPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.iconSize.Y * 0.5f);
                 }
 
-                float iconPositionX = position.X - (size.X * 0.5f) + (iconSize.X * 0.5f);
-                float barPositionX = position.X - (size.X * 0.5f) + (barSize.X * 0.5f);
-                float textLeftPositionX = position.X - (size.X * 0.5f) + iconSize.X;
-                float textRightPositionX = position.X + (size.X * 0.5f);
+                renderData_.iconPosition.X = position.X - (size.X * 0.5f) + (renderData_.iconSize.X * 0.5f);
+                renderData_.barPosition.X = position.X - (size.X * 0.5f) + (renderData_.barSize.X * 0.5f);
+                renderData_.textLeftPositionX = position.X - (size.X * 0.5f) + renderData_.iconSize.X;
+                renderData_.textRightPositionX = position.X + (size.X * 0.5f);
 
-                List<DataRetriever.ListContainer> container;
-                DataRetriever.list(out container, (item) => showMissing_ || item.value > 0);
+                DataRetriever.list(out renderData_.container, (item) => showMissing_ || item.value > 0);
 
                 // auto scroll
                 if (autoScroll_ == true)
                 {
-                    if (lines >= container.Count)
+                    if (renderData_.lines >= renderData_.container.Count)
                         autoScrollLine_ = 0;
                     else
                     {
                         autoScrollLine_ += autoScrollInc_;
 
                         // toggle inc
-                        if (autoScrollLine_ >= (container.Count - lines) || autoScrollLine_ < 0)
+                        if (autoScrollLine_ >= (renderData_.container.Count - renderData_.lines) || autoScrollLine_ < 0)
                         {
                             autoScrollInc_ *= -1;
                             autoScrollLine_ += autoScrollInc_;
@@ -133,11 +150,18 @@ namespace IngameScript
 
                 if (Gradient.Count == 0)
                     addGradientColor(0.0f, Template.FontColor);
+            }
+
+            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            {
+                Vector2 iconPosition = renderData_.iconPosition;
+                Vector2 barPosition = renderData_.barPosition;
+                float textPositionY = renderData_.textPositionY;
 
                 // render name
-                for (int l = autoScrollLine_; l < (lines + autoScrollLine_) && l < container.Count; l++)
+                for (int l = autoScrollLine_; l < (renderData_.lines + autoScrollLine_) && l < renderData_.container.Count; l++)
                 {
-                    var entry = container[l];
+                    var entry = renderData_.container[l];
                     if (entry.value == 0.0 && !showMissing_)
                         continue;
 
@@ -147,18 +171,17 @@ namespace IngameScript
                         string iconType = $"{entry.type.TypeId}/{entry.type.SubtypeId}";
                         if (RenderTarget.spriteExist(iconType))
                         {
-                            MySprite icon = new MySprite(SpriteType.TEXTURE, iconType, new Vector2(iconPositionX, iconPositionY), iconSize, Color.White);
-                            addSprite(icon);
-                            iconPositionY += lineHeight;
+                            addSprite(new MySprite(SpriteType.TEXTURE, iconType, iconPosition, renderData_.iconSize, Color.White));
+                            iconPosition.Y += renderData_.lineHeight;
                         }
                     }
 
                     // draw bar
                     if (showBar_)
                     {
-                        renderSimpleBar(addSprite, new Vector2(barPositionX, barPositionY), barSize, false, false, 0, 0f,
+                        renderSimpleBar(addSprite, rt, barPosition, renderData_.barSize, false, false, 0, 0f,
                             (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
-                        barPositionY += lineHeight;
+                        barPosition.Y += renderData_.lineHeight;
                     }
 
                     // draw text
@@ -166,15 +189,18 @@ namespace IngameScript
                     {
                         string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
 
-                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textLeftPositionX, textPositionY),
+                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, 
+                            new Vector2(renderData_.textLeftPositionX, textPositionY), 
                             getGradientColor((float)entry.indicator), entry.name, TextAlignment.LEFT);
-                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, new Vector2(textRightPositionX, textPositionY),
+                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize,
+                            new Vector2(renderData_.textRightPositionX, textPositionY),
                             getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
 
-                        textPositionY += lineHeight;
+                        textPositionY += renderData_.lineHeight;
                     }
                 }
             }
+            #endregion // Rendering
 
             #region Configuration
             public override ConfigHandler getConfigHandler()

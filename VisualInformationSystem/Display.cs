@@ -191,6 +191,9 @@ namespace IngameScript
 
             public void render()
             {
+                foreach (var graphic in template_.getGraphics())
+                    graphic.prepareRendering(this);
+
                 foreach (var rt in renderTargets_)
                 {
                     rt.BackgroundColor = template_.BackgroundColor;

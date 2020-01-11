@@ -54,7 +54,6 @@ namespace IngameScript
                 gfx.thresholdOnMin_ = thresholdOnMin_;
                 gfx.thresholdOnMax_ = thresholdOnMax_;
                 gfx.blink_ = blink_;
-                gfx.blinkToggle_ = blinkToggle_;
                 gfx.rotation_ = rotation_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
@@ -66,20 +65,31 @@ namespace IngameScript
                 return true;
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            bool show_ = true; // render data only
+            public override void prepareRendering(Display display)
             {
                 if (DataRetriever != null)
                     if (showOn_ == true && (DataRetriever.indicator() < thresholdOnMin_ && DataRetriever.indicator() > thresholdOnMax_))
+                    {
+                        show_ = false;
                         return;
+                    }
 
-                if (blink_ && blinkToggle_)
+                if (blink_)
+                    show_ = !show_;
+                else
+                    show_ = true;
+            }
+
+            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            {
+                if (!show_)
                     return;
-                blinkToggle_ = !blinkToggle_;
 
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
-                icon_(addSprite, iconName_, position, size, rotation_, Color);
+                icon_(addSprite, rt, iconName_, position, size, rotation_, Color);
             }
 
             #region Configuration
@@ -120,7 +130,6 @@ namespace IngameScript
             }
 
             bool blink_ = false;
-            bool blinkToggle_ = true;
             bool configBlink(string key, string value, Configuration.Options options)
             {
                 blink_ = Configuration.asBoolean(value, false);

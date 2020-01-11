@@ -72,7 +72,7 @@ namespace IngameScript
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
-                renderStyledBar_(addSprite, position, size, vertical_, DataRetriever.min() < 0.0, tiles_, tileSpace_,
+                renderStyledBar_(addSprite, rt, position, size, vertical_, DataRetriever.min() < 0.0, tiles_, tileSpace_,
                     (float)DataRetriever.indicator(), Gradient, borderSize_, borderColor_, backgroundColor_);
             }
 
@@ -103,8 +103,9 @@ namespace IngameScript
                 return true;
             }
 
-            delegate void RenderStyledBar(AddSpriteDelegate addSprite, Vector2 position, Vector2 size, bool vertical, bool doubleSided,
-                int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient, float borderSize, Color borderColor, Color backgroundColor);
+            delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size, 
+                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                float borderSize, Color borderColor, Color backgroundColor);
             RenderStyledBar renderStyledBar_;
             bool vertical_ = Default.BarVertical;
             int tiles_ = 0;
