@@ -51,7 +51,7 @@ namespace IngameScript
             }
 
 
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
                 {
@@ -65,7 +65,7 @@ namespace IngameScript
                 return null;
             }
 
-            class PressurizeAble : DataRetriever
+            class PressurizeAble : DataAccessor
             {
                 DataCollectorAirVent obj_ = null;
                 public PressurizeAble(DataCollectorAirVent obj)
@@ -111,7 +111,7 @@ namespace IngameScript
                 }
             }
 
-            class OxygenLevel : DataRetriever
+            class OxygenLevel : DataAccessor
             {
                 DataCollectorAirVent obj_ = null;
                 public OxygenLevel(DataCollectorAirVent obj)

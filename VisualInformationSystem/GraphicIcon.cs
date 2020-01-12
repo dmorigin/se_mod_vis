@@ -38,8 +38,8 @@ namespace IngameScript
                 GraphicIcon gfx = new GraphicIcon(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
-                gfx.DataRetrieverName = DataRetrieverName;
+                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;

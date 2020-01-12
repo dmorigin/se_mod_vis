@@ -38,8 +38,8 @@ namespace IngameScript
                 GraphicList gfx = new GraphicList(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataRetriever(DataRetrieverName);
-                gfx.DataRetrieverName = DataRetrieverName;
+                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
@@ -78,7 +78,7 @@ namespace IngameScript
                 public float textRightPositionX;
                 public float textPositionY;
 
-                public List<DataRetriever.ListContainer> container;
+                public List<DataAccessor.ListContainer> container;
             }
 
             RenderData renderData_ = new RenderData();

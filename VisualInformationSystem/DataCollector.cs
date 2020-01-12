@@ -168,7 +168,7 @@ namespace IngameScript
                 return CollectorTypeName == name && Options == options;
             }
 
-            public abstract DataRetriever getDataRetriever(string name);
+            public abstract DataAccessor getDataAccessor(string name);
 
 
             class UpdateJob : Job

@@ -59,7 +59,7 @@ namespace IngameScript
                 get { return "gastank"; }
             }
 
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
                 {
@@ -82,7 +82,7 @@ namespace IngameScript
             float fillRatio_ = 0f;
             float capacity_ = 0f;
 
-            public class Capacity : DataRetriever
+            public class Capacity : DataAccessor
             {
                 public Capacity(DataCollectorGasTank collector)
                 {

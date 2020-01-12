@@ -94,7 +94,7 @@ namespace IngameScript
                     .Replace("%currentstored%", (new ValueType(currentStored_, Multiplier.M, Unit.Wh)).pack().ToString());
             }
 
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 switch(name.ToLower())
                 {
@@ -104,11 +104,11 @@ namespace IngameScript
                         return new InOut(this);
                 }
 
-                return base.getDataRetriever(name);
+                return base.getDataAccessor(name);
             }
 
 
-            class Capacity : DataRetriever
+            class Capacity : DataAccessor
             {
                 public Capacity(DataCollectorBattery collector)
                 {
@@ -156,7 +156,7 @@ namespace IngameScript
                 }
             }
 
-            class InOut : DataRetriever
+            class InOut : DataAccessor
             {
                 public InOut(DataCollectorBattery collector)
                 {

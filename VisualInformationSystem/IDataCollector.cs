@@ -41,7 +41,7 @@ namespace IngameScript
             bool isSameCollector(IDataCollector other);
             bool isSameCollector(string name, Configuration.Options options);
 
-            DataRetriever getDataRetriever(string name);
+            DataAccessor getDataAccessor(string name);
         }
     }
 }

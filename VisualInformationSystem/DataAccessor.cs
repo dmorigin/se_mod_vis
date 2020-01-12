@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public abstract class DataRetriever
+        public abstract class DataAccessor
         {
             public struct ListContainer
             {

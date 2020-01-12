@@ -32,7 +32,7 @@ namespace IngameScript
             public override bool construct()
             {
                 if (Options.Count >= 1)
-                    dataRetrieverName_ = Options[0];
+                    dataAccessorName_ = Options[0];
                 else
                     log(Console.LogType.Warning, $"No data retriever defined");
 
@@ -63,7 +63,8 @@ namespace IngameScript
                 protected virtual bool configZPosition(string key, string value, Configuration.Options options)
                 {
                     graphic_.ZPosition = Configuration.asInteger(value, Default.ZPosition);
-                    return true;
+                    graphic_.log(Console.LogType.Error, "The z position configuration isn't fully implemented yet");
+                    return false;
                 }
 
                 protected virtual bool configPosition(string key, string value, Configuration.Options options)
@@ -117,9 +118,9 @@ namespace IngameScript
                 {
                     if (options.Count == 1)
                     {
-                        float indicator = Configuration.asFloat(value, 0f);
+                        float threshold = Configuration.asFloat(value, 0f);
                         Color color = options.asColor(0, Default.Color);
-                        graphic_.addGradientColor(indicator, color);
+                        graphic_.addGradientColor(threshold, color);
                         return true;
                     }
                     return false;
@@ -135,14 +136,14 @@ namespace IngameScript
                         {
                             graphic_.DataCollector = dataCollector;
                             graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
-                            DataRetriever retriever = dataCollector.getDataRetriever(graphic_.DataRetrieverName);
+                            DataAccessor retriever = dataCollector.getDataAccessor(graphic_.DataAccessorName);
                             if (retriever != null)
                             {
                                 graphic_.DataRetriever = retriever;
                                 return true;
                             }
                             else
-                                graphic_.log(Console.LogType.Error, $"Data retriever ${graphic_.DataRetrieverName} isn't supported");
+                                graphic_.log(Console.LogType.Error, $"Data retriever ${graphic_.DataAccessorName} isn't supported");
                         }
                     }
                     else
@@ -198,15 +199,15 @@ namespace IngameScript
                 protected set { dataCollector_ = value; }
             }
 
-            string dataRetrieverName_ = "";
-            protected string DataRetrieverName
+            string dataAccessorName_ = "";
+            protected string DataAccessorName
             {
-                get { return dataRetrieverName_; }
-                set { dataRetrieverName_ = value; }
+                get { return dataAccessorName_; }
+                set { dataAccessorName_ = value; }
             }
 
-            DataRetriever dataRetriever_ = null;
-            protected DataRetriever DataRetriever
+            DataAccessor dataRetriever_ = null;
+            protected DataAccessor DataRetriever
             {
                 get { return dataRetriever_; }
                 set { dataRetriever_ = value; }
@@ -263,21 +264,21 @@ namespace IngameScript
             }
 
             Dictionary<float, Color> colorGradient_ = new Dictionary<float, Color>();
-            public Color getGradientColor(float indicator)
+            public Color getGradientColor(float threshold)
             {
                 Color color;
-                if (getGradientColor(indicator, colorGradient_, out color))
+                if (getGradientColor(threshold, colorGradient_, out color))
                     return color;
                 else
                     return Template.FontColor;
             }
 
-            public static bool getGradientColor(float indicator, Dictionary<float, Color> gradient, out Color color)
+            public static bool getGradientColor(float threshold, Dictionary<float, Color> gradient, out Color color)
             {
                 color = Default.Color;
                 foreach (var pair in gradient)
                 {
-                    if (pair.Key <= indicator)
+                    if (pair.Key <= threshold)
                     {
                         color = pair.Value;
                         return true;
@@ -287,7 +288,7 @@ namespace IngameScript
                 return false;
             }
 
-            public static bool getGradientColorLerp(float indicator, Dictionary<float, Color> gradient, out Color color)
+            public static bool getGradientColorLerp(float threshold, Dictionary<float, Color> gradient, out Color color)
             {
                 color = Default.Color;
                 if (gradient.Count == 0)
@@ -301,7 +302,7 @@ namespace IngameScript
                     KeyValuePair<float, Color> prev = upper;
                     foreach (var pair in gradient)
                     {
-                        if (pair.Key <= indicator)
+                        if (pair.Key <= threshold)
                         {
                             upper = prev;
                             lower = pair;
@@ -312,17 +313,17 @@ namespace IngameScript
                     }
                 }
 
-                color = Color.Lerp(lower.Value, upper.Value, (indicator - lower.Key) / (upper.Key - lower.Key));
+                color = Color.Lerp(lower.Value, upper.Value, (threshold - lower.Key) / (upper.Key - lower.Key));
                 return true;
             }
 
-            public void addGradientColor(float indicator, Color color)
+            public void addGradientColor(float threshold, Color color)
             {
-                if (colorGradient_.ContainsKey(indicator))
-                    colorGradient_[indicator] = color;
+                if (colorGradient_.ContainsKey(threshold))
+                    colorGradient_[threshold] = color;
                 else
                 {
-                    colorGradient_.Add(indicator, color);
+                    colorGradient_.Add(threshold, color);
                     colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
             }

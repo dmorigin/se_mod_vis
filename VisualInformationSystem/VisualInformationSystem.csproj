@@ -60,7 +60,7 @@
     <Compile Include="GraphicList.cs" />
     <Compile Include="GraphicSlider.cs" />
     <Compile Include="GraphicText.cs" />
-    <Compile Include="DataRetriever.cs" />
+    <Compile Include="DataAccessor.cs" />
     <Compile Include="IDataCollector.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="JobManager.cs" />

@@ -73,7 +73,7 @@ namespace IngameScript
             protected float powerAvailableUsing_ = 0f;
 
 
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
                 {
@@ -86,7 +86,7 @@ namespace IngameScript
                 return null;
             }
 
-            class Using : DataRetriever
+            class Using : DataAccessor
             {
                 public Using(DataCollectorEnergyProducer<T> collector)
                 {

@@ -162,7 +162,7 @@ namespace IngameScript
                 public bool configTemplate(string key, string value, Configuration.Options options)
                 {
                     // create new template
-
+                    manager_.log(Console.LogType.Error, "The template configuration isnt' fully implemented yet");
                     return false;
                 }
             }

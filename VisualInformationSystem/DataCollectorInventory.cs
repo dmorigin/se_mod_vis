@@ -302,7 +302,7 @@ namespace IngameScript
             List<InventoryItem> items_ = new List<InventoryItem>();
 
             #region Data Retriever
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
                 {
@@ -317,7 +317,7 @@ namespace IngameScript
                 return null;
             }
 
-            class Capacity : DataRetriever
+            class Capacity : DataAccessor
             {
                 DataCollectorInventory inv_ = null;
                 public Capacity(DataCollectorInventory inventory)
@@ -365,7 +365,7 @@ namespace IngameScript
                 }
             }
 
-            class Items : DataRetriever
+            class Items : DataAccessor
             {
                 DataCollectorInventory inv_ = null;
                 public Items(DataCollectorInventory inv)

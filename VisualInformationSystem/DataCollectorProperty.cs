@@ -51,7 +51,7 @@ namespace IngameScript
                 get { return property_; }
             }
 
-            public override DataRetriever getDataRetriever(string name)
+            public override DataAccessor getDataAccessor(string name)
             {
                 return null;
             }
