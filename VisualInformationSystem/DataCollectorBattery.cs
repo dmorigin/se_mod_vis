@@ -98,6 +98,7 @@ namespace IngameScript
             {
                 switch(name.ToLower())
                 {
+                    case "":
                     case "capacity":
                         return new Capacity(this);
                     case "inout":

@@ -69,7 +69,7 @@ namespace IngameScript
             public override void prepareRendering(Display display)
             {
                 if (DataRetriever != null)
-                    if (showOn_ == true && (DataRetriever.indicator() < thresholdOnMin_ && DataRetriever.indicator() > thresholdOnMax_))
+                    if (showOn_ == true && (DataRetriever.indicator() < thresholdOnMin_ || DataRetriever.indicator() > thresholdOnMax_))
                     {
                         show_ = false;
                         return;

@@ -575,12 +575,12 @@ namespace IngameScript
 
                     if (sliderOrientation == SliderOrientation.Left)
                     {
-                        barPosition = new Vector2(rtPosition.X + (size.X - barSize.X) * 0.5f, rtPosition.Y);
+                        barPosition = new Vector2(position.X + (size.X - barSize.X) * 0.5f, position.Y);
                         sliderPosition = new Vector2(rtPosition.X - (size.X - sliderSize.X) * 0.5f, rtPosition.Y - ratio * barSize.Y);
                     }
                     else
                     {
-                        barPosition = new Vector2(rtPosition.X - (size.X - barSize.X) * 0.5f, rtPosition.Y);
+                        barPosition = new Vector2(position.X - (size.X - barSize.X) * 0.5f, position.Y);
                         sliderPosition = new Vector2(rtPosition.X + (size.X - sliderSize.X) * 0.5f, rtPosition.Y - ratio * barSize.Y);
                     }
                 }
@@ -591,12 +591,12 @@ namespace IngameScript
 
                     if (sliderOrientation == SliderOrientation.Top)
                     {
-                        barPosition = new Vector2(rtPosition.X, rtPosition.Y + (size.Y - barSize.Y) * 0.5f);
+                        barPosition = new Vector2(position.X, position.Y + (size.Y - barSize.Y) * 0.5f);
                         sliderPosition = new Vector2(rtPosition.X + ratio * barSize.X, rtPosition.Y - (size.Y - sliderSize.Y) * 0.5f);
                     }
                     else
                     {
-                        barPosition = new Vector2(rtPosition.X, rtPosition.Y - (size.Y - barSize.Y) * 0.5f);
+                        barPosition = new Vector2(position.X, position.Y - (size.Y - barSize.Y) * 0.5f);
                         sliderPosition = new Vector2(rtPosition.X + ratio * barSize.X, rtPosition.Y + (size.Y - sliderSize.Y) * 0.5f);
                     }
                 }
