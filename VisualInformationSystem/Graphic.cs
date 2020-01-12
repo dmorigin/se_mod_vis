@@ -690,9 +690,9 @@ namespace IngameScript
                     // custom icon
                     switch(name)
                     {
-                        case "Storage":
+                        case "VIS_Icon_Storage":
                             return renderStorageIcon;
-                        case "Delimiter":
+                        case "VIS_Icon_Delimiter":
                             return renderDelimiter;
                     }
 
