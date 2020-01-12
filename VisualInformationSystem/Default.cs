@@ -43,7 +43,9 @@ namespace IngameScript
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
             public static Color BarBorderColor = new Color(179, 237, 255);
             public static float BarBorderSize = 0f;
-            public static float BarTileSpace = 4f;
+            public static float BarTileSpace = 0.04f;
+            public static Graphic.ValueType BarTileSpaceType = Graphic.ValueType.Relative;
+            public static int BarTileCount = 10;
             public static bool BarVertical = true;
 
             public static string DisplayNameTag = "[VIS]";

@@ -71,9 +71,11 @@ namespace IngameScript
 
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                float borderSize = borderSizeType_ == ValueType.Relative ? borderSize_ * (size.X < size.Y ? size.X : size.Y) : borderSize_;
+                float tileSpace = tileSpaceType_ == ValueType.Relative ? tileSpace_ * (size.X < size.Y ? size.X : size.Y) : tileSpace_;
 
-                renderStyledBar_(addSprite, rt, position, size, vertical_, DataRetriever.min() < 0.0, tiles_, tileSpace_,
-                    (float)DataRetriever.indicator(), Gradient, borderSize_, borderColor_, backgroundColor_);
+                renderStyledBar_(addSprite, rt, position, size, vertical_, DataRetriever.min() < 0.0, tiles_, tileSpace,
+                    (float)DataRetriever.indicator(), Gradient, borderSize, borderColor_, backgroundColor_);
             }
 
             #region Configuration
@@ -95,11 +97,31 @@ namespace IngameScript
             }
 
             float borderSize_ = Default.BarBorderSize;
-            Color borderColor_ = Default.BarBackgroundColor;
+            ValueType borderSizeType_ = Default.SizeType;
+            Color borderColor_ = Default.BarBorderColor;
             bool configBorder(string key, string value, Configuration.Options options)
             {
                 borderSize_ = Configuration.asFloat(value, Default.BarBorderSize);
-                borderColor_ = options.asColor(0, Default.BarBorderColor);
+                if (options.Count > 0)
+                {
+                    switch (options[0].ToLower())
+                    {
+                        case "a":
+                        case "absolute":
+                            borderSizeType_ = ValueType.Absolute;
+                            break;
+                        case "r":
+                        case "relative":
+                            borderSizeType_ = ValueType.Relative;
+                            break;
+                        default:
+                            log(Console.LogType.Error, $"");
+                            return false;
+                    }
+
+                    borderColor_ = options.asColor(1, Default.BarBorderColor);
+                }
+
                 return true;
             }
 
@@ -110,25 +132,43 @@ namespace IngameScript
             bool vertical_ = Default.BarVertical;
             int tiles_ = 0;
             float tileSpace_ = Default.BarTileSpace;
+            ValueType tileSpaceType_ = Default.BarTileSpaceType;
             bool configBarStyle(string key, string value, Configuration.Options options)
             {
-                switch(value.ToLower())
+                vertical_ = options.asBoolean(0, Default.BarVertical);
+
+                switch (value.ToLower())
                 {
                     case "simple":
                         renderStyledBar_ = Graphic.renderSimpleBar;
-                        vertical_ = options.asBoolean(0, Default.BarVertical);
                         break;
-                    case "segmented":
+                    case "segments":
                         renderStyledBar_ = Graphic.renderSegmentedBar;
-                        vertical_ = options.asBoolean(0, Default.BarVertical);
                         break;
-                    case "tiled":
+                    case "tiles":
                         renderStyledBar_ = Graphic.renderTiledBar;
-                        vertical_ = options.asBoolean(0, Default.BarVertical);
-                        tiles_ = options.asInteger(1, 0);
+                        tiles_ = options.asInteger(1, Default.BarTileCount);
                         tileSpace_ = options.asFloat(2, Default.BarTileSpace);
+                        if (options.Count >= 4)
+                        {
+                            switch (options[3].ToLower())
+                            {
+                                case "r":
+                                case "relative":
+                                    tileSpaceType_ = ValueType.Relative;
+                                    break;
+                                case "a":
+                                case "absolute":
+                                    tileSpaceType_ = ValueType.Absolute;
+                                    break;
+                                default:
+                                    log(Console.LogType.Error, $"Invalid tile space type '{options[3]}'");
+                                    return false;
+                            }
+                        }
                         break;
                     default:
+                        log(Console.LogType.Error, $"Invalid bar style '{value}'");
                         return false;
                 }
 

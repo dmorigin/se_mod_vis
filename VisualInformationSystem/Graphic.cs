@@ -70,17 +70,21 @@ namespace IngameScript
                 protected virtual bool configPosition(string key, string value, Configuration.Options options)
                 {
                     graphic_.Position = Configuration.asVector(value, Default.Position);
-                    if (options.Count == 0)
+                    if (options.Count > 0)
                     {
-                        string type = options[0].ToLower();
-                        if (type == "relative" || type == "r")
-                            graphic_.PositionType = ValueType.Relative;
-                        else if (type == "absolute" || type == "a")
-                            graphic_.PositionType = ValueType.Absolute;
-                        else
+                        switch (options[0].ToLower())
                         {
-                            graphic_.log(Console.LogType.Error, $"Invalid position type:{type}");
-                            return false;
+                            case "r":
+                            case "relative":
+                                graphic_.PositionType = ValueType.Relative;
+                                break;
+                            case "a":
+                            case "absolute":
+                                graphic_.PositionType = ValueType.Absolute;
+                                break;
+                            default:
+                                graphic_.log(Console.LogType.Error, $"Invalid position type:{options[0]}");
+                                return false;
                         }
                     }
 
@@ -90,17 +94,21 @@ namespace IngameScript
                 protected virtual bool configSize(string key, string value, Configuration.Options options)
                 {
                     graphic_.Size = Configuration.asVector(value, Default.Size);
-                    if (options.Count == 1)
+                    if (options.Count > 0)
                     {
-                        string type = options[0].ToLower();
-                        if (type == "relative" || type == "r")
-                            graphic_.SizeType = ValueType.Relative;
-                        else if (type == "absolute" || type == "a")
-                            graphic_.SizeType = ValueType.Absolute;
-                        else
+                        switch (options[0].ToLower())
                         {
-                            graphic_.log(Console.LogType.Error, $"Invalid size type:{type}");
-                            return false;
+                            case "r":
+                            case "relative":
+                                graphic_.SizeType = ValueType.Relative;
+                                break;
+                            case "a":
+                            case "absolute":
+                                graphic_.SizeType = ValueType.Absolute;
+                                break;
+                            default:
+                                graphic_.log(Console.LogType.Error, $"Invalid size type:{options[0]}");
+                                return false;
                         }
                     }
 
