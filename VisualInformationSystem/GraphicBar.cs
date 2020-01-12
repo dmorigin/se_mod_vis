@@ -47,9 +47,11 @@ namespace IngameScript
                 gfx.vertical_ = vertical_;
                 gfx.backgroundColor_ = backgroundColor_;
                 gfx.borderSize_ = borderSize_;
+                gfx.borderSizeType_ = borderSizeType_;
                 gfx.borderColor_ = borderColor_;
                 gfx.tiles_ = tiles_;
                 gfx.tileSpace_ = tileSpace_;
+                gfx.tileSpaceType_ = tileSpaceType_;
                 gfx.renderStyledBar_ = renderStyledBar_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());

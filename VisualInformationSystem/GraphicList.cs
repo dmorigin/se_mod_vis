@@ -55,7 +55,7 @@ namespace IngameScript
                 gfx.showText_ = showText_;
                 gfx.showMissing_ = showMissing_;
                 gfx.barBackground_ = barBackground_;
-                gfx.barHeight_ = barHeight_;
+                gfx.barThickness_ = barThickness_;
                 gfx.autoScroll_ = autoScroll_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
@@ -89,7 +89,7 @@ namespace IngameScript
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
                 float fontHeight = showText_ == true ? Default.CharHeight * Template.FontSize : 0f;
-                renderData_.barSize = showBar_ ? new Vector2(size.X, barHeight_ == 0f ? fontHeight : barHeight_) : new Vector2();
+                renderData_.barSize = showBar_ ? new Vector2(size.X, barThickness_ == 0f ? fontHeight : barThickness_) : new Vector2();
                 renderData_.lineHeight = fontHeight + renderData_.barSize.Y + spacing_;
 
                 if (lines_ > 0)
@@ -230,7 +230,7 @@ namespace IngameScript
 
             bool configCols(string key, string value, Configuration.Options options)
             {
-                return true;
+                return false;
             }
 
             bool showIcon_ = false;
@@ -257,7 +257,7 @@ namespace IngameScript
             }
 
             bool showBar_ = false;
-            float barHeight_ = 0f;
+            float barThickness_ = 0f;
             Color barBackground_ = Default.BarBackgroundColor;
             bool configShowBar(string key, string value, Configuration.Options options)
             {
@@ -265,7 +265,7 @@ namespace IngameScript
 
                 if (options.Count > 0)
                 {
-                    barHeight_ = Configuration.asFloat(options[0], 0f);
+                    barThickness_ = Configuration.asFloat(options[0], 0f);
                     barBackground_ = Configuration.asColor(options[1], Template.BackgroundColor);
                 }
                 return true;

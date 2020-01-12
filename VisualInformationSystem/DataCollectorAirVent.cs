@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorAirVent : DataCollector<IMyAirVent>
         {
-            DataCollectorAirVent(string typeId, Configuration.Options options)
-                : base(typeId, options)
+            public DataCollectorAirVent(Configuration.Options options)
+                : base("", options)
             {
             }
 
@@ -47,9 +47,13 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%pressurizeable%", pressurizeAble_.ToString())
-                    .Replace("%oxygenlevel%", (new ValueType(oxygenLevel_, unit: Unit.Percent)).pack().ToString());
+                    .Replace("%oxygenlevel%", new ValueType(oxygenLevel_, unit: Unit.Percent).pack().ToString());
             }
 
+            public override string CollectorTypeName
+            {
+                get { return "airvent"; }
+            }
 
             public override DataAccessor getDataAccessor(string name)
             {

@@ -86,12 +86,12 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", powerAvailableLeft_.ToString(Default.StringFormat))
-                    .Replace("%powerstoring%", powerAvailableStoring_.ToString(Default.StringFormat))
-                    .Replace("%maxinput%", (new ValueType(maxAvailableInput_, Multiplier.M, Unit.W)).pack().ToString())
-                    .Replace("%maxstored%", (new ValueType(maxAvailableStored_, Multiplier.M, Unit.Wh)).pack().ToString())
-                    .Replace("%currentinput%", (new ValueType(currentInput_, Multiplier.M, Unit.W)).pack().ToString())
-                    .Replace("%currentstored%", (new ValueType(currentStored_, Multiplier.M, Unit.Wh)).pack().ToString());
+                    .Replace("%powerleft%", new ValueType(powerAvailableLeft_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%powerstoring%", new ValueType(powerAvailableStoring_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%maxinput%", new ValueType(maxAvailableInput_, Multiplier.M, Unit.W).pack().ToString())
+                    .Replace("%maxcapacity%", new ValueType(maxAvailableStored_, Multiplier.M, Unit.Wh).pack().ToString())
+                    .Replace("%currentinput%", new ValueType(currentInput_, Multiplier.M, Unit.W).pack().ToString())
+                    .Replace("%currentcapacity%", new ValueType(currentStored_, Multiplier.M, Unit.Wh).pack().ToString());
             }
 
             public override DataAccessor getDataAccessor(string name)

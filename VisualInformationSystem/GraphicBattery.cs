@@ -110,12 +110,12 @@ namespace IngameScript
                     case "onoff":
                         borderColors_[0] = options.asColor(0, Color.Red);
                         break;
-                    case "charging":
+                    case "load":
                         borderColors_[1] = options.asColor(0, Color.Red);
                         borderColors_[2] = options.asColor(1, Color.Green);
                         break;
                     case "mode":
-                        borderColors_[3] = options.asColor(0, new Color(192, 29, 0));
+                        borderColors_[3] = options.asColor(0, new Color(254, 69, 7));
                         borderColors_[4] = options.asColor(1, Color.Blue);
                         break;
                     case "bar":

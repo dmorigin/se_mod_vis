@@ -62,9 +62,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%using%", powerAvailableUsing_.ToString(Default.StringFormat))
-                    .Replace("%maxoutput%", (new ValueType(maxAvailableOutput_, Multiplier.M, Unit.W)).pack().ToString())
-                    .Replace("%currentoutput%", (new ValueType(currentOutput_, Multiplier.M, Unit.W)).pack().ToString());
+                    .Replace("%using%", new ValueType(powerAvailableUsing_, unit:Unit.Percent).pack().ToString())
+                    .Replace("%maxoutput%", new ValueType(maxAvailableOutput_, Multiplier.M, Unit.W).pack().ToString())
+                    .Replace("%currentoutput%", new ValueType(currentOutput_, Multiplier.M, Unit.W).pack().ToString());
             }
 
 

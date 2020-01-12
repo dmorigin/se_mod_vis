@@ -110,15 +110,12 @@ namespace IngameScript
                         sliderOrientation_ = SliderOrientation.Right;
                         break;
                     default:
+                        log(Console.LogType.Error, $"Invalid slider orientation '{value}'");
                         return false;
                 }
 
-                if (options.Count >= 1)
-                    sliderWidth_ = options.asFloat(0, 0.03f);
-
-                if (options.Count >= 2)
-                    sliderColor_ = options.asColor(1, Color.WhiteSmoke);
-
+                sliderWidth_ = options.asFloat(0, 0.03f);
+                sliderColor_ = options.asColor(1, Color.WhiteSmoke);
                 return true;
             }
             #endregion // Configuration

@@ -70,6 +70,9 @@ namespace IngameScript
                     case "energyproducer":
                         dataCollector = new DataCollectorEnergyProducer<IMyPowerProducer>(options);
                         break;
+                    case "airvent":
+                        dataCollector = new DataCollectorAirVent(options);
+                        break;
                 }
 
                 if (dataCollector != null)

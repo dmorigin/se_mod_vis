@@ -46,7 +46,6 @@ namespace IngameScript
                     return;
 
                 double fillRation = 0.0;
-                capacity_ = 0f;
 
                 foreach (var tank in Blocks)
                     fillRation += tank.FilledRatio;
@@ -74,9 +73,9 @@ namespace IngameScript
 
             public override string getText(string data)
             {
-                return data.Replace("%capacity%", (new ValueType(capacity_, unit: Unit.l)).pack().ToString())
-                    .Replace("%fillratio%", fillRatio_.ToString(Default.StringFormat))
-                    .Replace("%fillvalue", (new ValueType(fillRatio_ * capacity_, unit: Unit.l)).pack().ToString());
+                return data.Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
+                    .Replace("%fillratio%", new ValueType(fillRatio_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%fillvalue", new ValueType(fillRatio_ * capacity_, unit: Unit.l).pack().ToString());
             }
 
             float fillRatio_ = 0f;
