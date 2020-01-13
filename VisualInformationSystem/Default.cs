@@ -37,8 +37,6 @@ namespace IngameScript
             public static Vector2 Size = new Vector2(1f, 1f);
             public static Graphic.ValueType SizeType = Graphic.ValueType.Relative;
 
-            public static long AmountItems = 20000;
-
             public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
             public static Color BarBorderColor = new Color(179, 237, 255);
@@ -59,6 +57,46 @@ namespace IngameScript
             public static float DCRefreshInSec = 5.0f;
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
+
+            public static long MaxAmountItems = 12345;
+            public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()
+            {
+                // individual amount values
+                { "MyObjectBuilder_Ore/Ice", 100000 },
+                { "MyObjectBuilder_Ore/Stone", 20000 },
+                { "MyObjectBuilder_Ore/Iron", 200000 },
+
+                { "MyObjectBuilder_Component/SteelPlate", 10000 },
+                { "MyObjectBuilder_Component/Medical", 500 },
+                { "MyObjectBuilder_Component/Motor", 6000 },
+                { "MyObjectBuilder_Component/InteriorPlate", 10000 },
+                { "MyObjectBuilder_Component/Construction", 10000 },
+                { "MyObjectBuilder_Component/ZoneChip", 20 },
+
+                // amount values for type groups
+                { "MyObjectBuilder_AmmoMagazine/", 1000 },
+                { "MyObjectBuilder_Component/", 4000 },
+                { "MyObjectBuilder_PhysicalGunObject/", 100 },
+                { "MyObjectBuilder_Ore/", 200000 },
+                { "MyObjectBuilder_Ingot/", 40000 },
+                { "MyObjectBuilder_ConsumableItem/", 100 },
+                { "MyObjectBuilder_PhysicalObject/", 2000 },
+                { "MyObjectBuilder_Datapad/", 30 },
+                { "MyObjectBuilder_Package/", 100 }
+            };
+
+            public static Dictionary<string, VISItemType> ItemTypeMap = new Dictionary<string, VISItemType>()
+            {
+                { "ammo", "MyObjectBuilder_AmmoMagazine/" },
+                { "component", "MyObjectBuilder_Component/" },
+                { "handtool", "MyObjectBuilder_PhysicalGunObject/" },
+                { "ore", "MyObjectBuilder_Ore/" },
+                { "ingot", "MyObjectBuilder_Ingot/" },
+                { "consumable", "MyObjectBuilder_ConsumableItem/" },
+                { "ice", "MyObjectBuilder_Ore/Ice" },
+                { "uranium", "MyObjectBuilder_Ingot/Uranium" },
+                { "uraniumore", "MyObjectBuilder_Ore/Uranium" }
+            };
 
             public static int CharHeight = 29;
             public static int CharWidthMonospace = 24 + 1;

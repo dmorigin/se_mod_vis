@@ -83,6 +83,7 @@
     <Compile Include="TemplateManager.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="ValueType.cs" />
+    <Compile Include="VISItemType.cs" />
     <Compile Include="VISManager.cs" />
     <Compile Include="VISObject.cs" />
   </ItemGroup>

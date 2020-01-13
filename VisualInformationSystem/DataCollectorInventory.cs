@@ -28,16 +28,7 @@ namespace IngameScript
             {
             }
 
-            bool compareItemTypes(MyItemType a, MyItemType b)
-            {
-                if (a.SubtypeId != "" && b.SubtypeId != "")
-                    return a.TypeId == b.TypeId && a.SubtypeId == b.SubtypeId;
-
-                return a.TypeId == b.TypeId;
-            }
-
             #region Construction Part
-            string pattern = "^(MyObjectBuilder_[Ingot|Ore|PhysicalGunObject|Component|AmmoMagazine])[/]{0,1}([0-9a-zA-Z]+)$";
             int constructStage_ = 0;
             List<IMyTerminalBlock> construtBlocks_ = new List<IMyTerminalBlock>();
             int constructIndex_ = 0;
@@ -54,7 +45,7 @@ namespace IngameScript
                         inventory.GetAcceptedItems(acceptedItems);
                         foreach (ItemType item in itemTypes_)
                         {
-                            if (acceptedItems.Exists(x => compareItemTypes(x, item.type)))
+                            if (acceptedItems.Exists(x => item.type.Equals(x)))
                             {
                                 inventories_.Add(inventory);
                                 Blocks.Add(block);
@@ -84,45 +75,10 @@ namespace IngameScript
                     {
                         for (int it = 2; it < Options.Count; ++it)
                         {
-                            string itemType = Options[it];
-                            switch (itemType.ToLower())
-                            {
-                                case "ammo":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_AmmoMagazine", ""), defaultMaxAmountItems_));
-                                    continue;
-                                case "component":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Component", ""), defaultMaxAmountItems_));
-                                    continue;
-                                case "handtool":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_PhysicalGunObject", ""), defaultMaxAmountItems_));
-                                    continue;
-                                case "ore":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", ""), defaultMaxAmountItems_));
-                                    continue;
-                                case "ingot":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ingot", ""), defaultMaxAmountItems_));
-                                    continue;
-                                case "ice":
-                                    itemTypes_.Add(new ItemType(new MyItemType("MyObjectBuilder_Ore", "Ice"), defaultMaxAmountItems_));
-                                    continue;
-                            }
-
+                            string itemTypeName = Options[it];
                             int amount = 0;
-                            if (System.Text.RegularExpressions.Regex.IsMatch(itemType, pattern))
-                            {
-                                string[] parts = itemType.Split('/');
-                                if (parts.Length == 1)
-                                    itemTypes_.Add(new ItemType(new MyItemType(parts[0], ""), defaultMaxAmountItems_));
-                                else if (parts.Length == 2)
-                                    itemTypes_.Add(new ItemType(new MyItemType(parts[0], parts[1]), defaultMaxAmountItems_));
-                                else
-                                {
-                                    log(Console.LogType.Error, $"Invalid item type:{itemType}");
-                                    return false;
-                                }
-                                maxItems_ += defaultMaxAmountItems_;
-                            }
-                            else if (int.TryParse(itemType, out amount))
+
+                            if (int.TryParse(itemTypeName, out amount))
                             {
                                 if (itemTypes_.Count > 0)
                                 {
@@ -134,8 +90,21 @@ namespace IngameScript
                             }
                             else
                             {
-                                log(Console.LogType.Error, $"Invalid item type {itemType}");
-                                return false;
+                                VISItemType itemType = Default.ItemTypeMap.FirstOrDefault(pair => pair.Key == itemTypeName.ToLower()).Value;
+                                if (!itemType) // try as typeId string
+                                {
+                                    log(Console.LogType.Debug, $"Item '{itemTypeName}' not in default list");
+                                    itemType = itemTypeName;
+                                }
+
+                                if (!itemType)
+                                {
+                                    log(Console.LogType.Error, $"Invalid item type:{itemTypeName}");
+                                    return false;
+                                }
+
+                                long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key == itemType).Value;
+                                itemTypes_.Add(new ItemType(itemType, defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_));
                             }
                         }
                     }
@@ -226,12 +195,12 @@ namespace IngameScript
 
                     inventory.GetAcceptedItems(null, (itemType) =>
                     {
-                        int itemTypeIndex = itemTypes_.FindIndex(x => compareItemTypes(x.type, itemType));
+                        int itemTypeIndex = itemTypes_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
                         if (itemTypes_.Count > 0 && itemTypeIndex < 0)
                             return false;
 
                         var amount = inventory.GetItemAmount(itemType);
-                        int index = items_.FindIndex(x => compareItemTypes(x.type, itemType));
+                        int index = items_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
                         if (index >= 0)
                         {
                             items_[index].currentAmount += (long)amount;
@@ -246,7 +215,10 @@ namespace IngameScript
                             if (itemTypeIndex >= 0)
                                 item.maxAmount = itemTypes_[itemTypeIndex].amount;
                             else
-                                item.maxAmount = defaultMaxAmountItems_;
+                            {
+                                long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key.Equals(item.type)).Value;
+                                item.maxAmount = defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_;
+                            }
 
                             items_.Add(item);
                         }
@@ -278,7 +250,7 @@ namespace IngameScript
                     amount = a;
                 }
 
-                public MyItemType type;
+                public VISItemType type;
                 public long amount;
             }
 
@@ -291,7 +263,7 @@ namespace IngameScript
             long currentItems_ = 0;
             double itemRation_ = 0;
 
-            long defaultMaxAmountItems_ = Default.AmountItems;
+            long defaultMaxAmountItems_ = Default.MaxAmountItems;
 
             class InventoryItem
             {
