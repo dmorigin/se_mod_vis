@@ -94,8 +94,7 @@ namespace IngameScript
                 { "ingot", "MyObjectBuilder_Ingot/" },
                 { "consumable", "MyObjectBuilder_ConsumableItem/" },
                 { "ice", "MyObjectBuilder_Ore/Ice" },
-                { "uranium", "MyObjectBuilder_Ingot/Uranium" },
-                { "uraniumore", "MyObjectBuilder_Ore/Uranium" }
+                { "uranium", "MyObjectBuilder_Ingot/Uranium" }
             };
 
             public static int CharHeight = 29;
