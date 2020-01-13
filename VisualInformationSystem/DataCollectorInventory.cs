@@ -230,9 +230,9 @@ namespace IngameScript
                 if (invIndex_ >= inventories_.Count)
                 {
                     UpdateFinished = true;
-                    volumeRation_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
-                    itemRation_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
-                    itemRation_ = itemRation_ > 1 ? 1 : itemRation_;
+                    volumeRatio_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
+                    itemRatio_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
+                    itemRatio_ = itemRatio_ > 1 ? 1 : itemRatio_;
                 }
             }
             #endregion // Update Part
@@ -258,10 +258,21 @@ namespace IngameScript
             List<IMyInventory> inventories_ = new List<IMyInventory>();
             double currentVolume_ = 0;
             double maxVolume_ = 0;
-            double volumeRation_ = 0;
+            double volumeRatio_ = 0;
             long maxItems_ = 0;
             long currentItems_ = 0;
-            double itemRation_ = 0;
+            double itemRatio_ = 0;
+
+            public override string getText(string data)
+            {
+                return base.getText(data)
+                    .Replace("%maxitems%", maxItems_.ToString(Default.StringFormat))
+                    .Replace("%currentitems%", currentItems_.ToString(Default.StringFormat))
+                    .Replace("%itemratio%", new ValueType(itemRatio_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%maxvolume%", new ValueType(maxVolume_, unit: Unit.l).pack().ToString())
+                    .Replace("%currentvolume%", new ValueType(currentVolume_, unit: Unit.l).pack().ToString())
+                    .Replace("%volumeratio%", new ValueType(volumeRatio_, unit: Unit.Percent).pack().ToString());
+            }
 
             long defaultMaxAmountItems_ = Default.MaxAmountItems;
 
@@ -299,7 +310,7 @@ namespace IngameScript
 
                 public override double indicator()
                 {
-                    return inv_.volumeRation_;
+                    return inv_.volumeRatio_;
                 }
 
                 public override ValueType min()
@@ -347,7 +358,7 @@ namespace IngameScript
 
                 public override double indicator()
                 {
-                    return inv_.itemRation_;
+                    return inv_.itemRatio_;
                 }
 
                 public override ValueType min()
