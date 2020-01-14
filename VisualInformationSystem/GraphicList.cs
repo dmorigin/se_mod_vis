@@ -67,6 +67,7 @@ namespace IngameScript
             {
                 public int lines;
                 public float lineHeight;
+                public float fontSize;
 
                 public Vector2 iconPosition;
                 public Vector2 iconSize;
@@ -98,13 +99,19 @@ namespace IngameScript
 
                     fontHeight *= scale;
                     renderData_.barSize.Y *= scale;
-                    renderData_.lineHeight = fontHeight + renderData_.barSize.Y + spacing_;
+                    renderData_.lineHeight = fontHeight + renderData_.barSize.Y + (spacing_ * scale);
+                    renderData_.lines = lines_;
+                    renderData_.fontSize = Template.FontSize * scale;
+                }
+                else
+                {
+                    renderData_.lines = (int)(size.Y / renderData_.lineHeight);
+                    renderData_.fontSize = Template.FontSize;
                 }
 
                 if (showIcon_ && !showText_)
                     renderData_.barSize.X -= renderData_.barSize.Y;
 
-                renderData_.lines = (int)Math.Ceiling(size.Y / renderData_.lineHeight);
                 renderData_.textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
                 renderData_.barPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.barSize.Y * 0.5f) + fontHeight;
 
@@ -139,11 +146,15 @@ namespace IngameScript
                     {
                         autoScrollLine_ += autoScrollInc_;
 
-                        // toggle inc
-                        if (autoScrollLine_ >= (renderData_.container.Count - renderData_.lines) || autoScrollLine_ < 0)
+                        if (autoScrollLine_ < 0)
                         {
+                            autoScrollLine_ = 0;
                             autoScrollInc_ *= -1;
-                            autoScrollLine_ += autoScrollInc_;
+                        }
+                        else if (autoScrollLine_ > (renderData_.container.Count - renderData_.lines))
+                        {
+                            autoScrollLine_ = renderData_.container.Count - renderData_.lines;
+                            autoScrollInc_ *= -1;
                         }
                     }
                 }
@@ -170,10 +181,8 @@ namespace IngameScript
                     {
                         string iconType = $"{entry.type.TypeId}/{entry.type.SubtypeId}";
                         if (RenderTarget.spriteExist(iconType))
-                        {
-                            addSprite(new MySprite(SpriteType.TEXTURE, iconType, iconPosition, renderData_.iconSize, Color.White));
-                            iconPosition.Y += renderData_.lineHeight;
-                        }
+                            addSprite(new MySprite(SpriteType.TEXTURE, iconType, iconPosition + rt.DisplayOffset, renderData_.iconSize, Color.White));
+                        iconPosition.Y += renderData_.lineHeight;
                     }
 
                     // draw bar
@@ -189,10 +198,10 @@ namespace IngameScript
                     {
                         string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
 
-                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize, 
+                        renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize, 
                             new Vector2(renderData_.textLeftPositionX, textPositionY), 
                             getGradientColor((float)entry.indicator), entry.name, TextAlignment.LEFT);
-                        renderTextLine(display, rt, addSprite, Template.Font, Template.FontSize,
+                        renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize,
                             new Vector2(renderData_.textRightPositionX, textPositionY),
                             getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
 
@@ -253,6 +262,7 @@ namespace IngameScript
             bool configAutoScroll(string key, string value, Configuration.Options options)
             {
                 autoScroll_ = Configuration.asBoolean(value, true);
+                autoScrollInc_ = options.asInteger(0, 1);
                 return true;
             }
 

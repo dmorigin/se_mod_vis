@@ -58,7 +58,7 @@ namespace IngameScript
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
 
-            public static long MaxAmountItems = 12345;
+            public static long MaxAmountItems = 1000;
             public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()
             {
                 // individual amount values
@@ -73,10 +73,13 @@ namespace IngameScript
                 { "MyObjectBuilder_Component/Construction", 10000 },
                 { "MyObjectBuilder_Component/ZoneChip", 20 },
 
+                { "MyObjectBuilder_OxygenContainerObject/OxygenBottle", 5 },
+                { "MyObjectBuilder_GasContainerObject/HydrogenBottle", 5 },
+
                 // amount values for type groups
                 { "MyObjectBuilder_AmmoMagazine/", 1000 },
                 { "MyObjectBuilder_Component/", 4000 },
-                { "MyObjectBuilder_PhysicalGunObject/", 100 },
+                { "MyObjectBuilder_PhysicalGunObject/", 20 },
                 { "MyObjectBuilder_Ore/", 200000 },
                 { "MyObjectBuilder_Ingot/", 40000 },
                 { "MyObjectBuilder_ConsumableItem/", 100 },
