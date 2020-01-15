@@ -72,20 +72,10 @@ namespace IngameScript
                     graphic_.Position = Configuration.asVector(value, Default.Position);
                     if (options.Count > 0)
                     {
-                        switch (options[0].ToLower())
-                        {
-                            case "r":
-                            case "relative":
-                                graphic_.PositionType = ValueType.Relative;
-                                break;
-                            case "a":
-                            case "absolute":
-                                graphic_.PositionType = ValueType.Absolute;
-                                break;
-                            default:
-                                graphic_.log(Console.LogType.Error, $"Invalid position type:{options[0]}");
-                                return false;
-                        }
+                        ValueType vt;
+                        if (!toValueType(options[0], out vt, Default.PositionType))
+                            return false;
+                        graphic_.PositionType = vt;
                     }
 
                     return true;
@@ -96,20 +86,10 @@ namespace IngameScript
                     graphic_.Size = Configuration.asVector(value, Default.Size);
                     if (options.Count > 0)
                     {
-                        switch (options[0].ToLower())
-                        {
-                            case "r":
-                            case "relative":
-                                graphic_.SizeType = ValueType.Relative;
-                                break;
-                            case "a":
-                            case "absolute":
-                                graphic_.SizeType = ValueType.Absolute;
-                                break;
-                            default:
-                                graphic_.log(Console.LogType.Error, $"Invalid size type:{options[0]}");
-                                return false;
-                        }
+                        ValueType vt;
+                        if (!toValueType(options[0], out vt, Default.SizeType))
+                            return false;
+                        graphic_.SizeType = vt;
                     }
 
                     return true;
@@ -180,6 +160,28 @@ namespace IngameScript
             {
                 Absolute,
                 Relative
+            }
+
+            protected static bool toValueType(string value, out ValueType vt, ValueType defaultValue)
+            {
+                switch (value.ToLower())
+                {
+                    case "":
+                        vt = defaultValue;
+                        return true;
+                    case "r":
+                    case "relative":
+                        vt = ValueType.Relative;
+                        return true;
+                    case "a":
+                    case "absolute":
+                        vt = ValueType.Absolute;
+                        return true;
+                }
+
+                vt = Default.ValueType;
+                Program.App.Manager.log(Console.LogType.Error, $"Invalid value type:{value}");
+                return false;
             }
 
             #region Properties

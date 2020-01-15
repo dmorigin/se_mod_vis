@@ -28,23 +28,27 @@ namespace IngameScript
             public static Color FontColor = new Color(179, 237, 255);
             public static TextAlignment FontAlignment = TextAlignment.LEFT;
             public static string StringFormat = "#0.00#";
+            public static Graphic.ValueType ValueType = Graphic.ValueType.Relative;
 
             public static Color Color = Color.White;
             public static Color BackgroundColor = new Color(0, 88, 151);
             public static int ZPosition = 0;
             public static Vector2 Position = new Vector2(0.5f, 0.5f);
-            public static Graphic.ValueType PositionType = Graphic.ValueType.Relative;
+            public static Graphic.ValueType PositionType = ValueType;
             public static Vector2 Size = new Vector2(1f, 1f);
-            public static Graphic.ValueType SizeType = Graphic.ValueType.Relative;
+            public static Graphic.ValueType SizeType = ValueType;
 
             public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
             public static Color BarBorderColor = new Color(179, 237, 255);
             public static float BarBorderSize = 0f;
             public static float BarTileSpace = 0.04f;
-            public static Graphic.ValueType BarTileSpaceType = Graphic.ValueType.Relative;
+            public static Graphic.ValueType BarTileSpaceType = ValueType;
             public static int BarTileCount = 10;
             public static bool BarVertical = true;
+
+            public static float ListBarThickness = 1f;
+            public static Graphic.ValueType ListBarThicknessType = ValueType;
 
             public static string DisplayNameTag = "[VIS]";
             public static Vector2I DisplayCoordinate = new Vector2I(0, 0);

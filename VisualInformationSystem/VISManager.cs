@@ -123,7 +123,7 @@ namespace IngameScript
                 get { return console_; }
             }
 
-            private void log(Console.LogType logType, string messsage)
+            public void log(Console.LogType logType, string messsage)
             {
                 console_.log(logType, messsage);
             }

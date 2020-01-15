@@ -50,13 +50,23 @@ namespace IngameScript
 
                 gfx.lines_ = lines_;
                 gfx.spacing_ = spacing_;
-                gfx.showBar_ = showBar_;
-                gfx.showIcon_ = showIcon_;
-                gfx.showText_ = showText_;
-                gfx.showMissing_ = showMissing_;
-                gfx.barBackground_ = barBackground_;
+
+                gfx.textShow_ = textShow_;
+                gfx.textStyle_ = textStyle_;
+
+                gfx.barShow_ = barShow_;
+                gfx.barEmbedded_ = barEmbedded_;
+                gfx.barRenderMethod_ = barRenderMethod_;
                 gfx.barThickness_ = barThickness_;
+                gfx.barThicknessType_ = barThicknessType_;
+                gfx.barBackground_ = barBackground_;
+
+                gfx.visibleOperator_ = visibleOperator_;
+                gfx.visibleThreshold_ = visibleThreshold_;
+
+                gfx.iconShow_ = iconShow_;
                 gfx.autoScroll_ = autoScroll_;
+                gfx.autoScrollInc_ = autoScrollInc_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
@@ -74,6 +84,8 @@ namespace IngameScript
 
                 public Vector2 barPosition;
                 public Vector2 barSize;
+                public int barTiles;
+                public float barTileSpacing;
 
                 public float textLeftPositionX;
                 public float textRightPositionX;
@@ -89,9 +101,17 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
-                float fontHeight = showText_ == true ? Default.CharHeight * Template.FontSize : 0f;
-                renderData_.barSize = showBar_ ? new Vector2(size.X, barThickness_ == 0f ? fontHeight : barThickness_) : new Vector2();
-                renderData_.lineHeight = fontHeight + renderData_.barSize.Y + spacing_;
+                float fontHeight = textShow_ == true ? Default.CharHeight * Template.FontSize : 0f;
+                float barThickness = barThicknessType_ == ValueType.Relative ? barThickness_ * fontHeight : barThickness_;
+
+                renderData_.lineHeight = fontHeight + spacing_;
+                if (barShow_)
+                {
+                    renderData_.barSize = new Vector2(size.X, barThickness_);
+                    renderData_.lineHeight += barEmbedded_ ? 0f : renderData_.barSize.Y;
+                }
+                else
+                    renderData_.barSize = new Vector2();
 
                 if (lines_ > 0)
                 {
@@ -99,7 +119,7 @@ namespace IngameScript
 
                     fontHeight *= scale;
                     renderData_.barSize.Y *= scale;
-                    renderData_.lineHeight = fontHeight + renderData_.barSize.Y + (spacing_ * scale);
+                    renderData_.lineHeight *= scale; //fontHeight + renderData_.barSize.Y + (spacing_ * scale);
                     renderData_.lines = lines_;
                     renderData_.fontSize = Template.FontSize * scale;
                 }
@@ -109,17 +129,25 @@ namespace IngameScript
                     renderData_.fontSize = Template.FontSize;
                 }
 
-                if (showIcon_ && !showText_)
+                if (iconShow_ && (!textShow_ || barEmbedded_))
                     renderData_.barSize.X -= renderData_.barSize.Y;
 
+                // calculate bar tiles
+                if (barShow_)
+                {
+                    renderData_.barTiles = (int)((renderData_.barSize.X / renderData_.barSize.Y) * 2f);
+                    renderData_.barTileSpacing = renderData_.barSize.X * 0.01f;
+                }
+
+                // calculate Y position
                 renderData_.textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
-                renderData_.barPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.barSize.Y * 0.5f) + fontHeight;
+                renderData_.barPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.barSize.Y * 0.5f) + (barEmbedded_ ? 0f : fontHeight);
 
                 // icon
-                if (showIcon_)
+                if (iconShow_)
                 {
                     // adjust bar size if no text
-                    if (showText_ == false)
+                    if (textShow_ == false)
                     {
                         renderData_.barSize.X -= renderData_.barSize.Y;
                         renderData_.iconSize = new Vector2(renderData_.barSize.Y, renderData_.barSize.Y);
@@ -130,12 +158,14 @@ namespace IngameScript
                     renderData_.iconPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.iconSize.Y * 0.5f);
                 }
 
+                // calculate X position
                 renderData_.iconPosition.X = position.X - (size.X * 0.5f) + (renderData_.iconSize.X * 0.5f);
-                renderData_.barPosition.X = position.X - (size.X * 0.5f) + (renderData_.barSize.X * 0.5f);
+                renderData_.barPosition.X = position.X - (size.X * 0.5f) + (renderData_.barSize.X * 0.5f) + (barEmbedded_ ? renderData_.iconSize.X : 0f);
                 renderData_.textLeftPositionX = position.X - (size.X * 0.5f) + renderData_.iconSize.X;
                 renderData_.textRightPositionX = position.X + (size.X * 0.5f);
 
-                DataRetriever.list(out renderData_.container, (item) => showMissing_ || item.value > 0);
+                // filter list
+                DataRetriever.list(out renderData_.container, (item) => visibleOperator_(item.indicator, visibleThreshold_));
 
                 // auto scroll
                 if (autoScroll_ == true)
@@ -173,11 +203,11 @@ namespace IngameScript
                 for (int l = autoScrollLine_; l < (renderData_.lines + autoScrollLine_) && l < renderData_.container.Count; l++)
                 {
                     var entry = renderData_.container[l];
-                    if (entry.value == 0.0 && !showMissing_)
-                        continue;
+                    //if (entry.value == 0.0 && !showMissing_)
+                    //    continue;
 
                     // draw icon
-                    if (showIcon_)
+                    if (iconShow_)
                     {
                         string iconType = $"{entry.type.TypeId}/{entry.type.SubtypeId}";
                         if (RenderTarget.spriteExist(iconType))
@@ -186,24 +216,27 @@ namespace IngameScript
                     }
 
                     // draw bar
-                    if (showBar_)
+                    if (barShow_)
                     {
-                        renderSimpleBar(addSprite, rt, barPosition, renderData_.barSize, false, false, 0, 0f,
-                            (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
+                        barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, false, false, renderData_.barTiles, 
+                            renderData_.barTileSpacing, (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
                         barPosition.Y += renderData_.lineHeight;
                     }
 
                     // draw text
-                    if (showText_)
+                    if (textShow_)
                     {
-                        string rightText = $"{entry.value.pack()}/{entry.max.pack()}";
-
                         renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize, 
                             new Vector2(renderData_.textLeftPositionX, textPositionY), 
                             getGradientColor((float)entry.indicator), entry.name, TextAlignment.LEFT);
-                        renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize,
-                            new Vector2(renderData_.textRightPositionX, textPositionY),
-                            getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
+
+                        if (textStyle_ != TextStyle.OnlyName)
+                        {
+                            string rightText = textStyle_ == TextStyle.MinValue ? $"{entry.value.pack()}" : $"{entry.value.pack()}/{entry.max.pack()}";
+                            renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize,
+                                new Vector2(renderData_.textRightPositionX, textPositionY),
+                                getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
+                        }
 
                         textPositionY += renderData_.lineHeight;
                     }
@@ -217,15 +250,99 @@ namespace IngameScript
                 ConfigHandler config = base.getConfigHandler();
                 if (config != null)
                 {
+                    config.add("text", configText);
+                    config.add("bar", configBar);
+                    config.add("icon", configIcon);
+                    config.add("visibility", configVisibility);
                     config.add("setline", configSetLine);
-                    config.add("showicon", configShowIcon);
-                    config.add("showtext", configShowText);
-                    config.add("showbar", configShowBar);
                     config.add("autoscroll", configAutoScroll);
-                    config.add("showmissing", configShowMissing);
                 }
 
                 return config;
+            }
+
+            enum TextStyle
+            {
+                Normal,
+                OnlyName,
+                MinValue,
+            };
+            bool textShow_ = true;
+            TextStyle textStyle_ = TextStyle.Normal;
+            bool configText(string key, string value, Configuration.Options options)
+            {
+                textShow_ = Configuration.asBoolean(value, true);
+                if (textShow_ == true)
+                {
+                    switch (options[0].ToLower())
+                    {
+                        case "":
+                        case "normal":
+                            textStyle_ = TextStyle.Normal;
+                            break;
+                        case "onlyname":
+                            textStyle_ = TextStyle.OnlyName;
+                            break;
+                        case "minvalue":
+                            textStyle_ = TextStyle.MinValue;
+                            break;
+                        default:
+                            return false;
+                    }
+                }
+
+                return true;
+            }
+
+            delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                float borderSize, Color borderColor, Color backgroundColor);
+            
+            bool barShow_ = false;
+            bool barEmbedded_ = false;
+            RenderStyledBar barRenderMethod_;
+            float barThickness_ = Default.ListBarThickness;
+            ValueType barThicknessType_ = Default.ListBarThicknessType;
+            Color barBackground_ = Default.BarBackgroundColor;
+            bool configBar(string key, string value, Configuration.Options options)
+            {
+                barShow_ = true;
+                barEmbedded_ = Configuration.asBoolean(value, false);
+
+                switch (options[0].ToLower())
+                {
+                    case "simple":
+                        barRenderMethod_ = Graphic.renderSimpleBar;
+                        break;
+                    case "segments":
+                        barRenderMethod_ = Graphic.renderSegmentedBar;
+                        break;
+                    case "tiles":
+                        barRenderMethod_ = Graphic.renderTiledBar;
+                        break;
+                    default:
+                        log(Console.LogType.Error, $"Invalid list bar style: {options[0]}");
+                        return false;
+                }
+
+                barThickness_ = Configuration.asFloat(options[1], Default.ListBarThickness);
+                if (!toValueType(options[2], out barThicknessType_, Default.ListBarThicknessType))
+                    return false;
+                if (barThickness_ <= 0f || barEmbedded_)
+                {
+                    barThickness_ = 1f;
+                    barThicknessType_ = ValueType.Relative;
+                }
+
+                barBackground_ = Configuration.asColor(options[3], Template.BackgroundColor);
+                return true;
+            }
+
+            bool iconShow_ = false;
+            bool configIcon(string key, string value, Configuration.Options options)
+            {
+                iconShow_ = Configuration.asBoolean(value, false);
+                return true;
             }
 
             int lines_ = 0; // if 0 the amount of lines will be automaticaly calculated
@@ -234,25 +351,6 @@ namespace IngameScript
             {
                 spacing_ = Configuration.asFloat(value, 7f);
                 lines_ = options.asInteger(0, 0);
-                return true;
-            }
-
-            bool configCols(string key, string value, Configuration.Options options)
-            {
-                return false;
-            }
-
-            bool showIcon_ = false;
-            bool configShowIcon(string key, string value, Configuration.Options options)
-            {
-                showIcon_ = Configuration.asBoolean(value, false);
-                return true;
-            }
-
-            bool showText_ = true;
-            bool configShowText(string key, string value, Configuration.Options options)
-            {
-                showText_ = Configuration.asBoolean(value, true);
                 return true;
             }
 
@@ -266,28 +364,60 @@ namespace IngameScript
                 return true;
             }
 
-            bool showBar_ = false;
-            float barThickness_ = 0f;
-            Color barBackground_ = Default.BarBackgroundColor;
-            bool configShowBar(string key, string value, Configuration.Options options)
+            //bool visible_ = true;
+            double visibleThreshold_ = 0.0;
+            OperatorDelegate visibleOperator_ = greater;
+            bool configVisibility(string key, string value, Configuration.Options options)
             {
-                showBar_ = Configuration.asBoolean(value, false);
-
-                if (options.Count > 0)
+                switch (value.ToLower())
                 {
-                    barThickness_ = Configuration.asFloat(options[0], 0f);
-                    barBackground_ = Configuration.asColor(options[1], Template.BackgroundColor);
+                    case "equal":
+                    case "==":
+                        visibleOperator_ = equal;
+                        break;
+                    case "unequal":
+                    case "!=":
+                        visibleOperator_ = unequal;
+                        break;
+                    case "less":
+                    case "<":
+                        visibleOperator_ = less;
+                        break;
+                    case "greater":
+                    case ">":
+                        visibleOperator_ = greater;
+                        break;
+                    case "lessequal":
+                    case "<=":
+                        visibleOperator_ = lessequal;
+                        break;
+                    case "greaterequal":
+                    case ">=":
+                        visibleOperator_ = greaterequal;
+                        break;
+                    default:
+                        return false;
                 }
-                return true;
-            }
 
-            bool showMissing_ = false;
-            bool configShowMissing(string key, string value, Configuration.Options options)
-            {
-                showMissing_ = Configuration.asBoolean(value, false);
+                visibleThreshold_ = options.asFloat(0, 0f);
                 return true;
             }
             #endregion // Configuration
+
+            #region Condition
+            // indicator is greater then threshold
+            // example indicator > 0.1
+            // visibility:less:0.1
+            delegate bool OperatorDelegate(double a, double b);
+
+            static bool equal(double a, double b) => a == b;
+            static bool unequal(double a, double b) => a != b;
+            static bool less(double a, double b) => a < b;
+            static bool greater(double a, double b) => a > b;
+            static bool lessequal(double a, double b) => a <= b;
+            static bool greaterequal(double a, double b) => a >= b;
+            #endregion // Condition
+
         }
     }
 }

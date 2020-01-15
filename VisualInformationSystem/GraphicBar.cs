@@ -106,20 +106,8 @@ namespace IngameScript
                 borderSize_ = Configuration.asFloat(value, Default.BarBorderSize);
                 if (options.Count > 0)
                 {
-                    switch (options[0].ToLower())
-                    {
-                        case "a":
-                        case "absolute":
-                            borderSizeType_ = ValueType.Absolute;
-                            break;
-                        case "r":
-                        case "relative":
-                            borderSizeType_ = ValueType.Relative;
-                            break;
-                        default:
-                            log(Console.LogType.Error, $"");
-                            return false;
-                    }
+                    if (!toValueType(options[0], out borderSizeType_, Default.SizeType))
+                        return false;
 
                     borderColor_ = options.asColor(1, Default.BarBorderColor);
                 }
@@ -153,20 +141,8 @@ namespace IngameScript
                         tileSpace_ = options.asFloat(2, Default.BarTileSpace);
                         if (options.Count >= 4)
                         {
-                            switch (options[3].ToLower())
-                            {
-                                case "r":
-                                case "relative":
-                                    tileSpaceType_ = ValueType.Relative;
-                                    break;
-                                case "a":
-                                case "absolute":
-                                    tileSpaceType_ = ValueType.Absolute;
-                                    break;
-                                default:
-                                    log(Console.LogType.Error, $"Invalid tile space type '{options[3]}'");
-                                    return false;
-                            }
+                            if (!toValueType(options[3], out tileSpaceType_, Default.BarTileSpaceType))
+                                return false;
                         }
                         break;
                     default:
