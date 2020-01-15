@@ -160,6 +160,7 @@ namespace IngameScript
                 public Color fontColor;
 
                 public Vector2 position;
+                public float lineHeight;
                 public List<string> lines;
             }
 
@@ -181,6 +182,8 @@ namespace IngameScript
                     renderData_.lines.Add(line);
                 }
 
+                renderData_.lineHeight = maxSize.Y;
+
                 if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
@@ -201,7 +204,7 @@ namespace IngameScript
                 for (int c = 0; c < renderData_.lines.Count; c++)
                 {
                     Graphic.renderTextLine(display, rt, addSprite, Font, renderData_.fontSize, 
-                        new Vector2(renderData_.position.X, renderData_.position.Y + (c * renderData_.fontSize)), 
+                        new Vector2(renderData_.position.X, renderData_.position.Y + (c * renderData_.lineHeight)), 
                         renderData_.fontColor, renderData_.lines[c], TextAlignment);
                 }
             }

@@ -417,7 +417,6 @@ namespace IngameScript
             static bool lessequal(double a, double b) => a <= b;
             static bool greaterequal(double a, double b) => a >= b;
             #endregion // Condition
-
         }
     }
 }
