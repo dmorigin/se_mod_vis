@@ -59,16 +59,19 @@ namespace IngameScript
                         dataCollector = new DataCollectorBattery(options);
                         break;
                     case "solar":
-                        dataCollector = new DataCollectorEnergyProducer<IMySolarPanel>(options);
+                        dataCollector = new DataCollectorPowerProducer<IMySolarPanel>("solar", "", options);
+                        break;
+                    case "windturbine":
+                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("windturbine", "MyObjectBuilder_WindTurbine", options);
                         break;
                     case "reactor":
-                        dataCollector = new DataCollectorEnergyProducer<IMyReactor>(options);
+                        dataCollector = new DataCollectorReactor(options);
                         break;
                     case "generator":
-                        dataCollector = new DataCollectorEnergyProducer<IMyGasGenerator>(options);
+                        dataCollector = new DataCollectorGenerator(options);
                         break;
-                    case "energyproducer":
-                        dataCollector = new DataCollectorEnergyProducer<IMyPowerProducer>(options);
+                    case "powerproducer":
+                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("powerproducer", "", options);
                         break;
                     case "airvent":
                         dataCollector = new DataCollectorAirVent(options);

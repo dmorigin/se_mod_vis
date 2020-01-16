@@ -119,7 +119,7 @@ namespace IngameScript
 
                     fontHeight *= scale;
                     renderData_.barSize.Y *= scale;
-                    renderData_.lineHeight *= scale; //fontHeight + renderData_.barSize.Y + (spacing_ * scale);
+                    renderData_.lineHeight *= scale;
                     renderData_.lines = lines_;
                     renderData_.fontSize = Template.FontSize * scale;
                 }
@@ -203,8 +203,6 @@ namespace IngameScript
                 for (int l = autoScrollLine_; l < (renderData_.lines + autoScrollLine_) && l < renderData_.container.Count; l++)
                 {
                     var entry = renderData_.container[l];
-                    //if (entry.value == 0.0 && !showMissing_)
-                    //    continue;
 
                     // draw icon
                     if (iconShow_)

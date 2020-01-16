@@ -23,14 +23,15 @@ namespace IngameScript
     {
         public abstract class DataCollector<T> : VISObject, IDataCollector where T : class
         {
-            public DataCollector(string typeId, Configuration.Options options)
+            public DataCollector(string collectorTypeName, string typeId, Configuration.Options options)
             {
                 if (options == null)
                     options_ = new Configuration.Options(new List<string>());
                 else
                     options_ = options;
 
-                typeId_ = typeId;
+                TypeID = typeId;
+                CollectorTypeName = collectorTypeName;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
             }
 
@@ -44,22 +45,22 @@ namespace IngameScript
                     getBlocks<T>(BlockName, IsGroup, (block) =>
                     {
                         blocks_.Add(block);
-                    }, typeId_);
+                    }, TypeID);
                 }
                 else
                 {
                     if (!getBlocks<T>((block) =>
                     {
                         blocks_.Add(block);
-                    }, typeId_))
+                    }, TypeID))
                     {
-                        log(Console.LogType.Error, $"Failed to find blocks of type {typeId_}");
+                        log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
                         return false;
                     }
                 }
 
                 if (blocks_.Count == 0)
-                    log(Console.LogType.Warning, $"No blocks found for {blockName_}:{(isGroup_ ? "group" : "")}");
+                    log(Console.LogType.Warning, $"No blocks found for {BlockName}:{(IsGroup ? "group" : "")}");
                 Constructed = true;
                 return true;
             }
@@ -101,9 +102,10 @@ namespace IngameScript
             #endregion // Update System
 
             #region Properties
-            public virtual string CollectorTypeName
+            public string CollectorTypeName
             {
                 get;
+                protected set;
             }
 
             Configuration.Options options_ = null;
@@ -112,10 +114,10 @@ namespace IngameScript
                 get { return options_; }
             }
 
-            string typeId_ = "";
             public string TypeID
             {
-                get { return typeId_; }
+                get;
+                protected set;
             }
 
             List<T> blocks_ = new List<T>();
@@ -124,18 +126,16 @@ namespace IngameScript
                 get { return blocks_; }
             }
 
-            bool isGroup_ = false;
             public bool IsGroup
             {
-                get { return isGroup_; }
-                protected set { isGroup_ = value; }
+                get;
+                protected set;
             }
 
-            string blockName_ = "";
             public string BlockName
             {
-                get { return blockName_; }
-                protected set { blockName_ = value; }
+                get;
+                protected set;
             }
 
             TimeSpan nextUpdate_ = new TimeSpan(0);
@@ -160,7 +160,7 @@ namespace IngameScript
                 if (GetType() != other.GetType())
                     return false;
 
-                return options_ == other.Options && typeId_ == other.TypeID;
+                return options_ == other.Options && TypeID == other.TypeID;
             }
 
             public virtual bool isSameCollector(string name, Configuration.Options options)

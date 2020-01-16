@@ -21,43 +21,31 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorEnergyProducer<T> : DataCollector<T> where T: class
+        public class DataCollectorPowerProducer<T> : DataCollector<T> where T: class
         {
-            public DataCollectorEnergyProducer(Configuration.Options options)
-                : base("", options)
+            public DataCollectorPowerProducer(string collectorTypeName, string typeId, Configuration.Options options)
+                : base(collectorTypeName, typeId, options)
             {
             }
 
-            public override bool construct()
+            public override void prepareUpdate()
             {
-                if (!base.construct())
-                    return false;
+                base.prepareUpdate();
 
+                currentOutput_ = 0f;
                 maxAvailableOutput_ = 0f;
-                foreach (IMyPowerProducer pp in Blocks)
-                    maxAvailableOutput_ += pp.MaxOutput;
-
-                Constructed = true;
-                return true;
             }
-
 
             protected override void update()
             {
-                currentOutput_ = 0f;
-
                 foreach (IMyPowerProducer pp in Blocks)
+                {
                     currentOutput_ += pp.CurrentOutput;
+                    maxAvailableOutput_ += pp.MaxOutput;
+                }
 
                 powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
             }
-
-
-            public override string CollectorTypeName
-            {
-                get { return "energyproducer"; }
-            }
-
 
             public override string getText(string data)
             {
@@ -73,48 +61,32 @@ namespace IngameScript
             protected float powerAvailableUsing_ = 0f;
 
 
+            #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
                 {
                     case "":
-                    case "using":
-                        return new Using(this);
+                    case "usage":
+                        return new Usage(this);
                 }
 
                 log(Console.LogType.Error, $"Invalid data retriever {name}");
                 return null;
             }
 
-            class Using : DataAccessor
+            class Usage : DataAccessor
             {
-                public Using(DataCollectorEnergyProducer<T> collector)
+                DataCollectorPowerProducer<T> collector_ = null;
+                public Usage(DataCollectorPowerProducer<T> collector)
                 {
                     collector_ = collector;
                 }
 
-                DataCollectorEnergyProducer<T> collector_ = null;
-
-
-                public override double indicator()
-                {
-                    return collector_.powerAvailableUsing_;
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(collector_.currentOutput_, Multiplier.M, Unit.W);
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0, Multiplier.M, Unit.W);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
-                }
+                public override double indicator() => collector_.powerAvailableUsing_;
+                public override ValueType value() => new ValueType(collector_.currentOutput_, Multiplier.M, Unit.W);
+                public override ValueType min() => new ValueType(0, Multiplier.M, Unit.W);
+                public override ValueType max() => new ValueType(collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -123,7 +95,7 @@ namespace IngameScript
                     {
                         ListContainer item = new ListContainer();
                         item.name = pp.CustomName;
-                        item.indicator = pp.CurrentOutput / pp.MaxOutput;
+                        item.indicator = pp.MaxOutput != 0.0 ? pp.CurrentOutput / pp.MaxOutput : 0.0;
                         item.value = new ValueType(pp.CurrentOutput, Multiplier.M, Unit.W);
                         item.min = new ValueType(0, Multiplier.M, Unit.W);
                         item.max = new ValueType(pp.MaxOutput, Multiplier.M, Unit.W);
@@ -133,6 +105,7 @@ namespace IngameScript
                     }
                 }
             } // Using
+            #endregion // Data Accessor
         }
     }
 }

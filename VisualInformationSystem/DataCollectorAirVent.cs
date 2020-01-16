@@ -24,7 +24,7 @@ namespace IngameScript
         public class DataCollectorAirVent : DataCollector<IMyAirVent>
         {
             public DataCollectorAirVent(Configuration.Options options)
-                : base("", options)
+                : base("airvent", "", options)
             {
             }
 
@@ -50,11 +50,7 @@ namespace IngameScript
                     .Replace("%oxygenlevel%", new ValueType(oxygenLevel_, unit: Unit.Percent).pack().ToString());
             }
 
-            public override string CollectorTypeName
-            {
-                get { return "airvent"; }
-            }
-
+            #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
@@ -71,36 +67,21 @@ namespace IngameScript
 
             class PressurizeAble : DataAccessor
             {
-                DataCollectorAirVent obj_ = null;
+                DataCollectorAirVent dc_ = null;
                 public PressurizeAble(DataCollectorAirVent obj)
                 {
-                    obj_ = obj;
+                    dc_ = obj;
                 }
 
-                public override double indicator()
-                {
-                    return (double)obj_.pressurizeAble_ / obj_.Blocks.Count;
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0.0);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(obj_.Blocks.Count);
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType();
-                }
+                public override double indicator() => (double)dc_.pressurizeAble_ / dc_.Blocks.Count;
+                public override ValueType min() => new ValueType(0.0);
+                public override ValueType max() => new ValueType(dc_.Blocks.Count);
+                public override ValueType value() => new ValueType();
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var airvent in obj_.Blocks)
+                    foreach (var airvent in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
                         item.min = new ValueType(0.0);
@@ -117,36 +98,21 @@ namespace IngameScript
 
             class OxygenLevel : DataAccessor
             {
-                DataCollectorAirVent obj_ = null;
+                DataCollectorAirVent dc_ = null;
                 public OxygenLevel(DataCollectorAirVent obj)
                 {
-                    obj_ = obj;
+                    dc_ = obj;
                 }
 
-                public override double indicator()
-                {
-                    return 0.0;
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0.0, unit: Unit.Percent);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(1.0, unit: Unit.Percent);
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(obj_.oxygenLevel_, unit: Unit.Percent);
-                }
+                public override double indicator() => 0.0;
+                public override ValueType min() => new ValueType(0.0, unit: Unit.Percent);
+                public override ValueType max() => new ValueType(1.0, unit: Unit.Percent);
+                public override ValueType value() => new ValueType(dc_.oxygenLevel_, unit: Unit.Percent);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var airvent in obj_.Blocks)
+                    foreach (var airvent in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
                         item.min = new ValueType(0.0, unit: Unit.Percent);
@@ -160,6 +126,7 @@ namespace IngameScript
                     }
                 }
             }
+            #endregion // Data Accessor
         }
     }
 }

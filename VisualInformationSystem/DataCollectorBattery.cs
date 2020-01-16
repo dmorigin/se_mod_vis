@@ -21,53 +21,42 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorBattery : DataCollectorEnergyProducer<IMyBatteryBlock>
+        public class DataCollectorBattery : DataCollectorPowerProducer<IMyBatteryBlock>
         {
             public DataCollectorBattery(Configuration.Options options)
-                : base(options)
+                : base("battery", "", options)
             {
             }
 
-            public override bool construct()
+            public override void prepareUpdate()
             {
-                if (!base.construct())
-                    return false;
+                base.prepareUpdate();
 
-                maxAvailableOutput_ = 0f;
-                maxAvailableInput_ = 0f;
-                maxAvailableStored_ = 0f;
-                foreach(var battery in Blocks)
-                {
-                    maxAvailableOutput_ += battery.MaxOutput;
-                    maxAvailableInput_ += battery.MaxInput;
-                    maxAvailableStored_ += battery.MaxStoredPower;
-                }
-
-                Constructed = true;
-                return true;
-            }
-
-            protected override void update()
-            {
                 currentInput_ = 0f;
                 currentOutput_ = 0f;
                 currentStored_ = 0f;
 
+                maxAvailableOutput_ = 0f;
+                maxAvailableInput_ = 0f;
+                maxAvailableStored_ = 0f;
+            }
+
+            protected override void update()
+            {
                 foreach (var battery in Blocks)
                 {
                     currentInput_ += battery.CurrentInput;
                     currentOutput_ += battery.CurrentOutput;
                     currentStored_ += battery.CurrentStoredPower;
+
+                    maxAvailableOutput_ += battery.MaxOutput;
+                    maxAvailableInput_ += battery.MaxInput;
+                    maxAvailableStored_ += battery.MaxStoredPower;
                 }
 
                 powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
                 powerAvailableStoring_ = currentInput_ / maxAvailableInput_;
                 powerAvailableLeft_ = currentStored_ / maxAvailableStored_;
-            }
-
-            public override string CollectorTypeName
-            {
-                get { return "battery"; }
             }
 
             public List<IMyBatteryBlock> Batteries
@@ -94,6 +83,7 @@ namespace IngameScript
                     .Replace("%currentcapacity%", new ValueType(currentStored_, Multiplier.M, Unit.Wh).pack().ToString());
             }
 
+            #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
                 switch(name.ToLower())
@@ -108,41 +98,23 @@ namespace IngameScript
                 return base.getDataAccessor(name);
             }
 
-
             class Capacity : DataAccessor
             {
+                DataCollectorBattery dc_ = null;
                 public Capacity(DataCollectorBattery collector)
                 {
-                    collector_ = collector;
+                    dc_ = collector;
                 }
 
-                DataCollectorBattery collector_ = null;
-
-
-                public override double indicator()
-                {
-                    return collector_.powerAvailableLeft_;
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(collector_.currentStored_, Multiplier.M, Unit.Wh);
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0, Multiplier.M, Unit.Wh);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(collector_.maxAvailableStored_, Multiplier.M, Unit.Wh);
-                }
+                public override double indicator() => dc_.powerAvailableLeft_;
+                public override ValueType value() => new ValueType(dc_.currentStored_, Multiplier.M, Unit.Wh);
+                public override ValueType min() => new ValueType(0, Multiplier.M, Unit.Wh);
+                public override ValueType max() => new ValueType(dc_.maxAvailableStored_, Multiplier.M, Unit.Wh);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var ep in collector_.Blocks)
+                    foreach (var ep in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
                         item.name = ep.CustomName;
@@ -159,38 +131,21 @@ namespace IngameScript
 
             class InOut : DataAccessor
             {
+                DataCollectorBattery dc_ = null;
                 public InOut(DataCollectorBattery collector)
                 {
-                    collector_ = collector;
+                    dc_ = collector;
                 }
 
-                DataCollectorBattery collector_ = null;
-
-
-                public override double indicator()
-                {
-                    return collector_.powerAvailableStoring_ - collector_.powerAvailableUsing_;
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(collector_.currentInput_ - collector_.currentOutput_, Multiplier.M, Unit.W);
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(-collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(collector_.maxAvailableInput_, Multiplier.M, Unit.W);
-                }
+                public override double indicator() => dc_.powerAvailableStoring_ - dc_.powerAvailableUsing_;
+                public override ValueType value() => new ValueType(dc_.currentInput_ - dc_.currentOutput_, Multiplier.M, Unit.W);
+                public override ValueType min() => new ValueType(-dc_.maxAvailableOutput_, Multiplier.M, Unit.W);
+                public override ValueType max() => new ValueType(dc_.maxAvailableInput_, Multiplier.M, Unit.W);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var battery in collector_.Blocks)
+                    foreach (var battery in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
                         item.name = battery.CustomName;
@@ -204,6 +159,7 @@ namespace IngameScript
                     }
                 }
             }
+            #endregion // Data Accessor
         }
     }
 }

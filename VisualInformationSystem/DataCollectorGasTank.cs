@@ -24,7 +24,7 @@ namespace IngameScript
         public class DataCollectorGasTank : DataCollector<IMyGasTank>
         {
             public DataCollectorGasTank(string typeId, Configuration.Options options)
-                : base(typeId, options)
+                : base("gastank", typeId, options)
             {
             }
 
@@ -53,11 +53,17 @@ namespace IngameScript
                 fillRatio_ = (float)(fillRation / Blocks.Count);
             }
 
-            public override string CollectorTypeName
+            public override string getText(string data)
             {
-                get { return "gastank"; }
+                return data.Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
+                    .Replace("%fillratio%", new ValueType(fillRatio_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%fillvalue", new ValueType(fillRatio_ * capacity_, unit: Unit.l).pack().ToString());
             }
 
+            float fillRatio_ = 0f;
+            float capacity_ = 0f;
+
+            #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
@@ -71,49 +77,23 @@ namespace IngameScript
                 return null;
             }
 
-            public override string getText(string data)
-            {
-                return data.Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
-                    .Replace("%fillratio%", new ValueType(fillRatio_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%fillvalue", new ValueType(fillRatio_ * capacity_, unit: Unit.l).pack().ToString());
-            }
-
-            float fillRatio_ = 0f;
-            float capacity_ = 0f;
-
             public class Capacity : DataAccessor
             {
+                DataCollectorGasTank dc_ = null;
                 public Capacity(DataCollectorGasTank collector)
                 {
-                    collector_ = collector;
+                    dc_ = collector;
                 }
 
-                DataCollectorGasTank collector_ = null;
-
-                public override ValueType min()
-                {
-                    return new ValueType(0, unit: Unit.l);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(collector_.capacity_, unit: Unit.l);
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(collector_.capacity_ * collector_.fillRatio_, unit: Unit.l);
-                }
-
-                public override double indicator()
-                {
-                    return collector_.fillRatio_;
-                }
+                public override double indicator() => dc_.fillRatio_;
+                public override ValueType min() => new ValueType(0, unit: Unit.l);
+                public override ValueType max() => new ValueType(dc_.capacity_, unit: Unit.l);
+                public override ValueType value() => new ValueType(dc_.capacity_ * dc_.fillRatio_, unit: Unit.l);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var tank in collector_.Blocks)
+                    foreach (var tank in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
                         item.name = tank.CustomName;
@@ -127,6 +107,7 @@ namespace IngameScript
                     }
                 }
             }
+            #endregion // Data Accessor
         }
     }
 }

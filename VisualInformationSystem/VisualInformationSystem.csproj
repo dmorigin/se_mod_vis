@@ -43,9 +43,11 @@
     <Compile Include="Console.cs" />
     <Compile Include="DataCollectorAirVent.cs" />
     <Compile Include="DataCollectorEnergyProducer.cs" />
+    <Compile Include="DataCollectorGenerator.cs" />
     <Compile Include="DataCollectorInventory.cs" />
+    <Compile Include="DataCollectorJumpDrive.cs" />
     <Compile Include="DataCollectorManager.cs" />
-    <Compile Include="DataCollectorProperty.cs" />
+    <Compile Include="DataCollectorReactor.cs" />
     <Compile Include="Default.cs" />
     <Compile Include="Display.cs" />
     <Compile Include="DisplayManager.cs" />

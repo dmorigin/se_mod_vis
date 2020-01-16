@@ -25,6 +25,7 @@ namespace IngameScript
         {
             public struct ListContainer
             {
+                public string status;
                 public string name;
                 public ValueType min;
                 public ValueType max;
@@ -33,6 +34,7 @@ namespace IngameScript
                 public MyItemType type;
             }
 
+            public virtual string status() => "";
             public abstract double indicator();
             public abstract ValueType value();
             public abstract ValueType min();

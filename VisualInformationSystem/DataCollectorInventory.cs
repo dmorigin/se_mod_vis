@@ -24,7 +24,7 @@ namespace IngameScript
         public class DataCollectorInventory : DataCollector<IMyTerminalBlock>
         {
             public DataCollectorInventory(Configuration.Options options)
-                : base("", options)
+                : base("inventory", "", options)
             {
             }
 
@@ -237,11 +237,6 @@ namespace IngameScript
             }
             #endregion // Update Part
 
-            public override string CollectorTypeName
-            {
-                get { return "inventory"; }
-            }
-
             class ItemType
             {
                 public ItemType(MyItemType itemType, long a)
@@ -284,7 +279,7 @@ namespace IngameScript
             }
             List<InventoryItem> items_ = new List<InventoryItem>();
 
-            #region Data Retriever
+            #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
                 switch (name.ToLower())
@@ -308,25 +303,10 @@ namespace IngameScript
                     inv_ = inventory;
                 }
 
-                public override double indicator()
-                {
-                    return inv_.volumeRatio_;
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0.0, Multiplier.K, Unit.l);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(inv_.maxVolume_, Multiplier.K, Unit.l);
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(inv_.currentVolume_, Multiplier.K, Unit.l);
-                }
+                public override double indicator() => inv_.volumeRatio_;
+                public override ValueType min() => new ValueType(0.0, Multiplier.K, Unit.l);
+                public override ValueType max() => new ValueType(inv_.maxVolume_, Multiplier.K, Unit.l);
+                public override ValueType value() => new ValueType(inv_.currentVolume_, Multiplier.K, Unit.l);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -356,25 +336,10 @@ namespace IngameScript
                     inv_ = inv;
                 }
 
-                public override double indicator()
-                {
-                    return inv_.itemRatio_;
-                }
-
-                public override ValueType min()
-                {
-                    return new ValueType(0.0);
-                }
-
-                public override ValueType max()
-                {
-                    return new ValueType(inv_.maxItems_);
-                }
-
-                public override ValueType value()
-                {
-                    return new ValueType(inv_.currentItems_);
-                }
+                public override double indicator() => inv_.itemRatio_;
+                public override ValueType min() => new ValueType(0.0);
+                public override ValueType max() => new ValueType(inv_.maxItems_);
+                public override ValueType value() => new ValueType(inv_.currentItems_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -396,7 +361,7 @@ namespace IngameScript
                     }
                 }
             }
-            #endregion // Data Retriever
+            #endregion // Data Accessor
         }
     }
 }
