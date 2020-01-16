@@ -30,10 +30,10 @@ namespace IngameScript
 
             public override void prepareUpdate()
             {
-                base.prepareUpdate();
-
                 currentOutput_ = 0f;
                 maxAvailableOutput_ = 0f;
+
+                base.prepareUpdate();
             }
 
             protected override void update()
@@ -50,7 +50,7 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%using%", new ValueType(powerAvailableUsing_, unit:Unit.Percent).pack().ToString())
+                    .Replace("%usage%", new ValueType(powerAvailableUsing_, unit:Unit.Percent).pack().ToString())
                     .Replace("%maxoutput%", new ValueType(maxAvailableOutput_, Multiplier.M, Unit.W).pack().ToString())
                     .Replace("%currentoutput%", new ValueType(currentOutput_, Multiplier.M, Unit.W).pack().ToString());
             }

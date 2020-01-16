@@ -30,10 +30,10 @@ namespace IngameScript
 
             public override void prepareUpdate()
             {
-                base.prepareUpdate();
-
                 fuelCurrent_ = 0.0;
                 fuelMax_ = 0.0;
+
+                base.prepareUpdate();
             }
 
             protected override void update()

@@ -46,52 +46,49 @@ namespace IngameScript
         {
             public ValueType(double value, Multiplier multiplier = Multiplier.None, Unit unit = Unit.None)
             {
-                value_ = value;
-                multiplier_ = multiplier;
-                unit_ = unit;
+                Value = value;
+                Multiplier = multiplier;
+                Unit = unit;
             }
 
-            double value_;
             public double Value
             {
-                get { return value_; }
-                set { value_ = value; }
+                get;
+                set;
             }
 
-            Multiplier multiplier_;
             public Multiplier Multiplier
             {
-                get { return multiplier_; }
-                set { multiplier_ = value; }
+                get;
+                set;
             }
 
-            Unit unit_;
             public Unit Unit
             {
-                get { return unit_; }
-                set { unit_ = value; }
+                get;
+                set;
             }
 
-            public static implicit operator int(ValueType vt) => (int)vt.value_;
-            public static implicit operator long(ValueType vt) => (long)vt.value_;
-            public static implicit operator double(ValueType vt) => vt.value_;
-            public static implicit operator float(ValueType vt) => (float)vt.value_;
+            public static implicit operator int(ValueType vt) => (int)vt.Value;
+            public static implicit operator long(ValueType vt) => (long)vt.Value;
+            public static implicit operator double(ValueType vt) => vt.Value;
+            public static implicit operator float(ValueType vt) => (float)vt.Value;
 
-            public static bool operator >(ValueType vt, double d) => vt.value_ > d;
-            public static bool operator <(ValueType vt, double d) => vt.value_ < d;
-            public static bool operator >=(ValueType vt, double d) => vt.value_ >= d;
-            public static bool operator <=(ValueType vt, double d) => vt.value_ <= d;
+            public static bool operator >(ValueType vt, double d) => vt.Value > d;
+            public static bool operator <(ValueType vt, double d) => vt.Value < d;
+            public static bool operator >=(ValueType vt, double d) => vt.Value >= d;
+            public static bool operator <=(ValueType vt, double d) => vt.Value <= d;
 
             public override string ToString()
             {
-                string unit = UnitToString(unit_);
-                string multiplier = MultiplierToString(multiplier_);
-                double value = value_;
+                string unit = UnitToString(Unit);
+                string multiplier = MultiplierToString(Multiplier);
+                double value = Value;
 
                 // fix g
-                if (unit_ == Unit.g)
+                if (Unit == Unit.g)
                 {
-                    switch (multiplier_)
+                    switch (Multiplier)
                     {
                         case Multiplier.M:
                             unit = "T";
@@ -107,7 +104,7 @@ namespace IngameScript
                             break;
                     }
                 }
-                else if (unit_ == Unit.Percent)
+                else if (Unit == Unit.Percent)
                     value *= 100.0;
 
                 return $"{value.ToString(Default.StringFormat)}{multiplier}{unit}";
@@ -153,8 +150,8 @@ namespace IngameScript
 
             public ValueType pack()
             {
-                double value = value_;
-                Multiplier multiplier = multiplier_;
+                double value = Value;
+                Multiplier multiplier = Multiplier;
 
                 while (value >= 1000.0 && multiplier != Multiplier.P)
                 {
@@ -168,7 +165,7 @@ namespace IngameScript
                     multiplier = getNextLower(multiplier);
                 }
 
-                return new ValueType(value, multiplier, unit_);
+                return new ValueType(value, multiplier, Unit);
             }
 
             private Multiplier getNextHeigher(Multiplier multiplier)

@@ -28,11 +28,9 @@ namespace IngameScript
             bool stopped_ = true;
             bool paused_ = false;
 
-
             public Timer()
             {
             }
-
 
             public void stop()
             {
@@ -41,24 +39,20 @@ namespace IngameScript
                 delta_ = new TimeSpan();
             }
 
-
             public void start()
             {
                 stopped_ = false;
             }
-
 
             public void pause()
             {
                 paused_ = true;
             }
 
-
             public void resume()
             {
                 paused_ = false;
             }
-
 
             public void update(TimeSpan elapsed)
             {
@@ -70,35 +64,10 @@ namespace IngameScript
                 }
             }
 
-
-            public bool Paused
-            {
-                get { return paused_; }
-            }
-
-
-            public bool Stopped
-            {
-                get { return stopped_; }
-            }
-
-
-            public TimeSpan Delta
-            {
-                get
-                {
-                    return delta_;
-                }
-            }
-
-
-            public TimeSpan Ticks
-            {
-                get
-                {
-                    return ticks_;
-                }
-            }
+            public bool Paused => paused_;
+            public bool Stopped => stopped_;
+            public TimeSpan Delta => delta_;
+            public TimeSpan Ticks => ticks_;
         }
     }
 }

@@ -25,8 +25,10 @@ namespace IngameScript
         {
             public Job()
             {
-                jobManager_ = App.Manager.JobManager;
-                jobId_ = jobManager_.NextJobID;
+                JobManager = App.Manager.JobManager;
+                JobId = JobManager.NextJobID;
+                JobFinished = true;
+                LastExecute = new TimeSpan();
             }
 
 
@@ -39,30 +41,28 @@ namespace IngameScript
             {
             }
 
-            bool finished_ = true;
-            public bool JobFinished
-            {
-                get { return finished_; }
-                protected set { finished_ = value; }
-            }
-
-            JobManager jobManager_ = null;
             public JobManager JobManager
             {
-                get { return jobManager_; }
+                get;
+                private set;
             }
 
-            TimeSpan lastExecute = new TimeSpan();
+            public int JobId
+            {
+                get;
+                private set;
+            }
+
+            public bool JobFinished
+            {
+                get;
+                protected set;
+            }
+
             public TimeSpan LastExecute
             {
-                get { return lastExecute; }
-                set { lastExecute = value; }
-            }
-
-            int jobId_ = 0;
-            public int JobID
-            {
-                get { return jobId_; }
+                get;
+                set;
             }
         }
     }

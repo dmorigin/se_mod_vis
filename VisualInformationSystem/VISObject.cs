@@ -27,12 +27,13 @@ namespace IngameScript
 
             public VISObject(string name = "")
             {
-                id_ = VISObject.nextId_++;
+                Id = VISObject.nextId_++;
+                Constructed = false;
 
                 if (name == string.Empty)
-                    name_ = $"ModObject_{id_}";
+                    Name = $"ModObject_{Id}";
                 else
-                    name_ = name;
+                    Name = name;
             }
 
             protected Program App
@@ -43,16 +44,16 @@ namespace IngameScript
                 }
             }
 
-            private int id_ = 0;
             public int Id
             {
-                get { return id_; }
+                get;
+                private set;
             }
 
-            private string name_ = "";
             public string Name
             {
-                get { return name_; }
+                get;
+                private set;
             }
 
             public VISManager Manager
@@ -65,16 +66,15 @@ namespace IngameScript
                 Manager.Console.log(logType, message);
             }
 
-            bool constructed_ = false;
             public bool Constructed
             {
-                get { return constructed_; }
-                protected set { constructed_ = value; }
+                get;
+                protected set;
             }
 
             public virtual bool construct()
             {
-                constructed_ = true;
+                Constructed = true;
                 return true;
             }
 

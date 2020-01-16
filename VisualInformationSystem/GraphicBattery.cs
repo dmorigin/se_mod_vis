@@ -40,7 +40,7 @@ namespace IngameScript
                 GraphicBattery gfx = new GraphicBattery(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;

@@ -28,10 +28,11 @@ namespace IngameScript
                 config_ = new ConfigHandler(this);
 
                 console_ = new Console();
-                collectorManager_ = new DataCollectorManager();
-                jobManager_ = new JobManager();
-                templateManager_ = new TemplateManager();
-                displayManager_ = new DisplayManager();
+                Timer = new Timer();
+                CollectorManager = new DataCollectorManager();
+                JobManager = new JobManager();
+                TemplateManager = new TemplateManager();
+                DisplayManager = new DisplayManager();
             }
 
 
@@ -46,18 +47,18 @@ namespace IngameScript
                     stateHandlers_[State.Shutdown] = handleShutdownState;
                     stateHandlers_[State.Error] = handleErrorState;
 
-                    if (collectorManager_.construct())
+                    if (CollectorManager.construct())
                     {
-                        if (templateManager_.construct())
+                        if (TemplateManager.construct())
                         {
                             // construct job manager
-                            if (jobManager_.construct())
+                            if (JobManager.construct())
                             {
                                 // construct display manager
-                                if (displayManager_.construct())
+                                if (DisplayManager.construct())
                                 {
                                     log(Console.LogType.Info, "VIS Manager constructed");
-                                    timer_.start();
+                                    Timer.start();
                                     return true;
                                 }
                                 else
@@ -76,34 +77,34 @@ namespace IngameScript
                 return false;
             }
 
-            JobManager jobManager_ = null;
             public JobManager JobManager
             {
-                get { return jobManager_; }
+                get;
+                private set;
             }
 
-            TemplateManager templateManager_ = null;
             public TemplateManager TemplateManager
             {
-                get { return templateManager_; }
+                get;
+                private set;
             }
 
-            DisplayManager displayManager_ = null;
             public DisplayManager DisplayManager
             {
-                get { return displayManager_; }
+                get;
+                private set;
             }
 
-            DataCollectorManager collectorManager_ = null;
             public DataCollectorManager CollectorManager
             {
-                get { return collectorManager_; }
+                get;
+                private set;
             }
 
-            Timer timer_ = new Timer();
             public Timer Timer
             {
-                get { return timer_; }
+                get;
+                private set;
             }
 
             List<DisplayProvider> displayProviders_ = new List<DisplayProvider>();
@@ -322,7 +323,7 @@ namespace IngameScript
             void handleRunState()
             {
                 // process job manager
-                jobManager_.tick(timer_.Delta);
+                JobManager.tick(Timer.Delta);
             }
 
             void handleShutdownState()
@@ -370,7 +371,7 @@ namespace IngameScript
                 try
                 {
                     // update timer
-                    timer_.update(App.Runtime.TimeSinceLastRun);
+                    Timer.update(App.Runtime.TimeSinceLastRun);
 
                     if ((updateSource & UpdateType.Terminal) != 0 ||
                         (updateSource & UpdateType.Trigger) != 0)

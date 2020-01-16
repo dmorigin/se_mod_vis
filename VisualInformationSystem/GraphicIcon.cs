@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicIcon gfx = new GraphicIcon(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -68,8 +68,8 @@ namespace IngameScript
             bool show_ = true; // render data only
             public override void prepareRendering(Display display)
             {
-                if (DataRetriever != null)
-                    if (showOn_ == true && (DataRetriever.indicator() < thresholdOnMin_ || DataRetriever.indicator() > thresholdOnMax_))
+                if (DataAccessor != null)
+                    if (showOn_ == true && (DataAccessor.indicator() < thresholdOnMin_ || DataAccessor.indicator() > thresholdOnMax_))
                     {
                         show_ = false;
                         return;

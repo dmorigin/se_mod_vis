@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicSlider gfx = new GraphicSlider(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -63,7 +63,7 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (DataRetriever == null)
+                if (DataAccessor == null)
                     return;
 
                 if (Gradient.Count == 0)
@@ -73,7 +73,7 @@ namespace IngameScript
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
                 // draw slider
-                renderSlider(addSprite, rt, position, size, DataRetriever.min() < 0.0, (float)DataRetriever.indicator(),
+                renderSlider(addSprite, rt, position, size, DataAccessor.min() < 0.0, (float)DataAccessor.indicator(),
                     Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
 

@@ -56,13 +56,13 @@ namespace IngameScript
             {
                 if (job != null)
                 {
-                    if (getTimedJob(job.JobID) == null)
+                    if (getTimedJob(job.JobId) == null)
                     {
                         timedJobs_.Add(job);
                         return true;
                     }
                     else
-                        log(Console.LogType.Error, $"Job with id {job.JobID} already registered");
+                        log(Console.LogType.Error, $"Job with id {job.JobId} already registered");
                 }
 
                 return false;
@@ -88,7 +88,7 @@ namespace IngameScript
             {
                 foreach(var job in timedJobs_)
                 {
-                    if (job.JobID == id)
+                    if (job.JobId == id)
                         return job;
                 }
 

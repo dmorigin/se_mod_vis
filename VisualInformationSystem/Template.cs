@@ -26,8 +26,16 @@ namespace IngameScript
             public Template(TemplateManager templateManager, string name)
                 : base($"Template_{name}")
             {
-                templateManager_ = templateManager;
-                templateName_ = name;
+                TemplateManager = templateManager;
+                TemplateName = name;
+
+                // setup defaults
+                Refresh = Default.Refresh;
+                BackgroundColor = Default.BackgroundColor;
+                Font = Default.Font;
+                FontSize = Default.FontSize;
+                FontColor = Default.FontColor;
+                TextAlignment = Default.FontAlignment;
             }
 
             public virtual Settings getConfigHandler()
@@ -37,12 +45,12 @@ namespace IngameScript
 
             public virtual void merge(Template template)
             {
-                refresh_ = template.refresh_;
-                backgroundColor_ = template.backgroundColor_;
-                font_ = template.font_;
-                fontSize_ = template.fontSize_;
-                fontColor_ = template.fontColor_;
-                alignment_ = template.alignment_;
+                Refresh = template.Refresh;
+                BackgroundColor = template.BackgroundColor;
+                Font = template.Font;
+                FontSize = template.FontSize;
+                FontColor = template.FontColor;
+                TextAlignment = template.TextAlignment;
 
                 foreach (var gfx in template.graphics_)
                     graphics_.Add(gfx.clone());
@@ -50,59 +58,52 @@ namespace IngameScript
             }
 
             #region Properties
-            TemplateManager templateManager_ = null;
             public TemplateManager TemplateManager
             {
-                get { return templateManager_; }
+                get;
+                private set;
             }
 
-            string templateName_ = "";
             public string TemplateName
             {
-                get { return templateName_; }
-                set { templateName_ = value; }
+                get;
+                set;
             }
 
-            TimeSpan refresh_ = Default.Refresh;
             public TimeSpan Refresh
             {
-                get { return refresh_; }
-                protected set { refresh_ = value; }
+                get;
+                protected set;
             }
 
-            Color backgroundColor_ = Default.BackgroundColor;
             public Color BackgroundColor
             {
-                get { return backgroundColor_; }
-                protected set { backgroundColor_ = value; }
+                get;
+                protected set;
             }
 
-            string font_ = Default.Font;
             public string Font
             {
-                get { return font_; }
-                protected set { font_ = value; }
+                get;
+                protected set;
             }
 
-            float fontSize_ = Default.FontSize;
             public float FontSize
             {
-                get { return fontSize_; }
-                protected set { fontSize_ = value; }
+                get;
+                protected set;
             }
 
-            Color fontColor_ = Default.FontColor;
             public Color FontColor
             {
-                get { return fontColor_; }
-                protected set { fontColor_ = value; }
+                get;
+                protected set;
             }
 
-            TextAlignment alignment_ = Default.FontAlignment;
             public TextAlignment TextAlignment
             {
-                get { return alignment_; }
-                protected set { alignment_ = value; }
+                get;
+                protected set;
             }
 
             List<Graphic> graphics_ = new List<Graphic>();

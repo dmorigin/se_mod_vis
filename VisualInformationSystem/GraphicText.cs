@@ -34,7 +34,7 @@ namespace IngameScript
                 GraphicText gfx = new GraphicText(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -56,39 +56,21 @@ namespace IngameScript
                 return gfx;
             }
 
-
             bool useDefaultFont_ = true;
             bool useFontSize_ = false;
             float fontSize_ = Default.FontSize;
-            public float FontSize
-            {
-                get { return useDefaultFont_ ? Template.FontSize : fontSize_; }
-            }
-
+            public float FontSize => useDefaultFont_ ? Template.FontSize : fontSize_;
 
             string font_ = Default.Font;
-            public string Font
-            {
-                get { return useDefaultFont_ ? Template.Font : font_; }
-            }
+            public string Font => useDefaultFont_ ? Template.Font : font_;
 
-
-            public Color FontColor
-            {
-                get { return useDefaultFont_ ? Template.FontColor : Color; }
-            }
-
+            public Color FontColor => useDefaultFont_ ? Template.FontColor : Color;
 
             bool useDefaultAlignment_ = true;
             TextAlignment alignment_ = Default.FontAlignment;
-            public TextAlignment TextAlignment
-            {
-                get { return useDefaultAlignment_ ? Template.TextAlignment : alignment_; }
-            }
-
+            public TextAlignment TextAlignment => useDefaultAlignment_ ? Template.TextAlignment : alignment_;
 
             List<string> text_ = new List<string>();
-
 
             #region Configuration
             bool configFont(string key, string value, Configuration.Options options)
@@ -147,7 +129,6 @@ namespace IngameScript
             }
             #endregion // Configuration
 
-
             protected override bool supportCheck(string name)
             {
                 return true;
@@ -194,7 +175,7 @@ namespace IngameScript
                 renderData_.position = new Vector2(position.X, position.Y - ((maxSize.Y * (renderData_.lines.Count - 1)) * 0.5f));
 
                 if (Gradient.Count > 0)
-                    renderData_.fontColor = DataRetriever != null ? getGradientColor((float)DataRetriever.indicator()) : Color;
+                    renderData_.fontColor = DataAccessor != null ? getGradientColor((float)DataAccessor.indicator()) : Color;
                 else
                     renderData_.fontColor = FontColor;
             }

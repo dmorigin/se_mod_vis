@@ -38,7 +38,7 @@ namespace IngameScript
                 GraphicList gfx = new GraphicList(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -165,7 +165,7 @@ namespace IngameScript
                 renderData_.textRightPositionX = position.X + (size.X * 0.5f);
 
                 // filter list
-                DataRetriever.list(out renderData_.container, (item) => visibleOperator_(item.indicator, visibleThreshold_));
+                DataAccessor.list(out renderData_.container, (item) => visibleOperator_(item.indicator, visibleThreshold_));
 
                 // auto scroll
                 if (autoScroll_ == true)

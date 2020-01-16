@@ -346,16 +346,8 @@ namespace IngameScript
                     handlers_.Remove(key);
                 }
 
-                public bool exists(string key)
-                {
-                    return handlers_.ContainsKey(key);
-                }
-
-
-                Handler last()
-                {
-                    return sub_ != null ? sub_.last() : this;
-                }
+                public bool exists(string key) => handlers_.ContainsKey(key);
+                Handler last() => sub_ != null ? sub_.last() : this;
 
                 KeyHandler get(Handler use, string key)
                 {
@@ -373,18 +365,9 @@ namespace IngameScript
                     return handlers_["*"];
                 }
 
-                public KeyHandler this[string key]
-                {
-                    get
-                    {
-                        return get(last(), key);
-                    }
-                }
+                public KeyHandler this[string key] => get(last(), key);
 
-                bool wildcardHandler(string key, string value, Options options)
-                {
-                    return false;
-                }
+                bool wildcardHandler(string key, string value, Options options) => false;
 
                 public Handler()
                 {

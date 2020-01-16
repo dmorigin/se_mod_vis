@@ -25,14 +25,14 @@ namespace IngameScript
         {
             public Display(string groupId)
             {
-                groupId_ = groupId;
+                GroupId = groupId;
             }
 
             public override bool construct()
             {
                 if (Manager.JobManager.registerTimedJob(this))
                 {
-                    log(Console.LogType.Info, $"Display {GroupID} constructed");
+                    log(Console.LogType.Info, $"Display {GroupId} constructed");
                     Constructed = true;
                     return true;
                 }
@@ -66,10 +66,10 @@ namespace IngameScript
 
             public override void tick(TimeSpan delta)
             {
-                if (template_ != null)
+                if (Template != null)
                 {
                     // queue gather jobs
-                    foreach (var graphic in template_.getGraphics())
+                    foreach (var graphic in Template.getGraphics())
                     {
                         if (graphic.DataCollector != null)
                             JobManager.queueJob(graphic.DataCollector.getUpdateJob());
@@ -84,25 +84,24 @@ namespace IngameScript
             {
                 get
                 {
-                    if (template_ != null)
-                        return template_.Refresh;
+                    if (Template != null)
+                        return Template.Refresh;
                     return base.Interval;
                 }
 
                 set { base.Interval = value; }
             }
 
-            string groupId_ = "";
-            public string GroupID
+            public string GroupId
             {
-                get { return groupId_; }
+                get;
+                private set;
             }
 
-            Template template_ = null;
             public Template Template
             {
-                get { return template_; }
-                set { template_ = value; }
+                get;
+                set;
             }
 
 
@@ -191,16 +190,16 @@ namespace IngameScript
 
             public void render()
             {
-                foreach (var graphic in template_.getGraphics())
+                foreach (var graphic in Template.getGraphics())
                     graphic.prepareRendering(this);
 
                 foreach (var rt in renderTargets_)
                 {
-                    rt.BackgroundColor = template_.BackgroundColor;
+                    rt.BackgroundColor = Template.BackgroundColor;
 
                     using (var frame = rt.getRenderFrame())
                     {
-                        foreach (var graphic in template_.getGraphics())
+                        foreach (var graphic in Template.getGraphics())
                             graphic.getSprite(this, rt, sprite => frame.Add(sprite));
                     }
                 }

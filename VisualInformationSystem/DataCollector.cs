@@ -32,6 +32,7 @@ namespace IngameScript
 
                 TypeID = typeId;
                 CollectorTypeName = collectorTypeName;
+                UpdateFinished = false;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
             }
 
@@ -73,16 +74,15 @@ namespace IngameScript
             }
 
             #region Update System
-            bool updateFinished_ = false;
             public bool UpdateFinished
             {
-                get { return updateFinished_; }
-                protected set { updateFinished_ = value; }
+                get;
+                protected set;
             }
 
             public virtual void prepareUpdate()
             {
-                updateFinished_ = true;
+                UpdateFinished = true;
             }
 
             public virtual void finalizeUpdate()

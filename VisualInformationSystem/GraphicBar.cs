@@ -34,7 +34,7 @@ namespace IngameScript
                 GraphicBar gfx = new GraphicBar(Template, Options);
 
                 gfx.DataCollector = DataCollector;
-                gfx.DataRetriever = gfx.DataCollector.getDataAccessor(DataAccessorName);
+                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
                 gfx.DataAccessorName = DataAccessorName;
                 gfx.Position = Position;
                 gfx.PositionType = PositionType;
@@ -65,7 +65,7 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (DataRetriever == null)
+                if (DataAccessor == null)
                     return;
 
                 if (Gradient.Count == 0)
@@ -76,8 +76,8 @@ namespace IngameScript
                 float borderSize = borderSizeType_ == ValueType.Relative ? borderSize_ * (size.X < size.Y ? size.X : size.Y) : borderSize_;
                 float tileSpace = tileSpaceType_ == ValueType.Relative ? tileSpace_ * (size.X < size.Y ? size.X : size.Y) : tileSpace_;
 
-                renderStyledBar_(addSprite, rt, position, size, vertical_, DataRetriever.min() < 0.0, tiles_, tileSpace,
-                    (float)DataRetriever.indicator(), Gradient, borderSize, borderColor_, backgroundColor_);
+                renderStyledBar_(addSprite, rt, position, size, vertical_, DataAccessor.min() < 0.0, tiles_, tileSpace,
+                    (float)DataAccessor.indicator(), Gradient, borderSize, borderColor_, backgroundColor_);
             }
 
             #region Configuration

@@ -62,7 +62,7 @@ namespace IngameScript
             {
                 foreach(var display in displays_)
                 {
-                    if (display.GroupID == id)
+                    if (display.GroupId == id)
                         return display;
                 }
 

@@ -25,16 +25,25 @@ namespace IngameScript
         {
             public Graphic(Template template, Configuration.Options options)
             {
-                options_ = options;
-                template_ = template;
+                Options = options;
+                Template = template;
+                DataAccessorName = "";
+
+                // defaults
+                MaxDCUpdateInterval = Default.DCRefresh;
+                ZPosition = Default.ZPosition;
+                Position = Default.Position;
+                PositionType = Default.PositionType;
+                Size = Default.Size;
+                SizeType = Default.SizeType;
             }
 
             public override bool construct()
             {
                 if (Options.Count >= 1)
-                    dataAccessorName_ = Options[0];
+                    DataAccessorName = Options[0];
                 else
-                    log(Console.LogType.Warning, $"No data retriever defined");
+                    log(Console.LogType.Warning, $"No data accessor defined");
 
                 return true;
             }
@@ -124,14 +133,14 @@ namespace IngameScript
                         {
                             graphic_.DataCollector = dataCollector;
                             graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
-                            DataAccessor retriever = dataCollector.getDataAccessor(graphic_.DataAccessorName);
-                            if (retriever != null)
+                            DataAccessor accessor = dataCollector.getDataAccessor(graphic_.DataAccessorName);
+                            if (accessor != null)
                             {
-                                graphic_.DataRetriever = retriever;
+                                graphic_.DataAccessor = accessor;
                                 return true;
                             }
                             else
-                                graphic_.log(Console.LogType.Error, $"Data retriever ${graphic_.DataAccessorName} isn't supported");
+                                graphic_.log(Console.LogType.Error, $"Data accessor ${graphic_.DataAccessorName} isn't supported");
                         }
                     }
                     else
@@ -185,86 +194,72 @@ namespace IngameScript
             }
 
             #region Properties
-            Template template_ = null;
             public Template Template
             {
-                get { return template_; }
+                get;
+                protected set;
             }
 
-            Configuration.Options options_ = null;
             protected Configuration.Options Options
             {
-                get { return options_; }
+                get;
+                set;
             }
 
-            protected DataCollectorManager CollectorManager
-            {
-                get { return Manager.CollectorManager; }
-            }
+            protected DataCollectorManager CollectorManager => Manager.CollectorManager;
 
-            IDataCollector dataCollector_ = null;
             public IDataCollector DataCollector
             {
-                get { return dataCollector_; }
-                protected set { dataCollector_ = value; }
+                get;
+                protected set;
             }
 
-            string dataAccessorName_ = "";
             protected string DataAccessorName
             {
-                get { return dataAccessorName_; }
-                set { dataAccessorName_ = value; }
+                get;
+                set;
             }
 
-            DataAccessor dataRetriever_ = null;
-            protected DataAccessor DataRetriever
+            protected DataAccessor DataAccessor
             {
-                get { return dataRetriever_; }
-                set { dataRetriever_ = value; }
+                get;
+                set;
             }
 
-            TimeSpan maxDCUpdateInterval_ = Default.DCRefresh;
             public TimeSpan MaxDCUpdateInterval
             {
-                get { return maxDCUpdateInterval_; }
-                protected set { maxDCUpdateInterval_ = value; }
+                get;
+                protected set;
             }
 
-            int zPosition_ = Default.ZPosition;
             public int ZPosition
             {
-                get { return zPosition_; }
-                protected set { zPosition_ = value; }
+                get;
+                protected set;
             }
 
-            Vector2 position_ = Default.Position;
             public Vector2 Position
             {
-                get { return position_; }
-                protected set { position_ = value; }
+                get;
+                protected set;
             }
 
-
-            ValueType positionType_ = Default.PositionType;
             public ValueType PositionType
             {
-                get { return positionType_; }
-                protected set { positionType_ = value; }
+                get;
+                protected set;
             }
 
-
-            Vector2 size_ = Default.Size;
             public Vector2 Size
             {
-                get { return size_; }
-                protected set { size_ = value; }
+                get;
+                protected set;
             }
 
-            ValueType sizeType_ = Default.SizeType;
             public ValueType SizeType
             {
-                get { return sizeType_; }
-                protected set { sizeType_ = value; }
+                get;
+                protected set;
             }
 
             public Color Color
@@ -274,6 +269,8 @@ namespace IngameScript
             }
 
             Dictionary<float, Color> colorGradient_ = new Dictionary<float, Color>();
+            protected Dictionary<float, Color> Gradient => colorGradient_;
+
             public Color getGradientColor(float threshold)
             {
                 Color color;
@@ -336,11 +333,6 @@ namespace IngameScript
                     colorGradient_.Add(threshold, color);
                     colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
-            }
-
-            protected Dictionary<float, Color> Gradient
-            {
-                get { return colorGradient_; }
             }
             #endregion // Properties
 

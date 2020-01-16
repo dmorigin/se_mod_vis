@@ -25,28 +25,28 @@ namespace IngameScript
         {
             IMyTextSurface surface_ = null;
 
-            Vector2 renderPosition_ = new Vector2();
             public Vector2 Position
             {
-                get { return renderPosition_; }
+                get;
+                private set;
             }
 
-            Vector2 renderSize_ = new Vector2();
             public Vector2 Size
             {
-                get { return renderSize_; }
+                get;
+                private set;
             }
 
-            Vector2I coordinate_ = new Vector2I();
             public Vector2I Coordinate
             {
-                get { return coordinate_; }
+                get;
+                private set;
             }
 
-            Vector2 displayOffset_ = new Vector2();
             public Vector2 DisplayOffset
             {
-                get { return displayOffset_; }
+                get;
+                private set;
             }
 
             public Color BackgroundColor
@@ -57,7 +57,7 @@ namespace IngameScript
 
             public RenderTarget(Vector2I coordinate)
             {
-                coordinate_ = coordinate;
+                Coordinate = coordinate;
             }
 
             public void setupSurface(IMyTextSurface surface)
@@ -75,10 +75,10 @@ namespace IngameScript
                 surface_.BackgroundColor = Color.Black;
                 surface_.ScriptBackgroundColor = Color.Black;
 
-                renderSize_ = surface_.SurfaceSize;
-                renderPosition_ = (surface_.TextureSize - renderSize_) * 0.5f;
+                Size = surface_.SurfaceSize;
+                Position = (surface_.TextureSize - Size) * 0.5f;
 
-                displayOffset_ = -(renderSize_ * coordinate_) + renderPosition_;
+                DisplayOffset = -(Size * Coordinate) + Position;
 
                 if (RenderTarget.sprites_.Count == 0)
                     surface_.GetSprites(RenderTarget.sprites_);
@@ -120,7 +120,7 @@ namespace IngameScript
                 using (MySpriteDrawFrame frame = getRenderFrame())
                 {
                     MySprite textInit = MySprite.CreateText("Initilize screen", "debug", Color.LawnGreen, 1f, TextAlignment.LEFT);
-                    textInit.Position = new Vector2(5f, Default.CharHeight) + renderPosition_;
+                    textInit.Position = new Vector2(5f, Default.CharHeight) + Position;
                     frame.Add(textInit);
                 }
             }

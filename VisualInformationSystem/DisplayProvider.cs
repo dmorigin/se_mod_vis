@@ -130,7 +130,7 @@ namespace IngameScript
                     // configure display
                     if (coordinate == new Vector2I(0, 0))
                     {
-                        Template template = provider_.Manager.TemplateManager.createTemplate(display.GroupID);
+                        Template template = provider_.Manager.TemplateManager.createTemplate(display.GroupId);
                         if (template == null)
                         {
                             provider_.log(Console.LogType.Error, "Failed to create template config handler");
