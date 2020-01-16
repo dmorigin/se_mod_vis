@@ -48,14 +48,19 @@ namespace IngameScript
                 double fillRation = 0.0;
 
                 foreach (var tank in Blocks)
+                {
                     fillRation += tank.FilledRatio;
+                    blocksOn_ += isOn(tank) ? 1 : 0;
+                }
 
                 fillRatio_ = (float)(fillRation / Blocks.Count);
+                UpdateFinished = true;
             }
 
             public override string getText(string data)
             {
-                return data.Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
+                return base.getText(data)
+                    .Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
                     .Replace("%fillratio%", new ValueType(fillRatio_, unit: Unit.Percent).pack().ToString())
                     .Replace("%fillvalue", new ValueType(fillRatio_ * capacity_, unit: Unit.l).pack().ToString());
             }
@@ -73,8 +78,7 @@ namespace IngameScript
                         return new Capacity(this);
                 }
 
-                log(Console.LogType.Error, $"Invalid data retriever {name}");
-                return null;
+                return base.getDataAccessor(name);
             }
 
             public class Capacity : DataAccessor

@@ -40,6 +40,8 @@ namespace IngameScript
             {
                 foreach (IMyPowerProducer pp in Blocks)
                 {
+                    blocksOn_ += isOn(pp) ? 1 : 0;
+
                     currentOutput_ += pp.CurrentOutput;
                     maxAvailableOutput_ += pp.MaxOutput;
 
@@ -50,6 +52,7 @@ namespace IngameScript
                 }
 
                 powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
+                UpdateFinished = true;
             }
 
             double fuelMax_ = 0.0;

@@ -30,10 +30,10 @@ namespace IngameScript
 
             public override void prepareUpdate()
             {
+                base.prepareUpdate();
+
                 currentOutput_ = 0f;
                 maxAvailableOutput_ = 0f;
-
-                base.prepareUpdate();
             }
 
             protected override void update()
@@ -42,9 +42,11 @@ namespace IngameScript
                 {
                     currentOutput_ += pp.CurrentOutput;
                     maxAvailableOutput_ += pp.MaxOutput;
+                    blocksOn_ += isOn(pp) ? 1 : 0;
                 }
 
-                powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
+                powerAvailableUsing_ = maxAvailableOutput_ != 0f ? currentOutput_ / maxAvailableOutput_ : 0f;
+                UpdateFinished = true;
             }
 
             public override string getText(string data)
@@ -55,11 +57,9 @@ namespace IngameScript
                     .Replace("%currentoutput%", new ValueType(currentOutput_, Multiplier.M, Unit.W).pack().ToString());
             }
 
-
             protected float maxAvailableOutput_ = 0f; // MW
             protected float currentOutput_ = 0f; // MW
             protected float powerAvailableUsing_ = 0f;
-
 
             #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
@@ -71,8 +71,7 @@ namespace IngameScript
                         return new Usage(this);
                 }
 
-                log(Console.LogType.Error, $"Invalid data retriever {name}");
-                return null;
+                return base.getDataAccessor(name);
             }
 
             class Usage : DataAccessor

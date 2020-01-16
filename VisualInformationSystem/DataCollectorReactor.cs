@@ -30,10 +30,10 @@ namespace IngameScript
 
             public override void prepareUpdate()
             {
+                base.prepareUpdate();
+
                 fuelCurrent_ = 0.0;
                 fuelMax_ = 0.0;
-
-                base.prepareUpdate();
             }
 
             protected override void update()
@@ -46,12 +46,11 @@ namespace IngameScript
                     IMyInventory inventory = reactor.GetInventory();
                     fuelCurrent_ += (double)inventory.CurrentVolume;
                     fuelMax_ += (double)inventory.MaxVolume;
-
-                    inventory.GetItemAmount(new MyItemType("MyObjectBuilder_Ingot/", "Uranium"));
                 }
 
-                powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
+                powerAvailableUsing_ = maxAvailableOutput_ != 0f ? currentOutput_ / maxAvailableOutput_ : 0f;
                 fuelRatio_ = (float)(fuelCurrent_ / fuelMax_);
+                UpdateFinished = true;
             }
 
             double fuelMax_ = 0.0;

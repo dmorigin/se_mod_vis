@@ -44,15 +44,14 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
+                gfx.VisibleThreshold = VisibleThreshold;
+                gfx.VisibleOperator = VisibleOperator;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
 
                 gfx.iconName_ = iconName_;
                 gfx.icon_ = icon_;
-                gfx.showOn_ = showOn_;
-                gfx.thresholdOnMin_ = thresholdOnMin_;
-                gfx.thresholdOnMax_ = thresholdOnMax_;
                 gfx.blink_ = blink_;
                 gfx.rotation_ = rotation_;
 
@@ -65,25 +64,19 @@ namespace IngameScript
                 return true;
             }
 
-            bool show_ = true; // render data only
+            bool toggleShow_ = true; // render data only
             public override void prepareRendering(Display display)
             {
-                if (DataAccessor != null)
-                    if (showOn_ == true && (DataAccessor.indicator() < thresholdOnMin_ || DataAccessor.indicator() > thresholdOnMax_))
-                    {
-                        show_ = false;
-                        return;
-                    }
-
-                if (blink_)
-                    show_ = !show_;
-                else
-                    show_ = true;
+                toggleShow_ = !toggleShow_;
             }
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (!show_)
+                bool visible = true;
+                if (DataAccessor != null)
+                    visible = VisibleOperator(DataAccessor.indicator(), VisibleThreshold);
+
+                if (!visible || (!toggleShow_ && blink_))
                     return;
 
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
@@ -97,7 +90,6 @@ namespace IngameScript
             {
                 var config = base.getConfigHandler();
                 config.add("icon", configIcon);
-                config.add("showon", configShowOn);
                 config.add("blink", configBlink);
                 config.add("rotation", configRotation);
 
@@ -115,17 +107,6 @@ namespace IngameScript
                     log(Console.LogType.Error, $"Invalid icon name:{value}");
                     return false;
                 }
-                return true;
-            }
-
-            bool showOn_ = false;
-            float thresholdOnMin_ = -1f;
-            float thresholdOnMax_ = 1f;
-            bool configShowOn(string key, string value, Configuration.Options options)
-            {
-                thresholdOnMin_ = Configuration.asFloat(value, -1f);
-                thresholdOnMax_ = options.asFloat(0, 1f);
-                showOn_ = true;
                 return true;
             }
 

@@ -73,6 +73,18 @@ namespace IngameScript
                 return true;
             }
 
+            public virtual string getText(string data)
+            {
+                return data
+                    .Replace("%blockcount%", Blocks.Count.ToString())
+                    .Replace("%blockname%", BlockName)
+                    .Replace("%isgroup%", IsGroup ? "true" : "false")
+                    .Replace("%on%", blocksOn_.ToString())
+                    .Replace("%off%", blocksOff_.ToString())
+                    .Replace("%onratio%", new ValueType(onRatio_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%offratio%", new ValueType(offRatio_, unit: Unit.Percent).pack().ToString());
+            }
+
             #region Update System
             public bool UpdateFinished
             {
@@ -82,15 +94,21 @@ namespace IngameScript
 
             public virtual void prepareUpdate()
             {
-                UpdateFinished = true;
+                blocksOn_ = 0;
             }
 
             public virtual void finalizeUpdate()
             {
+                blocksOff_ = Blocks.Count - blocksOn_;
+                onRatio_ = (float)blocksOn_ / (float)Blocks.Count;
+                offRatio_ = (float)blocksOff_ / (float)Blocks.Count;
             }
 
             protected virtual void update()
             {
+                foreach (IMyTerminalBlock block in Blocks)
+                    blocksOn_ += isOn(block) ? 1 : 0;
+                UpdateFinished = true;
             }
 
             public virtual Job getUpdateJob()
@@ -146,31 +164,92 @@ namespace IngameScript
                 get { return maxInterval_; }
                 set { maxInterval_ = value; }
             }
-
-            public virtual string getText(string data)
-            {
-                return data.Replace("%blockcount%", Blocks.Count.ToString())
-                    .Replace("%blockname%", BlockName)
-                    .Replace("%isgroup%", IsGroup ? "true" : "false");
-            }
             #endregion // Properties
 
-            public virtual bool isSameCollector(IDataCollector other)
-            {
-                if (GetType() != other.GetType())
-                    return false;
+            #region Data Accessor
+            protected int blocksOn_ = 0;
+            protected int blocksOff_ = 0;
+            protected float onRatio_ = 0f;
+            protected float offRatio_ = 0f;
 
-                return options_ == other.Options && TypeID == other.TypeID;
+            public virtual DataAccessor getDataAccessor(string name)
+            {
+                switch(name.ToLower())
+                {
+                    case "on":
+                        return new DAOn(this);
+                    case "off":
+                        return new DAOff(this);
+                }
+
+                log(Console.LogType.Error, $"Invalid data retriever {name}");
+                return null;
             }
 
-            public virtual bool isSameCollector(string name, Configuration.Options options)
+            class DAOn : DataAccessor
             {
-                return CollectorTypeName == name && Options == options;
+                DataCollector<T> dc_;
+                public DAOn(DataCollector<T> dc)
+                {
+                    dc_ = dc;
+                }
+
+                public override double indicator() => dc_.onRatio_;
+                public override ValueType min() => new ValueType(0);
+                public override ValueType max() => new ValueType(dc_.Blocks.Count);
+                public override ValueType value() => new ValueType(dc_.blocksOn_);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (IMyTerminalBlock block in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = block.CustomName;
+                        item.indicator = isOn(block) ? 1.0 : 0.0;
+                        item.value = new ValueType(item.indicator);
+                        item.min = new ValueType(0);
+                        item.max = new ValueType(1);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
             }
 
-            public abstract DataAccessor getDataAccessor(string name);
+            class DAOff : DataAccessor
+            {
+                DataCollector<T> dc_;
+                public DAOff(DataCollector<T> dc)
+                {
+                    dc_ = dc;
+                }
 
+                public override double indicator() => dc_.offRatio_;
+                public override ValueType min() => new ValueType(0);
+                public override ValueType max() => new ValueType(dc_.Blocks.Count);
+                public override ValueType value() => new ValueType(dc_.blocksOff_);
 
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (IMyTerminalBlock block in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = block.CustomName;
+                        item.indicator = isOn(block) ? 0.0 : 1.0;
+                        item.value = new ValueType(item.indicator);
+                        item.min = new ValueType(0);
+                        item.max = new ValueType(1);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+            #endregion // Data Accessor
+
+            #region Jobs
             class UpdateJob : Job
             {
                 public UpdateJob(DataCollector<T> dc)
@@ -234,7 +313,21 @@ namespace IngameScript
                     JobFinished = dc_.Constructed;
                 }
             }
+            #endregion // Jobs
 
+            #region Helper
+            public virtual bool isSameCollector(IDataCollector other)
+            {
+                if (GetType() != other.GetType())
+                    return false;
+
+                return options_ == other.Options && TypeID == other.TypeID;
+            }
+
+            public virtual bool isSameCollector(string name, Configuration.Options options)
+            {
+                return CollectorTypeName == name && Options == options;
+            }
 
             protected delegate void GetBlockDelegate<BlockType>(BlockType block) where BlockType: class;
 
@@ -315,6 +408,7 @@ namespace IngameScript
             {
                 return block.GetValue<bool>("OnOff") && block.IsFunctional;
             }
+            #endregion // Helper
         }
     }
 }

@@ -35,9 +35,11 @@ namespace IngameScript
                 {
                     oxygenLevel_ += airvent.GetOxygenLevel();
                     pressurizeAble_ += airvent.CanPressurize && !airvent.Depressurize ? 1 : 0;
+                    blocksOn_ += isOn(airvent) ? 1 : 0;
                 }
 
                 oxygenLevel_ /= Blocks.Count;
+                UpdateFinished = true;
             }
 
             float oxygenLevel_ = 0f;
@@ -62,7 +64,7 @@ namespace IngameScript
                         return new PressurizeAble(this);
                 }
 
-                return null;
+                return base.getDataAccessor(name);
             }
 
             class PressurizeAble : DataAccessor

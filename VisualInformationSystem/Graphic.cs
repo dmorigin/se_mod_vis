@@ -36,6 +36,8 @@ namespace IngameScript
                 PositionType = Default.PositionType;
                 Size = Default.Size;
                 SizeType = Default.SizeType;
+                VisibleThreshold = -1.0;
+                VisibleOperator = greaterequal;
             }
 
             public override bool construct()
@@ -65,6 +67,7 @@ namespace IngameScript
                     add("gradient", configGradient);
                     add("check", configCheck);
                     add("dcrefresh", configDCRefresh);
+                    add("visibility", configVisibility);
                 }
 
                 Graphic graphic_ = null;
@@ -140,7 +143,7 @@ namespace IngameScript
                                 return true;
                             }
                             else
-                                graphic_.log(Console.LogType.Error, $"Data accessor ${graphic_.DataAccessorName} isn't supported");
+                                graphic_.log(Console.LogType.Error, $"Data accessor {graphic_.DataAccessorName} isn't supported");
                         }
                     }
                     else
@@ -157,7 +160,57 @@ namespace IngameScript
                         graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
                     return true;
                 }
+
+                bool configVisibility(string key, string value, Configuration.Options options)
+                {
+                    switch (value.ToLower())
+                    {
+                        case "equal":
+                        case "==":
+                            graphic_.VisibleOperator = equal;
+                            break;
+                        case "unequal":
+                        case "!=":
+                            graphic_.VisibleOperator = unequal;
+                            break;
+                        case "less":
+                        case "<":
+                            graphic_.VisibleOperator = less;
+                            break;
+                        case "greater":
+                        case ">":
+                            graphic_.VisibleOperator = greater;
+                            break;
+                        case "lessequal":
+                        case "<=":
+                            graphic_.VisibleOperator = lessequal;
+                            break;
+                        case "greaterequal":
+                        case ">=":
+                            graphic_.VisibleOperator = greaterequal;
+                            break;
+                        default:
+                            return false;
+                    }
+
+                    graphic_.VisibleThreshold = options.asFloat(0, 0f);
+                    return true;
+                }
             }
+
+            #region Condition
+            // indicator is greater then threshold
+            // example indicator > 0.1
+            // visibility:less:0.1
+            protected delegate bool OperatorDelegate(double a, double b);
+
+            protected static bool equal(double a, double b) => a == b;
+            protected static bool unequal(double a, double b) => a != b;
+            protected static bool less(double a, double b) => a < b;
+            protected static bool greater(double a, double b) => a > b;
+            protected static bool lessequal(double a, double b) => a <= b;
+            protected static bool greaterequal(double a, double b) => a >= b;
+            #endregion // Condition
 
             public virtual ConfigHandler getConfigHandler()
             {
@@ -333,6 +386,18 @@ namespace IngameScript
                     colorGradient_.Add(threshold, color);
                     colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
+            }
+
+            protected double VisibleThreshold
+            {
+                get;
+                set;
+            }
+
+            protected OperatorDelegate VisibleOperator
+            {
+                get;
+                set;
             }
             #endregion // Properties
 

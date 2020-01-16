@@ -26,6 +26,8 @@ namespace IngameScript
             public GraphicList(Template template, Configuration.Options options)
                 : base(template, options)
             {
+                VisibleOperator = greater;
+                VisibleThreshold = 0.0;
             }
 
             protected override bool supportCheck(string name)
@@ -44,6 +46,8 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
+                gfx.VisibleThreshold = VisibleThreshold;
+                gfx.VisibleOperator = VisibleOperator;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
@@ -60,9 +64,6 @@ namespace IngameScript
                 gfx.barThickness_ = barThickness_;
                 gfx.barThicknessType_ = barThicknessType_;
                 gfx.barBackground_ = barBackground_;
-
-                gfx.visibleOperator_ = visibleOperator_;
-                gfx.visibleThreshold_ = visibleThreshold_;
 
                 gfx.iconShow_ = iconShow_;
                 gfx.autoScroll_ = autoScroll_;
@@ -165,7 +166,7 @@ namespace IngameScript
                 renderData_.textRightPositionX = position.X + (size.X * 0.5f);
 
                 // filter list
-                DataAccessor.list(out renderData_.container, (item) => visibleOperator_(item.indicator, visibleThreshold_));
+                DataAccessor.list(out renderData_.container, (item) => VisibleOperator(item.indicator, VisibleThreshold));
 
                 // auto scroll
                 if (autoScroll_ == true)
@@ -251,7 +252,6 @@ namespace IngameScript
                     config.add("text", configText);
                     config.add("bar", configBar);
                     config.add("icon", configIcon);
-                    config.add("visibility", configVisibility);
                     config.add("setline", configSetLine);
                     config.add("autoscroll", configAutoScroll);
                 }
@@ -264,6 +264,7 @@ namespace IngameScript
                 Normal,
                 OnlyName,
                 MinValue,
+                Status
             };
             bool textShow_ = true;
             TextStyle textStyle_ = TextStyle.Normal;
@@ -361,60 +362,7 @@ namespace IngameScript
                 autoScrollInc_ = options.asInteger(0, 1);
                 return true;
             }
-
-            //bool visible_ = true;
-            double visibleThreshold_ = 0.0;
-            OperatorDelegate visibleOperator_ = greater;
-            bool configVisibility(string key, string value, Configuration.Options options)
-            {
-                switch (value.ToLower())
-                {
-                    case "equal":
-                    case "==":
-                        visibleOperator_ = equal;
-                        break;
-                    case "unequal":
-                    case "!=":
-                        visibleOperator_ = unequal;
-                        break;
-                    case "less":
-                    case "<":
-                        visibleOperator_ = less;
-                        break;
-                    case "greater":
-                    case ">":
-                        visibleOperator_ = greater;
-                        break;
-                    case "lessequal":
-                    case "<=":
-                        visibleOperator_ = lessequal;
-                        break;
-                    case "greaterequal":
-                    case ">=":
-                        visibleOperator_ = greaterequal;
-                        break;
-                    default:
-                        return false;
-                }
-
-                visibleThreshold_ = options.asFloat(0, 0f);
-                return true;
-            }
             #endregion // Configuration
-
-            #region Condition
-            // indicator is greater then threshold
-            // example indicator > 0.1
-            // visibility:less:0.1
-            delegate bool OperatorDelegate(double a, double b);
-
-            static bool equal(double a, double b) => a == b;
-            static bool unequal(double a, double b) => a != b;
-            static bool less(double a, double b) => a < b;
-            static bool greater(double a, double b) => a > b;
-            static bool lessequal(double a, double b) => a <= b;
-            static bool greaterequal(double a, double b) => a >= b;
-            #endregion // Condition
         }
     }
 }

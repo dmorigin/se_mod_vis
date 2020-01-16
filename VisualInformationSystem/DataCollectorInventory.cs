@@ -177,11 +177,22 @@ namespace IngameScript
 
             public override void prepareUpdate()
             {
+                base.prepareUpdate();
+
                 currentVolume_ = 0.0;
                 currentItems_ = 0;
                 invIndex_ = 0;
                 items_.Clear();
                 UpdateFinished = false;
+            }
+
+            public override void finalizeUpdate()
+            {
+                volumeRatio_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
+                itemRatio_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
+                itemRatio_ = itemRatio_ > 1 ? 1 : itemRatio_;
+
+                base.finalizeUpdate();
             }
 
             protected override void update()
@@ -229,10 +240,8 @@ namespace IngameScript
 
                 if (invIndex_ >= inventories_.Count)
                 {
+                    base.update();
                     UpdateFinished = true;
-                    volumeRatio_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
-                    itemRatio_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
-                    itemRatio_ = itemRatio_ > 1 ? 1 : itemRatio_;
                 }
             }
             #endregion // Update Part
@@ -291,8 +300,7 @@ namespace IngameScript
                         return new Items(this);
                 }
 
-                log(Console.LogType.Error, $"Invalid data retriever {name}");
-                return null;
+                return base.getDataAccessor(name);
             }
 
             class Capacity : DataAccessor

@@ -52,11 +52,14 @@ namespace IngameScript
                     maxAvailableOutput_ += battery.MaxOutput;
                     maxAvailableInput_ += battery.MaxInput;
                     maxAvailableStored_ += battery.MaxStoredPower;
+
+                    blocksOn_ += isOn(battery) ? 1 : 0;
                 }
 
                 powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;
                 powerAvailableStoring_ = currentInput_ / maxAvailableInput_;
                 powerAvailableLeft_ = currentStored_ / maxAvailableStored_;
+                UpdateFinished = true;
             }
 
             public List<IMyBatteryBlock> Batteries
