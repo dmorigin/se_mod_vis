@@ -76,6 +76,9 @@ namespace IngameScript
                     case "airvent":
                         dataCollector = new DataCollectorAirVent(options);
                         break;
+                    case "jumpdrive":
+                        dataCollector = new DataCollectorJumpDrive(options);
+                        break;
                 }
 
                 if (dataCollector != null)

@@ -26,6 +26,7 @@ namespace IngameScript
             public VISManager()
             {
                 config_ = new ConfigHandler(this);
+                CurrentState = State.Stopped;
 
                 console_ = new Console();
                 Timer = new Timer();
@@ -108,14 +109,6 @@ namespace IngameScript
             }
 
             List<DisplayProvider> displayProviders_ = new List<DisplayProvider>();
-
-            #region Command line
-            CommandLine cmdLine_ = new CommandLine();
-            public CommandLine CommandLine
-            {
-                get { return cmdLine_; }
-            }
-            #endregion // Command line
 
             #region Console
             Console console_ = null;
@@ -342,22 +335,15 @@ namespace IngameScript
             }
             #endregion // State Handler
 
-
-            State currentState_ = State.Stopped;
             public State CurrentState
             {
-                get { return currentState_; }
+                get;
+                protected set;
             }
+            public void switchState(State nextState) => CurrentState = nextState;
 
             Dictionary<State, StateDelegate> stateHandlers_ = new Dictionary<State, StateDelegate>();
             bool reboot_ = true;
-
-
-            public void switchState(State nextState)
-            {
-                log(Console.LogType.Info, $"Switch to state:{stateToString(nextState)}");
-                currentState_ = nextState;
-            }
             #endregion // Application State System
 
 
@@ -373,15 +359,8 @@ namespace IngameScript
                     // update timer
                     Timer.update(App.Runtime.TimeSinceLastRun);
 
-                    if ((updateSource & UpdateType.Terminal) != 0 ||
-                        (updateSource & UpdateType.Trigger) != 0)
-                    {
-                        // process command line
-                        //cmdLine_.process(args);
-                    }
-
                     // process state
-                    stateHandlers_[currentState_]();
+                    stateHandlers_[CurrentState]();
 
                     // process console
                     console_.flush();

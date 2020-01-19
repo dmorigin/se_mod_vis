@@ -75,7 +75,7 @@ namespace IngameScript
                     dc_ = obj;
                 }
 
-                public override double indicator() => (double)dc_.pressurizeAble_ / dc_.Blocks.Count;
+                public override double indicator() => (double)dc_.pressurizeAble_ / (double)dc_.Blocks.Count;
                 public override ValueType min() => new ValueType(0.0);
                 public override ValueType max() => new ValueType(dc_.Blocks.Count);
                 public override ValueType value() => new ValueType();

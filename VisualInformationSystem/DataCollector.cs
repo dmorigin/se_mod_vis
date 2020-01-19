@@ -406,8 +406,16 @@ namespace IngameScript
 
             public static bool isOn(IMyTerminalBlock block)
             {
-                return block.GetValue<bool>("OnOff") && block.IsFunctional;
+                var prop = block.GetProperty("OnOff");
+                if (prop != null)
+                    return block.GetValue<bool>("OnOff") && block.IsFunctional;
+                return block.IsFunctional;
             }
+
+            public static double clamp(double value, double min, double max) => value < min ? min : (value > max ? max : value);
+            //public static float clamp(float value, float min, float max) => value < min ? min : (value > max ? max : value);
+            public static long clamp(long value, long min, long max) => value < min ? min : (value > max ? max : value);
+            //public static int clamp(int value, int min, int max) => value < min ? min : (value > max ? max : value);
             #endregion // Helper
         }
     }

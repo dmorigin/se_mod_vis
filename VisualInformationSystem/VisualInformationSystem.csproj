@@ -38,7 +38,6 @@
   <Import Project="MDK/MDK.options.props" />
   <Import Project="MDK/MDK.paths.props" Condition="exists('MDK/MDK.paths.props')" />
   <ItemGroup>
-    <Compile Include="Commandline.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="DataCollectorAirVent.cs" />

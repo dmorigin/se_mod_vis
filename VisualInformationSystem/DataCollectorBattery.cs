@@ -117,14 +117,14 @@ namespace IngameScript
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
-                    foreach (var ep in dc_.Blocks)
+                    foreach (var battery in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.name = ep.CustomName;
-                        item.indicator = ep.CurrentStoredPower / ep.MaxStoredPower;
-                        item.value = new ValueType(ep.CurrentStoredPower, Multiplier.M, Unit.Wh);
+                        item.name = battery.CustomName;
+                        item.indicator = battery.CurrentStoredPower / battery.MaxStoredPower;
+                        item.value = new ValueType(battery.CurrentStoredPower, Multiplier.M, Unit.Wh);
                         item.min = new ValueType(0, Multiplier.M, Unit.Wh);
-                        item.max = new ValueType(ep.MaxStoredPower, Multiplier.M, Unit.Wh);
+                        item.max = new ValueType(battery.MaxStoredPower, Multiplier.M, Unit.Wh);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

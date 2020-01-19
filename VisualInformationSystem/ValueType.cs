@@ -159,7 +159,7 @@ namespace IngameScript
                     multiplier = getNextHeigher(multiplier);
                 }
 
-                while (value < 0.0 && multiplier != Multiplier.None)
+                while (value < 0.1 && multiplier != Multiplier.None)
                 {
                     value *= 1000.0;
                     multiplier = getNextLower(multiplier);

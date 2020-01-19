@@ -264,7 +264,6 @@ namespace IngameScript
                 Normal,
                 OnlyName,
                 MinValue,
-                Status
             };
             bool textShow_ = true;
             TextStyle textStyle_ = TextStyle.Normal;

@@ -46,6 +46,8 @@ namespace IngameScript
                     IMyInventory inventory = reactor.GetInventory();
                     fuelCurrent_ += (double)inventory.CurrentVolume;
                     fuelMax_ += (double)inventory.MaxVolume;
+
+                    blocksOn_ += isOn(reactor) ? 1 : 0;
                 }
 
                 powerAvailableUsing_ = maxAvailableOutput_ != 0f ? currentOutput_ / maxAvailableOutput_ : 0f;
@@ -60,8 +62,8 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%maxfuel%", new ValueType(fuelMax_, unit: Unit.l).pack().ToString())
-                    .Replace("%currentfuel%", new ValueType(fuelCurrent_, unit: Unit.l).pack().ToString())
+                    .Replace("%maxfuel%", new ValueType(fuelMax_, Multiplier.K, Unit.l).pack().ToString())
+                    .Replace("%currentfuel%", new ValueType(fuelCurrent_, Multiplier.K, Unit.l).pack().ToString())
                     .Replace("%fuelratio%", new ValueType(fuelRatio_, unit: Unit.Percent).pack().ToString());
             }
 
@@ -83,8 +85,8 @@ namespace IngameScript
 
                 public override double indicator() => dc_.fuelRatio_;
                 public override ValueType min() => new ValueType(0, unit: Unit.l);
-                public override ValueType max() => new ValueType(dc_.fuelMax_, unit: Unit.l);
-                public override ValueType value() => new ValueType(dc_.fuelCurrent_, unit: Unit.l);
+                public override ValueType max() => new ValueType(dc_.fuelMax_, Multiplier.K, Unit.l);
+                public override ValueType value() => new ValueType(dc_.fuelCurrent_, Multiplier.K, Unit.l);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -96,8 +98,8 @@ namespace IngameScript
                         item.name = entry.CustomName;
                         item.indicator = (double)inventory.CurrentVolume / (double)inventory.MaxVolume;
                         item.min = new ValueType(0.0, unit: Unit.l);
-                        item.max = new ValueType((double)inventory.MaxVolume, unit: Unit.l);
-                        item.value = new ValueType((double)inventory.CurrentVolume, unit: Unit.l);
+                        item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
+                        item.value = new ValueType((double)inventory.CurrentVolume, Multiplier.K, Unit.l);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

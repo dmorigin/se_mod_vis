@@ -81,10 +81,7 @@ namespace IngameScript
                             if (int.TryParse(itemTypeName, out amount))
                             {
                                 if (itemTypes_.Count > 0)
-                                {
                                     itemTypes_[itemTypes_.Count - 1].amount = amount;
-                                    maxItems_ -= defaultMaxAmountItems_ - amount;
-                                }
                                 else
                                     defaultMaxAmountItems_ = amount;
                             }
@@ -92,10 +89,7 @@ namespace IngameScript
                             {
                                 VISItemType itemType = Default.ItemTypeMap.FirstOrDefault(pair => pair.Key == itemTypeName.ToLower()).Value;
                                 if (!itemType) // try as typeId string
-                                {
-                                    log(Console.LogType.Debug, $"Item '{itemTypeName}' not in default list");
                                     itemType = itemTypeName;
-                                }
 
                                 if (!itemType)
                                 {
@@ -152,7 +146,15 @@ namespace IngameScript
                     if (inventories_.Count == 0)
                         log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
 
-                    maxItems_ = maxItems_ == 0 ? (defaultMaxAmountItems_ * inventories_.Count) : maxItems_;
+                    if (itemTypes_.Count > 0)
+                        foreach (var it in itemTypes_)
+                            maxItems_ += it.amount;
+                    else
+                    {
+                        foreach (var it in Default.AmountItems)
+                            maxItems_ += it.Key.Group ? it.Value * 10 : it.Value;
+                    }
+
                     Constructed = true;
                 }
 
@@ -189,8 +191,7 @@ namespace IngameScript
             public override void finalizeUpdate()
             {
                 volumeRatio_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
-                itemRatio_ = maxItems_ != 0 ? currentItems_ / maxItems_ : 0;
-                itemRatio_ = itemRatio_ > 1 ? 1 : itemRatio_;
+                itemRatio_ = maxItems_ != 0 ? clamp((double)currentItems_ / (double)maxItems_, 0.0, 1.0) : 0.0;
 
                 base.finalizeUpdate();
             }
@@ -270,8 +271,8 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%maxitems%", maxItems_.ToString(Default.StringFormat))
-                    .Replace("%currentitems%", currentItems_.ToString(Default.StringFormat))
+                    .Replace("%maxitems%", new ValueType(maxItems_).pack().ToString())
+                    .Replace("%currentitems%", new ValueType(currentItems_).pack().ToString())
                     .Replace("%itemratio%", new ValueType(itemRatio_, unit: Unit.Percent).pack().ToString())
                     .Replace("%maxvolume%", new ValueType(maxVolume_, unit: Unit.l).pack().ToString())
                     .Replace("%currentvolume%", new ValueType(currentVolume_, unit: Unit.l).pack().ToString())
@@ -321,10 +322,10 @@ namespace IngameScript
                     container = new List<ListContainer>();
                     foreach (var inventory in inv_.inventories_)
                     {
-                        double indicator = inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
+                        double indicator = (double)inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
 
                         ListContainer item = new ListContainer();
-                        item.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
+                        item.indicator = clamp(indicator, 0.0, 1.0);
                         item.min = new ValueType(0, Multiplier.K, Unit.l);
                         item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
                         item.value = new ValueType((double)inventory.CurrentVolume, Multiplier.K, Unit.l);
@@ -354,10 +355,10 @@ namespace IngameScript
                     container = new List<ListContainer>();
                     foreach(var item in inv_.items_)
                     {
-                        double indicator = item.currentAmount / (double)item.maxAmount;
+                        double indicator = (double)item.currentAmount / (double)item.maxAmount;
 
                         ListContainer entry = new ListContainer();
-                        entry.indicator = indicator > 1.0 ? 1.0 : (indicator < 0.0 ? 0.0 : indicator);
+                        entry.indicator = clamp(indicator, 0.0, 1.0);
                         entry.min = new ValueType(0.0);
                         entry.max = new ValueType(item.maxAmount);
                         entry.value = new ValueType(item.currentAmount);

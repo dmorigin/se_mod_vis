@@ -66,7 +66,7 @@ namespace IngameScript
             public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()
             {
                 // individual amount values
-                { "MyObjectBuilder_Ore/Ice", 100000 },
+                { "MyObjectBuilder_Ore/Ice", 200000 },
                 { "MyObjectBuilder_Ore/Stone", 20000 },
                 { "MyObjectBuilder_Ore/Iron", 200000 },
 

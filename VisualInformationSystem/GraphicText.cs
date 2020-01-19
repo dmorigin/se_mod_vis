@@ -165,13 +165,14 @@ namespace IngameScript
                     renderData_.lines.Add(line);
                 }
 
-                renderData_.lineHeight = maxSize.Y;
-
                 if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
                     renderData_.fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * renderData_.lines.Count));
+                    renderData_.lineHeight = maxSize.Y * renderData_.fontSize;
                 }
+                else
+                    renderData_.lineHeight = maxSize.Y;
 
                 Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 renderData_.position = new Vector2(position.X, position.Y - ((maxSize.Y * (renderData_.lines.Count - 1)) * 0.5f));
