@@ -180,7 +180,7 @@ namespace IngameScript
                 return null;
             }
 
-            RenderTarget getReferenceRT()
+            public RenderTarget getReferenceRT()
             {
                 if (renderTargets_.Count == 1)
                     return renderTargets_[0];

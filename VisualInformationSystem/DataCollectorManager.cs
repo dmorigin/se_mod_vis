@@ -79,6 +79,12 @@ namespace IngameScript
                     case "jumpdrive":
                         dataCollector = new DataCollectorJumpDrive(options);
                         break;
+                    case "landinggear":
+                        dataCollector = new DataCollectorLandingGear(options);
+                        break;
+                    case "connector":
+                        dataCollector = new DataCollectorConnector(options);
+                        break;
                 }
 
                 if (dataCollector != null)

@@ -149,22 +149,56 @@ namespace IngameScript
 
             RenderData renderData_ = new RenderData();
 
+            string getText(string text)
+            {
+                string line = text;
+
+                if (DataAccessor != null)
+                {
+                    line = line
+                        .Replace("%min%", DataAccessor.min().pack().ToString())
+                        .Replace("%max%", DataAccessor.max().pack().ToString())
+                        .Replace("%value%", DataAccessor.value().pack().ToString())
+                        .Replace("%indicator%", new Program.ValueType(DataAccessor.indicator(), unit: Unit.Percent).pack().ToString());
+                }
+
+                return DataCollector != null ? DataCollector.getText(line) : line;
+            }
+
             public override void prepareRendering(Display display)
             {
                 renderData_.fontSize = FontSize;
                 renderData_.lines = new List<string>();
                 Vector2 maxSize = new Vector2(0f, 0f);
 
-                foreach (string text in text_)
+                Func<string, string> calcMaxSize = (text) =>
                 {
-                    string line = DataCollector != null ? DataCollector.getText(text) : text;
+                    string line = getText(text);
                     Vector2 lineSize = display.measureLineInPixels(line, Font, renderData_.fontSize);
 
-                    maxSize.X = lineSize.X > maxSize.X ? lineSize.X : maxSize.X;
-                    maxSize.Y = lineSize.Y > maxSize.Y ? lineSize.Y : maxSize.Y;
-                    renderData_.lines.Add(line);
-                }
+                    maxSize.X = Math.Max(maxSize.X, lineSize.X);
+                    maxSize.Y = Math.Max(maxSize.Y, lineSize.Y);
 
+                    return line;
+                };
+
+                foreach (string text in text_)
+                {
+                    // add text from display text field
+                    if (text == "%display_text_field%")
+                    {
+                        RenderTarget rt = display.getReferenceRT();
+                        if (rt != null)
+                        {
+                            string[] lines = rt.Text.Split('\n');
+                            foreach (string line in lines)
+                                renderData_.lines.Add(calcMaxSize(line));
+                        }
+                    }
+                    else
+                        renderData_.lines.Add(calcMaxSize(text));
+                }
+                
                 if (!useFontSize_)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
@@ -175,7 +209,7 @@ namespace IngameScript
                     renderData_.lineHeight = maxSize.Y;
 
                 Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                renderData_.position = new Vector2(position.X, position.Y - ((maxSize.Y * (renderData_.lines.Count - 1)) * 0.5f));
+                renderData_.position = new Vector2(position.X, position.Y - ((renderData_.lineHeight * (renderData_.lines.Count - 1)) * 0.5f));
 
                 if (Gradient.Count > 0)
                     renderData_.fontColor = DataAccessor != null ? getGradientColor((float)DataAccessor.indicator()) : Color;

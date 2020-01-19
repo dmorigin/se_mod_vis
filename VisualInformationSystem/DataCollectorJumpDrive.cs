@@ -65,12 +65,24 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxcapacity%", new ValueType(maxStoredPower_, Multiplier.M, Unit.Wh).pack().ToString())
                     .Replace("%currentcapacity%", new ValueType(currentStoredPower_, Multiplier.M, Unit.Wh).pack().ToString())
-                    .Replace("%capacityratio%", new ValueType(ratioStoredPower_, unit: Unit.Percent).pack().ToString());
+                    .Replace("%capacityratio%", new ValueType(ratioStoredPower_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%amountcharging%", amountRecharging_.ToString())
+                    .Replace("amountjumping", amountJumping_.ToString())
+                    .Replace("%amountready", amountReady_.ToString());
             }
 
             #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
+                switch(name.ToLower())
+                {
+                    case "":
+                    case "capacity":
+                        return new Capacity(this);
+                    case "ready":
+                        return new Ready(this);
+                }
+
                 return base.getDataAccessor(name);
             }
 
@@ -125,10 +137,10 @@ namespace IngameScript
                     {
                         ListContainer item = new ListContainer();
                         item.name = jd.CustomName;
-                        item.indicator = jd.CurrentStoredPower / jd.MaxStoredPower;
-                        item.min = new ValueType(0, Multiplier.M, Unit.Wh);
-                        item.max = new ValueType(jd.MaxStoredPower, Multiplier.M, Unit.Wh);
-                        item.value = new ValueType(jd.CurrentStoredPower, Multiplier.M, Unit.Wh);
+                        item.indicator = jd.Status == MyJumpDriveStatus.Ready ? 1 : 0;
+                        item.min = new ValueType(0);
+                        item.max = new ValueType(1);
+                        item.value = new ValueType(item.indicator);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

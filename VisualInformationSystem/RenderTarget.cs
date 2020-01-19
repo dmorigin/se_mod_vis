@@ -55,6 +55,8 @@ namespace IngameScript
                 set { surface_.ScriptBackgroundColor = value; }
             }
 
+            public string Text => surface_.GetText();
+
             public RenderTarget(Vector2I coordinate)
             {
                 Coordinate = coordinate;
@@ -62,10 +64,8 @@ namespace IngameScript
 
             public void setupSurface(IMyTextSurface surface)
             {
-                releaseSurface();
-
                 surface_ = surface;
-                surface_.WriteText("");
+                //surface_.WriteText("");
                 surface_.Script = "";
                 surface_.ContentType = ContentType.SCRIPT;
                 surface_.Font = Default.Font;
@@ -84,24 +84,6 @@ namespace IngameScript
                     surface_.GetSprites(RenderTarget.sprites_);
 
                 drawInitScreen();
-            }
-
-            public void releaseSurface()
-            {
-                if (surface_ == null)
-                    return;
-
-                surface_.WriteText("");
-                surface_.Script = "";
-                surface_.ContentType = ContentType.NONE;
-                surface_.TextPadding = 2f;
-                surface_.Font = "DEBUG";
-                surface_.FontSize = 1f;
-                surface_.BackgroundColor = Color.Black;
-                surface_.FontColor = Color.White;
-                surface_.Alignment = TextAlignment.LEFT;
-
-                surface_ = null;
             }
 
             public MySpriteDrawFrame getRenderFrame()
