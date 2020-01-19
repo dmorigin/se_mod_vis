@@ -47,7 +47,7 @@ namespace IngameScript
                     gfx.addGradientColor(color.Key, color.Value);
 
                 gfx.useDefaultFont_ = useDefaultFont_;
-                gfx.useFontSize_ = useFontSize_;
+                gfx.sizeIsSet = sizeIsSet;
                 gfx.useDefaultAlignment_ = useDefaultAlignment_;
                 gfx.font_ = font_;
                 gfx.fontSize_ = fontSize_;
@@ -59,76 +59,80 @@ namespace IngameScript
             }
 
             bool useDefaultFont_ = true;
-            bool useFontSize_ = false;
-            float fontSize_ = Default.FontSize;
-            public float FontSize => useDefaultFont_ ? Template.FontSize : fontSize_;
-
+            bool sizeIsSet = false;
             string font_ = Default.Font;
-            public string Font => useDefaultFont_ ? Template.Font : font_;
-
-            public Color FontColor => useDefaultFont_ ? Template.FontColor : Color;
-
+            float fontSize_ = 0f;
             bool useDefaultAlignment_ = true;
             TextAlignment alignment_ = Default.FontAlignment;
+
+            public float FontSize => useDefaultFont_ ? Template.FontSize : fontSize_;
+            public string Font => useDefaultFont_ ? Template.Font : font_;
+            public Color FontColor => useDefaultFont_ ? Template.FontColor : Color;
             public TextAlignment TextAlignment => useDefaultAlignment_ ? Template.TextAlignment : alignment_;
 
             List<string> text_ = new List<string>();
 
             #region Configuration
-            bool configFont(string key, string value, Configuration.Options options)
+            class Config : ConfigHandler
             {
-                font_ = value != string.Empty ? value : Default.Font;
-                fontSize_ = options.asFloat(0, 0f);
-                if (fontSize_ == 0f)
-                    useFontSize_ = false;
-                else
-                    useFontSize_ = true;
-
-                Color = options.asColor(1, Default.FontColor);
-                useDefaultFont_ = false;
-                return true;
-            }
-
-            bool configText(string key, string value, Configuration.Options options)
-            {
-                text_.Add(value);
-                return true;
-            }
-
-            bool configAlignment(string key, string value, Configuration.Options options)
-            {
-                string data = value.ToLower();
-                switch (data)
+                GraphicText gfx_;
+                public Config(GraphicText gfx)
+                    : base(gfx)
                 {
-                    case "center":
-                    case "c":
-                        alignment_ = TextAlignment.CENTER;
-                        break;
-                    case "left":
-                    case "l":
-                        alignment_ = TextAlignment.LEFT;
-                        break;
-                    case "right":
-                    case "r":
-                        alignment_ = TextAlignment.RIGHT;
-                        break;
-                    default:
-                        return false;
+                    gfx_ = gfx;
+                    add("font", configFont);
+                    add("text", configText);
+                    add("alignment", configAlignment);
                 }
 
-                useDefaultAlignment_ = false;
-                return true;
+                bool configFont(string key, string value, Configuration.Options options)
+                {
+                    gfx_.font_ = value != string.Empty ? value : Default.Font;
+                    gfx_.fontSize_ = options.asFloat(0, 0f);
+                    gfx_.Color = options.asColor(1, Default.FontColor);
+                    gfx_.useDefaultFont_ = false;
+                    return true;
+                }
+
+                bool configText(string key, string value, Configuration.Options options)
+                {
+                    gfx_.text_.Add(value);
+                    return true;
+                }
+
+                bool configAlignment(string key, string value, Configuration.Options options)
+                {
+                    string data = value.ToLower();
+                    switch (data)
+                    {
+                        case "center":
+                        case "c":
+                            gfx_.alignment_ = TextAlignment.CENTER;
+                            break;
+                        case "left":
+                        case "l":
+                            gfx_.alignment_ = TextAlignment.LEFT;
+                            break;
+                        case "right":
+                        case "r":
+                            gfx_.alignment_ = TextAlignment.RIGHT;
+                            break;
+                        default:
+                            return false;
+                    }
+
+                    gfx_.useDefaultAlignment_ = false;
+                    return true;
+                }
+
+                protected override bool configSize(string key, string value, Configuration.Options options)
+                {
+                    gfx_.sizeIsSet = true;
+                    return base.configSize(key, value, options);
+                }
             }
 
-            public override ConfigHandler getConfigHandler()
-            {
-                ConfigHandler handler = base.getConfigHandler();
-                handler.add("font", configFont);
-                handler.add("text", configText);
-                handler.add("alignment", configAlignment);
-
-                return handler;
-            }
+            public override ConfigHandler getConfigHandler() => new Config(this);
             #endregion // Configuration
 
             protected override bool supportCheck(string name)
@@ -167,14 +171,16 @@ namespace IngameScript
 
             public override void prepareRendering(Display display)
             {
-                renderData_.fontSize = FontSize;
+                float fontSize = FontSize;
+                bool dynFontSize = fontSize == 0f || (useDefaultFont_ && sizeIsSet);
+
                 renderData_.lines = new List<string>();
                 Vector2 maxSize = new Vector2(0f, 0f);
 
                 Func<string, string> calcMaxSize = (text) =>
                 {
                     string line = getText(text);
-                    Vector2 lineSize = display.measureLineInPixels(line, Font, renderData_.fontSize);
+                    Vector2 lineSize = display.measureLineInPixels(line, Font, dynFontSize ? 1f : fontSize);
 
                     maxSize.X = Math.Max(maxSize.X, lineSize.X);
                     maxSize.Y = Math.Max(maxSize.Y, lineSize.Y);
@@ -199,14 +205,17 @@ namespace IngameScript
                         renderData_.lines.Add(calcMaxSize(text));
                 }
                 
-                if (!useFontSize_)
+                if (dynFontSize)
                 {
                     Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
                     renderData_.fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * renderData_.lines.Count));
                     renderData_.lineHeight = maxSize.Y * renderData_.fontSize;
                 }
                 else
+                {
+                    renderData_.fontSize = fontSize;
                     renderData_.lineHeight = maxSize.Y;
+                }
 
                 Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 renderData_.position = new Vector2(position.X, position.Y - ((renderData_.lineHeight * (renderData_.lines.Count - 1)) * 0.5f));
