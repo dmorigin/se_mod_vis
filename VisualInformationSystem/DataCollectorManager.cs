@@ -24,15 +24,28 @@ namespace IngameScript
         public class DataCollectorManager : VISObject
         {
             public DataCollectorManager()
+                : base("DataCollectorManager")
             {
             }
 
 
             List<IDataCollector> dataCollectors_ = new List<IDataCollector>();
 
+            public int Requested
+            {
+                get;
+                protected set;
+            }
+
+            public int Created
+            {
+                get;
+                protected set;
+            }
 
             public IDataCollector getDataCollector(string name, Configuration.Options options)
             {
+                Requested++;
                 IDataCollector collector = dataCollectors_.Find(x => x.isSameCollector(name, options));
                 if (collector != null)
                     return collector;
@@ -41,16 +54,16 @@ namespace IngameScript
             }
 
 
-            private IDataCollector createDataCollector(string name, Configuration.Options options)
+            IDataCollector createDataCollector(string name, Configuration.Options options)
             {
                 IDataCollector dataCollector = null;
                 switch (name)
                 {
                     case "hydrogen":
-                        dataCollector = new DataCollectorGasTank("MyObjectBuilder_HydrogenTank", options);
+                        dataCollector = new DataCollectorGasTank("hydrogentank", "Hydrogen Tank", options);
                         break;
                     case "oxygen":
-                        dataCollector = new DataCollectorGasTank("MyObjectBuilder_OxygenTank", options);
+                        dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen Tank", options);
                         break;
                     case "inventory":
                         dataCollector = new DataCollectorInventory(options);
@@ -89,7 +102,9 @@ namespace IngameScript
 
                 if (dataCollector != null)
                 {
+                    Created++;
                     Manager.JobManager.queueJob((dataCollector as VISObject).getConstructionJob());
+                    dataCollectors_.Add(dataCollector);
                     return dataCollector;
                 }
                 else

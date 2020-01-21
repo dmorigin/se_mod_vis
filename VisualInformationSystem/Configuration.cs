@@ -220,32 +220,8 @@ namespace IngameScript
                 }
 
 
-                public override bool Equals(object obj)
-                {
-                    if (GetType() != obj.GetType())
-                        return false;
-
-                    Options options = obj as Options;
-                    if (options == null)
-                        return false;
-
-                    return options_ == options.options_;
-                }
-
-
-                public override int GetHashCode()
-                {
-                    return base.GetHashCode();
-                }
-
-
-                public int Count
-                {
-                    get
-                    {
-                        return options_.Count;
-                    }
-                }
+                public bool equals(Options other) => options_.SequenceEqual(other.options_);
+                public int Count => options_.Count;
 
 
                 public string this[int index]

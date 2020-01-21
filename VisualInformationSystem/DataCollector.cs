@@ -26,14 +26,19 @@ namespace IngameScript
             public DataCollector(string collectorTypeName, string typeId, Configuration.Options options)
             {
                 if (options == null)
-                    options_ = new Configuration.Options(new List<string>());
+                    Options = new Configuration.Options(new List<string>());
                 else
-                    options_ = options;
+                    Options = options;
 
                 TypeID = typeId;
                 CollectorTypeName = collectorTypeName;
-                UpdateFinished = false;
+                Blocks = new List<T>();
+                AcceptBlock = (block) => Blocks.Add(block);
+
+                MaxUpdateInterval = Default.DCRefresh;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
+
+                UpdateFinished = false;
             }
 
             public override bool construct()
@@ -45,14 +50,14 @@ namespace IngameScript
                 {
                     getBlocks<T>(BlockName, IsGroup, (block) =>
                     {
-                        blocks_.Add(block);
+                        Blocks.Add(block);
                     }, TypeID);
                 }
                 else
                 {
                     if (!getBlocks<T>((block) =>
                     {
-                        blocks_.Add(block);
+                        Blocks.Add(block);
                     }, TypeID))
                     {
                         log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
@@ -60,7 +65,7 @@ namespace IngameScript
                     }
                 }
 
-                if (blocks_.Count == 0)
+                if (Blocks.Count == 0)
                     log(Console.LogType.Warning, $"No blocks found for {BlockName}:{(IsGroup ? "group" : "")}");
                 Constructed = true;
                 return true;
@@ -68,7 +73,7 @@ namespace IngameScript
 
             public virtual bool reconstruct()
             {
-                blocks_.Clear();
+                Blocks.Clear();
                 Constructed = false;
                 return true;
             }
@@ -126,10 +131,10 @@ namespace IngameScript
                 protected set;
             }
 
-            Configuration.Options options_ = null;
             public Configuration.Options Options
             {
-                get { return options_; }
+                get;
+                private set;
             }
 
             public string TypeID
@@ -138,10 +143,10 @@ namespace IngameScript
                 protected set;
             }
 
-            List<T> blocks_ = new List<T>();
             protected List<T> Blocks
             {
-                get { return blocks_; }
+                get;
+                private set;
             }
 
             public bool IsGroup
@@ -156,13 +161,18 @@ namespace IngameScript
                 protected set;
             }
 
+            protected GetBlockDelegate<T> AcceptBlock
+            {
+                get;
+                set;
+            }
+
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan nextReconstruct_ = new TimeSpan(0);
-            TimeSpan maxInterval_ = Default.DCRefresh;
             public TimeSpan MaxUpdateInterval
             {
-                get { return maxInterval_; }
-                set { maxInterval_ = value; }
+                get;
+                set;
             }
             #endregion // Properties
 
@@ -268,7 +278,7 @@ namespace IngameScript
                 public override void finalizeJob()
                 {
                     dc_.finalizeUpdate();
-                    dc_.nextUpdate_ = dc_.maxInterval_ + Manager.Timer.Ticks;
+                    dc_.nextUpdate_ = dc_.MaxUpdateInterval + Manager.Timer.Ticks;
 
                     if (dc_.nextReconstruct_ <= Manager.Timer.Ticks)
                         JobManager.queueJob(new ReconstructJob(dc_));
@@ -316,17 +326,9 @@ namespace IngameScript
             #endregion // Jobs
 
             #region Helper
-            public virtual bool isSameCollector(IDataCollector other)
-            {
-                if (GetType() != other.GetType())
-                    return false;
-
-                return options_ == other.Options && TypeID == other.TypeID;
-            }
-
             public virtual bool isSameCollector(string name, Configuration.Options options)
             {
-                return CollectorTypeName == name && Options == options;
+                return CollectorTypeName == name && Options.equals(options);
             }
 
             protected delegate void GetBlockDelegate<BlockType>(BlockType block) where BlockType: class;

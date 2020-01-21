@@ -38,7 +38,6 @@ namespace IngameScript
             TimeSpan MaxUpdateInterval { get; set; }
 
             string getText(string data);
-            bool isSameCollector(IDataCollector other);
             bool isSameCollector(string name, Configuration.Options options);
 
             DataAccessor getDataAccessor(string name);

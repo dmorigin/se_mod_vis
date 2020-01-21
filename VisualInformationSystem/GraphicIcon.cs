@@ -72,9 +72,13 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
+                Color color = Color;
                 bool visible = true;
                 if (DataAccessor != null)
+                {
                     visible = VisibleOperator(DataAccessor.indicator(), VisibleThreshold);
+                    getGradientColorLerp((float)DataAccessor.indicator(), Gradient, out color);
+                }
 
                 if (!visible || (!toggleShow_ && blink_))
                     return;
@@ -82,7 +86,7 @@ namespace IngameScript
                 Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
-                icon_(addSprite, rt, iconName_, position, size, rotation_, Color);
+                icon_(addSprite, rt, iconName_, position, size, rotation_, color);
             }
 
             #region Configuration

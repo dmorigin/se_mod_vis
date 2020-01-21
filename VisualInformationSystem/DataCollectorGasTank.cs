@@ -23,28 +23,32 @@ namespace IngameScript
     {
         public class DataCollectorGasTank : DataCollector<IMyGasTank>
         {
-            public DataCollectorGasTank(string typeId, Configuration.Options options)
-                : base("gastank", typeId, options)
+            public DataCollectorGasTank(string name, string typeId, Configuration.Options options)
+                : base(name, "MyObjectBuilder_OxygenTank", options)
             {
+                subType_ = typeId;
             }
 
+            static string typePattern = @"^Type: (?<type>Oxygen Tank|Hydrogen Tank)$";
+            string subType_ = "";
             public override bool construct()
             {
-                if (!base.construct())
-                    return false;
+                var regex = new System.Text.RegularExpressions.Regex(typePattern, System.Text.RegularExpressions.RegexOptions.Multiline);
+                AcceptBlock = (block) =>
+                {
+                    var match = regex.Match(block.DetailedInfo);
+                    if (match.Success && match.Groups["type"].Value == subType_)
+                    {
+                        capacity_ += block.Capacity;
+                        Blocks.Add(block);
+                    }
+                };
 
-                foreach (var tank in Blocks)
-                    capacity_ += tank.Capacity;
-
-                Constructed = true;
-                return true;
+                return base.construct();
             }
 
             protected override void update()
             {
-                if (Blocks.Count == 0)
-                    return;
-
                 double fillRation = 0.0;
 
                 foreach (var tank in Blocks)
@@ -53,7 +57,7 @@ namespace IngameScript
                     blocksOn_ += isOn(tank) ? 1 : 0;
                 }
 
-                fillRatio_ = (float)(fillRation / Blocks.Count);
+                fillRatio_ = Blocks.Count == 0 ? 0f : (float)(fillRation / Blocks.Count);
                 UpdateFinished = true;
             }
 
