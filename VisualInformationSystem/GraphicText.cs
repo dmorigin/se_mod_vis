@@ -166,8 +166,8 @@ namespace IngameScript
                         .Replace("%indicator%", new Program.ValueType(DataAccessor.indicator(), unit: Unit.Percent).pack().ToString())
                         .Replace("%time_hhmmss%", DateTime.Now.ToString("HH:mm:ss"))
                         .Replace("%time_hhmm%", DateTime.Now.ToString("HH:mm"))
-                        .Replace("%date_tmy%", DateTime.Now.ToString("dd.MM.yyyy"))
-                        .Replace("%date_mty%", DateTime.Now.ToString("MM/dd/yyyy"));
+                        .Replace("%date_ttmmyyyy%", DateTime.Now.ToString("dd.MM.yyyy"))
+                        .Replace("%date_mmttyyyy%", DateTime.Now.ToString("MM/dd/yyyy"));
                 }
 
                 return DataCollector != null ? DataCollector.getText(line) : line;
