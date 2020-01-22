@@ -32,7 +32,7 @@ namespace IngameScript
 
             protected override bool supportCheck(string name)
             {
-                return true;
+                return name != "shipcontroller";
             }
 
             public override Graphic clone()

@@ -49,6 +49,7 @@
     <Compile Include="DataCollectorJumpDrive.cs" />
     <Compile Include="DataCollectorManager.cs" />
     <Compile Include="DataCollectorReactor.cs" />
+    <Compile Include="DataCollectorShipController.cs" />
     <Compile Include="Default.cs" />
     <Compile Include="Display.cs" />
     <Compile Include="DisplayManager.cs" />

@@ -47,18 +47,10 @@ namespace IngameScript
                 IsGroup = Options.asBoolean(1, false);
 
                 if (BlockName != "")
-                {
-                    getBlocks<T>(BlockName, IsGroup, (block) =>
-                    {
-                        Blocks.Add(block);
-                    }, TypeID);
-                }
+                    getBlocks<T>(BlockName, IsGroup, AcceptBlock, TypeID);
                 else
                 {
-                    if (!getBlocks<T>((block) =>
-                    {
-                        Blocks.Add(block);
-                    }, TypeID))
+                    if (!getBlocks<T>(AcceptBlock, TypeID))
                     {
                         log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
                         return false;
