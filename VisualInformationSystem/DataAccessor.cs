@@ -26,17 +26,17 @@ namespace IngameScript
             public struct ListContainer
             {
                 public string name;
-                public ValueType min;
-                public ValueType max;
+                public VISUnitType min;
+                public VISUnitType max;
                 public double indicator;
-                public ValueType value;
+                public VISUnitType value;
                 public MyItemType type;
             }
 
             public abstract double indicator();
-            public abstract ValueType value();
-            public abstract ValueType min();
-            public abstract ValueType max();
+            public abstract VISUnitType value();
+            public abstract VISUnitType min();
+            public abstract VISUnitType max();
             public abstract void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null);
         }
     }

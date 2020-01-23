@@ -98,6 +98,9 @@ namespace IngameScript
                     case "connector":
                         dataCollector = new DataCollectorConnector(options);
                         break;
+                    case "shipcontroller":
+                        dataCollector = new DataCollectorShipController(options);
+                        break;
                 }
 
                 if (dataCollector != null)

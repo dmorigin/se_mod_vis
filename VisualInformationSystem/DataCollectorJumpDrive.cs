@@ -63,9 +63,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%maxcapacity%", new ValueType(maxStoredPower_, Multiplier.M, Unit.Wh).pack().ToString())
-                    .Replace("%currentcapacity%", new ValueType(currentStoredPower_, Multiplier.M, Unit.Wh).pack().ToString())
-                    .Replace("%capacityratio%", new ValueType(ratioStoredPower_, unit: Unit.Percent).pack().ToString())
+                    .Replace("%maxcapacity%", new VISUnitType(maxStoredPower_, Multiplier.M, Unit.WattHour).pack())
+                    .Replace("%currentcapacity%", new VISUnitType(currentStoredPower_, Multiplier.M, Unit.WattHour).pack())
+                    .Replace("%capacityratio%", new VISUnitType(ratioStoredPower_, unit: Unit.Percent).pack())
                     .Replace("%amountcharging%", amountRecharging_.ToString())
                     .Replace("amountjumping", amountJumping_.ToString())
                     .Replace("%amountready", amountReady_.ToString());
@@ -95,9 +95,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.ratioStoredPower_;
-                public override ValueType min() => new ValueType(0, Multiplier.M, Unit.Wh);
-                public override ValueType max() => new ValueType(dc_.maxStoredPower_, Multiplier.M, Unit.Wh);
-                public override ValueType value() => new ValueType(dc_.currentStoredPower_, Multiplier.M, Unit.Wh);
+                public override VISUnitType min() => new VISUnitType(0, Multiplier.M, Unit.WattHour);
+                public override VISUnitType max() => new VISUnitType(dc_.maxStoredPower_, Multiplier.M, Unit.WattHour);
+                public override VISUnitType value() => new VISUnitType(dc_.currentStoredPower_, Multiplier.M, Unit.WattHour);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -107,9 +107,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = jd.CustomName;
                         item.indicator = jd.CurrentStoredPower / jd.MaxStoredPower;
-                        item.min = new ValueType(0, Multiplier.M, Unit.Wh);
-                        item.max = new ValueType(jd.MaxStoredPower, Multiplier.M, Unit.Wh);
-                        item.value = new ValueType(jd.CurrentStoredPower, Multiplier.M, Unit.Wh);
+                        item.min = new VISUnitType(0, Multiplier.M, Unit.WattHour);
+                        item.max = new VISUnitType(jd.MaxStoredPower, Multiplier.M, Unit.WattHour);
+                        item.value = new VISUnitType(jd.CurrentStoredPower, Multiplier.M, Unit.WattHour);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);
@@ -126,9 +126,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => (double)dc_.amountReady_ / dc_.Blocks.Count;
-                public override ValueType min() => new ValueType(0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType(dc_.amountReady_);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.amountReady_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -138,9 +138,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = jd.CustomName;
                         item.indicator = jd.Status == MyJumpDriveStatus.Ready ? 1 : 0;
-                        item.min = new ValueType(0);
-                        item.max = new ValueType(1);
-                        item.value = new ValueType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(item.indicator);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

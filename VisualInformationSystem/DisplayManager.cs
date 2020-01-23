@@ -38,21 +38,17 @@ namespace IngameScript
                 if (groupId == Default.EmptyDisplayGroupID)
                 {
                     groupId = $"genericDisplayGroup_{++genericDisplayGroupId_}";
-                    log(Console.LogType.Info, $"Create new display: group({groupId})");
                     display = new Display(groupId);
                 }
                 else if ((display = getDisplayGroup(groupId)) == null)
-                {
-                    log(Console.LogType.Info, $"Create new display: group({groupId})");
                     display = new Display(groupId);
-                }
                 else
                 {
                     log(Console.LogType.Error, $"Multiple display group detected: {groupId}");
                     return null;
                 }
 
-                //display.construct();
+                log(Console.LogType.Info, $"Create new display: group({groupId})");
                 Manager.JobManager.queueJob(display.getConstructionJob());
                 displays_.Add(display);
                 return display;

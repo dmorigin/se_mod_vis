@@ -26,6 +26,7 @@ namespace IngameScript
             public Display(string groupId)
             {
                 GroupId = groupId;
+                PanelConnector = null;
             }
 
             public override bool construct()
@@ -104,7 +105,33 @@ namespace IngameScript
                 set;
             }
 
+            public PanelConnectorObj PanelConnector
+            {
+                get;
+                set;
+            }
 
+            public string Text => PanelConnector != null ? PanelConnector.Text : "";
+            public string Title => PanelConnector != null ? PanelConnector.Title : "";
+
+            public class PanelConnectorObj
+            {
+                public PanelConnectorObj(IMyTextPanel panel)
+                {
+                    Panel = panel;
+                }
+
+                public IMyTextPanel Panel
+                {
+                    get;
+                    private set;
+                }
+
+                public string Text => Panel.GetText();
+                public string Title => Panel.GetPublicTitle();
+            }
+
+            #region Rendering
             class RenderJob : Job
             {
                 public RenderJob(Display display)
@@ -123,7 +150,6 @@ namespace IngameScript
                 }
             }
 
-            #region Rendering
             RectangleF renderArea_ = new RectangleF(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
             public RectangleF RenderArea
             {

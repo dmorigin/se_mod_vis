@@ -114,10 +114,7 @@ namespace IngameScript
                     {
                         display = provider_.Manager.DisplayManager.createDisplay(Default.EmptyDisplayGroupID);
                         if (display == null)
-                        {
-                            provider_.log(Console.LogType.Error, $"Failed to create display");
                             return false;
-                        }
                     }
 
                     // create render target to display
@@ -130,6 +127,12 @@ namespace IngameScript
                     // configure display
                     if (coordinate == new Vector2I(0, 0))
                     {
+                        // setup display text
+                        IMyTextPanel lcdPanel = provider_.surfaceProvider_ as IMyTextPanel;
+                        if (lcdPanel != null)
+                            display.PanelConnector = new Display.PanelConnectorObj(lcdPanel);
+
+                        // setup template
                         Template template = provider_.Manager.TemplateManager.createTemplate(display.GroupId);
                         if (template == null)
                         {

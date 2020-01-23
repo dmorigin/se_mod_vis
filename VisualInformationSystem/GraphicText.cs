@@ -155,19 +155,19 @@ namespace IngameScript
 
             string getText(string text)
             {
-                string line = text;
+                string line = text
+                    .Replace("%time_hhmmss%", DateTime.Now.ToString("HH:mm:ss"))
+                    .Replace("%time_hhmm%", DateTime.Now.ToString("HH:mm"))
+                    .Replace("%date_ddmmyyyy%", DateTime.Now.ToString("dd.MM.yyyy"))
+                    .Replace("%date_mmddyyyy%", DateTime.Now.ToString("MM/dd/yyyy"));
 
                 if (DataAccessor != null)
                 {
                     line = line
-                        .Replace("%min%", DataAccessor.min().pack().ToString())
-                        .Replace("%max%", DataAccessor.max().pack().ToString())
-                        .Replace("%value%", DataAccessor.value().pack().ToString())
-                        .Replace("%indicator%", new Program.ValueType(DataAccessor.indicator(), unit: Unit.Percent).pack().ToString())
-                        .Replace("%time_hhmmss%", DateTime.Now.ToString("HH:mm:ss"))
-                        .Replace("%time_hhmm%", DateTime.Now.ToString("HH:mm"))
-                        .Replace("%date_ttmmyyyy%", DateTime.Now.ToString("dd.MM.yyyy"))
-                        .Replace("%date_mmttyyyy%", DateTime.Now.ToString("MM/dd/yyyy"));
+                        .Replace("%min%", DataAccessor.min().pack())
+                        .Replace("%max%", DataAccessor.max().pack())
+                        .Replace("%value%", DataAccessor.value().pack())
+                        .Replace("%indicator%", new Program.VISUnitType(DataAccessor.indicator(), unit: Unit.Percent).pack());
                 }
 
                 return DataCollector != null ? DataCollector.getText(line) : line;
@@ -197,13 +197,9 @@ namespace IngameScript
                     // add text from display text field
                     if (text == "%display_text_field%")
                     {
-                        RenderTarget rt = display.getReferenceRT();
-                        if (rt != null)
-                        {
-                            string[] lines = rt.Text.Split('\n');
-                            foreach (string line in lines)
-                                renderData_.lines.Add(calcMaxSize(line));
-                        }
+                        string[] lines = display.Text.Split('\n');
+                        foreach (string line in lines)
+                            renderData_.lines.Add(calcMaxSize(line));
                     }
                     else
                         renderData_.lines.Add(calcMaxSize(text));

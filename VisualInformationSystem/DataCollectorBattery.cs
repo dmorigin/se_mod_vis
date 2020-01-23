@@ -78,12 +78,12 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", new ValueType(powerAvailableLeft_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%powerstoring%", new ValueType(powerAvailableStoring_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%maxinput%", new ValueType(maxAvailableInput_, Multiplier.M, Unit.W).pack().ToString())
-                    .Replace("%maxcapacity%", new ValueType(maxAvailableStored_, Multiplier.M, Unit.Wh).pack().ToString())
-                    .Replace("%currentinput%", new ValueType(currentInput_, Multiplier.M, Unit.W).pack().ToString())
-                    .Replace("%currentcapacity%", new ValueType(currentStored_, Multiplier.M, Unit.Wh).pack().ToString());
+                    .Replace("%powerleft%", new VISUnitType(powerAvailableLeft_, unit: Unit.Percent).pack())
+                    .Replace("%powerstoring%", new VISUnitType(powerAvailableStoring_, unit: Unit.Percent).pack())
+                    .Replace("%maxinput%", new VISUnitType(maxAvailableInput_, Multiplier.M, Unit.Watt).pack())
+                    .Replace("%maxcapacity%", new VISUnitType(maxAvailableStored_, Multiplier.M, Unit.WattHour).pack())
+                    .Replace("%currentinput%", new VISUnitType(currentInput_, Multiplier.M, Unit.Watt).pack())
+                    .Replace("%currentcapacity%", new VISUnitType(currentStored_, Multiplier.M, Unit.WattHour).pack());
             }
 
             #region Data Accessor
@@ -110,9 +110,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.powerAvailableLeft_;
-                public override ValueType value() => new ValueType(dc_.currentStored_, Multiplier.M, Unit.Wh);
-                public override ValueType min() => new ValueType(0, Multiplier.M, Unit.Wh);
-                public override ValueType max() => new ValueType(dc_.maxAvailableStored_, Multiplier.M, Unit.Wh);
+                public override VISUnitType value() => new VISUnitType(dc_.currentStored_, Multiplier.M, Unit.WattHour);
+                public override VISUnitType min() => new VISUnitType(0, Multiplier.M, Unit.WattHour);
+                public override VISUnitType max() => new VISUnitType(dc_.maxAvailableStored_, Multiplier.M, Unit.WattHour);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -122,9 +122,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = battery.CustomName;
                         item.indicator = battery.CurrentStoredPower / battery.MaxStoredPower;
-                        item.value = new ValueType(battery.CurrentStoredPower, Multiplier.M, Unit.Wh);
-                        item.min = new ValueType(0, Multiplier.M, Unit.Wh);
-                        item.max = new ValueType(battery.MaxStoredPower, Multiplier.M, Unit.Wh);
+                        item.value = new VISUnitType(battery.CurrentStoredPower, Multiplier.M, Unit.WattHour);
+                        item.min = new VISUnitType(0, Multiplier.M, Unit.WattHour);
+                        item.max = new VISUnitType(battery.MaxStoredPower, Multiplier.M, Unit.WattHour);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);
@@ -141,9 +141,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.powerAvailableStoring_ - dc_.powerAvailableUsing_;
-                public override ValueType value() => new ValueType(dc_.currentInput_ - dc_.currentOutput_, Multiplier.M, Unit.W);
-                public override ValueType min() => new ValueType(-dc_.maxAvailableOutput_, Multiplier.M, Unit.W);
-                public override ValueType max() => new ValueType(dc_.maxAvailableInput_, Multiplier.M, Unit.W);
+                public override VISUnitType value() => new VISUnitType(dc_.currentInput_ - dc_.currentOutput_, Multiplier.M, Unit.Watt);
+                public override VISUnitType min() => new VISUnitType(-dc_.maxAvailableOutput_, Multiplier.M, Unit.Watt);
+                public override VISUnitType max() => new VISUnitType(dc_.maxAvailableInput_, Multiplier.M, Unit.Watt);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -153,9 +153,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = battery.CustomName;
                         item.indicator = (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput);
-                        item.value = new ValueType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.W);
-                        item.min = new ValueType(battery.MaxOutput, Multiplier.M, Unit.W);
-                        item.max = new ValueType(battery.MaxInput, Multiplier.M, Unit.W);
+                        item.value = new VISUnitType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.Watt);
+                        item.min = new VISUnitType(battery.MaxOutput, Multiplier.M, Unit.Watt);
+                        item.max = new VISUnitType(battery.MaxInput, Multiplier.M, Unit.Watt);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

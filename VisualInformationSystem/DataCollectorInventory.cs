@@ -191,7 +191,7 @@ namespace IngameScript
             public override void finalizeUpdate()
             {
                 volumeRatio_ = maxVolume_ != 0 ? currentVolume_ / maxVolume_ : 0.0;
-                itemRatio_ = maxItems_ != 0 ? clamp((double)currentItems_ / (double)maxItems_, 0.0, 1.0) : 0.0;
+                itemRatio_ = maxItems_ != 0 ? clamp((double)currentItems_ / (double)maxItems_) : 0.0;
 
                 base.finalizeUpdate();
             }
@@ -271,12 +271,12 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%maxitems%", new ValueType(maxItems_).pack().ToString())
-                    .Replace("%currentitems%", new ValueType(currentItems_).pack().ToString())
-                    .Replace("%itemratio%", new ValueType(itemRatio_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%maxvolume%", new ValueType(maxVolume_, unit: Unit.l).pack().ToString())
-                    .Replace("%currentvolume%", new ValueType(currentVolume_, unit: Unit.l).pack().ToString())
-                    .Replace("%volumeratio%", new ValueType(volumeRatio_, unit: Unit.Percent).pack().ToString());
+                    .Replace("%maxitems%", new VISUnitType(maxItems_).pack())
+                    .Replace("%currentitems%", new VISUnitType(currentItems_).pack())
+                    .Replace("%itemratio%", new VISUnitType(itemRatio_, unit: Unit.Percent).pack())
+                    .Replace("%maxvolume%", new VISUnitType(maxVolume_, unit: Unit.Liter).pack())
+                    .Replace("%currentvolume%", new VISUnitType(currentVolume_, unit: Unit.Liter).pack())
+                    .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent).pack());
             }
 
             long defaultMaxAmountItems_ = Default.MaxAmountItems;
@@ -313,9 +313,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => inv_.volumeRatio_;
-                public override ValueType min() => new ValueType(0.0, Multiplier.K, Unit.l);
-                public override ValueType max() => new ValueType(inv_.maxVolume_, Multiplier.K, Unit.l);
-                public override ValueType value() => new ValueType(inv_.currentVolume_, Multiplier.K, Unit.l);
+                public override VISUnitType min() => new VISUnitType(0.0, Multiplier.K, Unit.Liter);
+                public override VISUnitType max() => new VISUnitType(inv_.maxVolume_, Multiplier.K, Unit.Liter);
+                public override VISUnitType value() => new VISUnitType(inv_.currentVolume_, Multiplier.K, Unit.Liter);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -325,10 +325,10 @@ namespace IngameScript
                         double indicator = (double)inventory.CurrentVolume.RawValue / (double)inventory.MaxVolume.RawValue;
 
                         ListContainer item = new ListContainer();
-                        item.indicator = clamp(indicator, 0.0, 1.0);
-                        item.min = new ValueType(0, Multiplier.K, Unit.l);
-                        item.max = new ValueType((double)inventory.MaxVolume, Multiplier.K, Unit.l);
-                        item.value = new ValueType((double)inventory.CurrentVolume, Multiplier.K, Unit.l);
+                        item.indicator = clamp(indicator);
+                        item.min = new VISUnitType(0, Multiplier.K, Unit.Liter);
+                        item.max = new VISUnitType((double)inventory.MaxVolume, Multiplier.K, Unit.Liter);
+                        item.value = new VISUnitType((double)inventory.CurrentVolume, Multiplier.K, Unit.Liter);
                         item.name = (inventory.Owner as IMyTerminalBlock).CustomName;
 
                         if (filter == null || (filter != null && filter(item)))
@@ -346,9 +346,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => inv_.itemRatio_;
-                public override ValueType min() => new ValueType(0.0);
-                public override ValueType max() => new ValueType(inv_.maxItems_);
-                public override ValueType value() => new ValueType(inv_.currentItems_);
+                public override VISUnitType min() => new VISUnitType(0.0);
+                public override VISUnitType max() => new VISUnitType(inv_.maxItems_);
+                public override VISUnitType value() => new VISUnitType(inv_.currentItems_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -358,10 +358,10 @@ namespace IngameScript
                         double indicator = (double)item.currentAmount / (double)item.maxAmount;
 
                         ListContainer entry = new ListContainer();
-                        entry.indicator = clamp(indicator, 0.0, 1.0);
-                        entry.min = new ValueType(0.0);
-                        entry.max = new ValueType(item.maxAmount);
-                        entry.value = new ValueType(item.currentAmount);
+                        entry.indicator = clamp(indicator);
+                        entry.min = new VISUnitType(0.0);
+                        entry.max = new VISUnitType(item.maxAmount);
+                        entry.value = new VISUnitType(item.currentAmount);
                         entry.name = item.type.SubtypeId;
                         entry.type = item.type;
 

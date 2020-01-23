@@ -28,11 +28,6 @@ namespace IngameScript
             {
             }
 
-            public override bool construct()
-            {
-                return base.construct();
-            }
-
             public override Graphic clone()
             {
                 GraphicIcon gfx = new GraphicIcon(Template, Options);
@@ -59,10 +54,7 @@ namespace IngameScript
                 return gfx;
             }
 
-            protected override bool supportCheck(string name)
-            {
-                return true;
-            }
+            protected override bool supportCheck(string name) => true;
 
             bool toggleShow_ = true; // render data only
             public override void prepareRendering(Display display)

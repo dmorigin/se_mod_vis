@@ -78,8 +78,8 @@ namespace IngameScript
                     .Replace("%isgroup%", IsGroup ? "true" : "false")
                     .Replace("%on%", blocksOn_.ToString())
                     .Replace("%off%", blocksOff_.ToString())
-                    .Replace("%onratio%", new ValueType(onRatio_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%offratio%", new ValueType(offRatio_, unit: Unit.Percent).pack().ToString());
+                    .Replace("%onratio%", new VISUnitType(onRatio_, unit: Unit.Percent).pack())
+                    .Replace("%offratio%", new VISUnitType(offRatio_, unit: Unit.Percent).pack());
             }
 
             #region Update System
@@ -197,9 +197,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.onRatio_;
-                public override ValueType min() => new ValueType(0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType(dc_.blocksOn_);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.blocksOn_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -209,9 +209,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = block.CustomName;
                         item.indicator = isOn(block) ? 1.0 : 0.0;
-                        item.value = new ValueType(item.indicator);
-                        item.min = new ValueType(0);
-                        item.max = new ValueType(1);
+                        item.value = new VISUnitType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);
@@ -228,9 +228,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.offRatio_;
-                public override ValueType min() => new ValueType(0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType(dc_.blocksOff_);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.blocksOff_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -240,9 +240,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = block.CustomName;
                         item.indicator = isOn(block) ? 0.0 : 1.0;
-                        item.value = new ValueType(item.indicator);
-                        item.min = new ValueType(0);
-                        item.max = new ValueType(1);
+                        item.value = new VISUnitType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);
@@ -406,9 +406,9 @@ namespace IngameScript
                 return block.IsFunctional;
             }
 
-            public static double clamp(double value, double min, double max) => value < min ? min : (value > max ? max : value);
-            //public static float clamp(float value, float min, float max) => value < min ? min : (value > max ? max : value);
-            public static long clamp(long value, long min, long max) => value < min ? min : (value > max ? max : value);
+            public static double clamp(double value, double min = 0.0, double max = 1.0) => value < min ? min : (value > max ? max : value);
+            public static float clamp(float value, float min = 0f, float max = 1f) => value < min ? min : (value > max ? max : value);
+            public static long clamp(long value, long min = 0, long max = 1) => value < min ? min : (value > max ? max : value);
             //public static int clamp(int value, int min, int max) => value < min ? min : (value > max ? max : value);
             #endregion // Helper
         }

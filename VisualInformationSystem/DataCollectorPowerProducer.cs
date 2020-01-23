@@ -52,9 +52,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%usage%", new ValueType(powerAvailableUsing_, unit:Unit.Percent).pack().ToString())
-                    .Replace("%maxoutput%", new ValueType(maxAvailableOutput_, Multiplier.M, Unit.W).pack().ToString())
-                    .Replace("%currentoutput%", new ValueType(currentOutput_, Multiplier.M, Unit.W).pack().ToString());
+                    .Replace("%usage%", new VISUnitType(powerAvailableUsing_, unit:Unit.Percent).pack())
+                    .Replace("%maxoutput%", new VISUnitType(maxAvailableOutput_, Multiplier.M, Unit.Watt).pack())
+                    .Replace("%currentoutput%", new VISUnitType(currentOutput_, Multiplier.M, Unit.Watt).pack());
             }
 
             protected float maxAvailableOutput_ = 0f; // MW
@@ -83,9 +83,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => collector_.powerAvailableUsing_;
-                public override ValueType value() => new ValueType(collector_.currentOutput_, Multiplier.M, Unit.W);
-                public override ValueType min() => new ValueType(0, Multiplier.M, Unit.W);
-                public override ValueType max() => new ValueType(collector_.maxAvailableOutput_, Multiplier.M, Unit.W);
+                public override VISUnitType value() => new VISUnitType(collector_.currentOutput_, Multiplier.M, Unit.Watt);
+                public override VISUnitType min() => new VISUnitType(0, Multiplier.M, Unit.Watt);
+                public override VISUnitType max() => new VISUnitType(collector_.maxAvailableOutput_, Multiplier.M, Unit.Watt);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -95,9 +95,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = pp.CustomName;
                         item.indicator = pp.MaxOutput != 0.0 ? pp.CurrentOutput / pp.MaxOutput : 0.0;
-                        item.value = new ValueType(pp.CurrentOutput, Multiplier.M, Unit.W);
-                        item.min = new ValueType(0, Multiplier.M, Unit.W);
-                        item.max = new ValueType(pp.MaxOutput, Multiplier.M, Unit.W);
+                        item.value = new VISUnitType(pp.CurrentOutput, Multiplier.M, Unit.Watt);
+                        item.min = new VISUnitType(0, Multiplier.M, Unit.Watt);
+                        item.max = new VISUnitType(pp.MaxOutput, Multiplier.M, Unit.Watt);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

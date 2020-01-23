@@ -47,7 +47,7 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%locked%", locked_.ToString())
-                    .Replace("%ratio%", new ValueType(locked_ / (double)Blocks.Count, unit: Unit.Percent).pack().ToString());
+                    .Replace("%ratio%", new VISUnitType(locked_ / (double)Blocks.Count, unit: Unit.Percent).pack());
             }
 
             #region Data Accessor
@@ -67,9 +67,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.locked_ / (double)dc_.Blocks.Count;
-                public override ValueType min() => new ValueType(0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType(dc_.locked_);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.locked_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -79,9 +79,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = gear.CustomName;
                         item.indicator = gear.IsLocked ? 1 : 0;
-                        item.min = new ValueType(0);
-                        item.max = new ValueType(1);
-                        item.value = new ValueType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(item.indicator);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

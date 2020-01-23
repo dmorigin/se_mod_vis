@@ -76,9 +76,9 @@ namespace IngameScript
 
                 public override double indicator() => (dc_.connected_ / (float)dc_.Blocks.Count) +
                     (dc_.connectable_ / (float)dc_.Blocks.Count) * 0.5f;
-                public override ValueType min() => new ValueType(0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType(dc_.connected_ + (dc_.connectable_ * 0.5));
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.connected_ + (dc_.connectable_ * 0.5));
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -88,9 +88,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = connector.CustomName;
                         item.indicator = connector.Status == MyShipConnectorStatus.Connected ? 1 : (connector.Status == MyShipConnectorStatus.Connectable ? 0.5 : 0);
-                        item.min = new ValueType(0);
-                        item.max = new ValueType(1);
-                        item.value = new ValueType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(item.indicator);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

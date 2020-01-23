@@ -64,9 +64,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%capacity%", new ValueType(capacity_, unit: Unit.l).pack().ToString())
-                    .Replace("%fillratio%", new ValueType(fillRatio_, unit: Unit.Percent).pack().ToString())
-                    .Replace("%fillvalue", new ValueType(fillRatio_ * capacity_, unit: Unit.l).pack().ToString());
+                    .Replace("%capacity%", new VISUnitType(capacity_, unit: Unit.Liter).pack())
+                    .Replace("%fillratio%", new VISUnitType(fillRatio_, unit: Unit.Percent).pack())
+                    .Replace("%fillvalue", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack());
             }
 
             float fillRatio_ = 0f;
@@ -94,9 +94,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.fillRatio_;
-                public override ValueType min() => new ValueType(0, unit: Unit.l);
-                public override ValueType max() => new ValueType(dc_.capacity_, unit: Unit.l);
-                public override ValueType value() => new ValueType(dc_.capacity_ * dc_.fillRatio_, unit: Unit.l);
+                public override VISUnitType min() => new VISUnitType(0, unit: Unit.Liter);
+                public override VISUnitType max() => new VISUnitType(dc_.capacity_, unit: Unit.Liter);
+                public override VISUnitType value() => new VISUnitType(dc_.capacity_ * dc_.fillRatio_, unit: Unit.Liter);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -106,9 +106,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = tank.CustomName;
                         item.indicator = (float)tank.FilledRatio;
-                        item.min = new ValueType(0, unit:Unit.l);
-                        item.max = new ValueType(tank.Capacity, unit: Unit.l);
-                        item.value = new ValueType(tank.FilledRatio * tank.Capacity, unit: Unit.l);
+                        item.min = new VISUnitType(0, unit:Unit.Liter);
+                        item.max = new VISUnitType(tank.Capacity, unit: Unit.Liter);
+                        item.value = new VISUnitType(tank.FilledRatio * tank.Capacity, unit: Unit.Liter);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

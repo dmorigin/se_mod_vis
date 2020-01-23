@@ -62,9 +62,9 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%maxfuel%", new ValueType(fuelMax_, unit: Unit.l).pack().ToString())
-                    .Replace("%currentfuel%", new ValueType(fuelCurrent_, unit: Unit.l).pack().ToString())
-                    .Replace("%fuelratio%", new ValueType(fuelRatio_, unit: Unit.Percent).pack().ToString());
+                    .Replace("%maxfuel%", new VISUnitType(fuelMax_, unit: Unit.Liter).pack())
+                    .Replace("%currentfuel%", new VISUnitType(fuelCurrent_, unit: Unit.Liter).pack())
+                    .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent).pack());
             }
 
             static string pattern = @"^Filled: [0-9\.]+% \((?<cur>[0-9]+)L/(?<max>[0-9]+)L\)$";
@@ -101,9 +101,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => dc_.fuelRatio_;
-                public override ValueType min() => new ValueType(0, unit: Unit.l);
-                public override ValueType max() => new ValueType(dc_.fuelMax_, unit: Unit.l);
-                public override ValueType value() => new ValueType(dc_.fuelCurrent_, unit: Unit.l);
+                public override VISUnitType min() => new VISUnitType(0, unit: Unit.Liter);
+                public override VISUnitType max() => new VISUnitType(dc_.fuelMax_, unit: Unit.Liter);
+                public override VISUnitType value() => new VISUnitType(dc_.fuelCurrent_, unit: Unit.Liter);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -116,9 +116,9 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = entry.CustomName;
                         item.indicator = max != 0 ? current / max : 0.0;
-                        item.min = new ValueType(0.0, unit: Unit.l);
-                        item.max = new ValueType(max, unit: Unit.l);
-                        item.value = new ValueType(current, unit: Unit.l);
+                        item.min = new VISUnitType(0.0, unit: Unit.Liter);
+                        item.max = new VISUnitType(max, unit: Unit.Liter);
+                        item.value = new VISUnitType(current, unit: Unit.Liter);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

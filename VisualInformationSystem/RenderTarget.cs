@@ -55,8 +55,6 @@ namespace IngameScript
                 set { surface_.ScriptBackgroundColor = value; }
             }
 
-            public string Text => surface_.GetText();
-
             public RenderTarget(Vector2I coordinate)
             {
                 Coordinate = coordinate;

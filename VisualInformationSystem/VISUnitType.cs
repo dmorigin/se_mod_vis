@@ -24,16 +24,20 @@ namespace IngameScript
         public enum Unit
         {
             None,
-            W,
-            Wh,
-            l,
-            g,
-            Percent
+            Watt,
+            WattHour,
+            Liter,
+            Gram,
+            Percent,
+            Gravity,
+            Speed,
+            Meter
         }
 
         public enum Multiplier
         {
             None,
+            m, // milli
             K, // Kilo
             M, // Million
             G, // Giga
@@ -42,9 +46,9 @@ namespace IngameScript
         }
 
 
-        public struct ValueType
+        public struct VISUnitType
         {
-            public ValueType(double value, Multiplier multiplier = Multiplier.None, Unit unit = Unit.None)
+            public VISUnitType(double value, Multiplier multiplier = Multiplier.None, Unit unit = Unit.None)
             {
                 Value = value;
                 Multiplier = multiplier;
@@ -69,15 +73,17 @@ namespace IngameScript
                 set;
             }
 
-            public static implicit operator int(ValueType vt) => (int)vt.Value;
-            public static implicit operator long(ValueType vt) => (long)vt.Value;
-            public static implicit operator double(ValueType vt) => vt.Value;
-            public static implicit operator float(ValueType vt) => (float)vt.Value;
+            public static implicit operator int(VISUnitType ut) => (int)ut.Value;
+            public static implicit operator long(VISUnitType ut) => (long)ut.Value;
+            public static implicit operator double(VISUnitType ut) => ut.Value;
+            public static implicit operator float(VISUnitType ut) => (float)ut.Value;
 
-            public static bool operator >(ValueType vt, double d) => vt.Value > d;
-            public static bool operator <(ValueType vt, double d) => vt.Value < d;
-            public static bool operator >=(ValueType vt, double d) => vt.Value >= d;
-            public static bool operator <=(ValueType vt, double d) => vt.Value <= d;
+            public static implicit operator string(VISUnitType ut) => ut.ToString();
+
+            public static bool operator >(VISUnitType ut, double d) => ut.Value > d;
+            public static bool operator <(VISUnitType ut, double d) => ut.Value < d;
+            public static bool operator >=(VISUnitType ut, double d) => ut.Value >= d;
+            public static bool operator <=(VISUnitType ut, double d) => ut.Value <= d;
 
             public override string ToString()
             {
@@ -86,7 +92,7 @@ namespace IngameScript
                 double value = Value;
 
                 // fix g
-                if (Unit == Unit.g)
+                if (Unit == Unit.Gram)
                 {
                     switch (Multiplier)
                     {
@@ -114,16 +120,22 @@ namespace IngameScript
             {
                 switch(unit)
                 {
-                    case Unit.W:
+                    case Unit.Watt:
                         return "W";
-                    case Unit.Wh:
+                    case Unit.WattHour:
                         return "Wh";
-                    case Unit.l:
+                    case Unit.Liter:
                         return "L";
-                    case Unit.g:
+                    case Unit.Gram:
                         return "g";
                     case Unit.Percent:
                         return "%";
+                    case Unit.Gravity:
+                        return "G";
+                    case Unit.Speed:
+                        return "m/s";
+                    case Unit.Meter:
+                        return "m";
                 }
 
                 return "";
@@ -133,6 +145,8 @@ namespace IngameScript
             {
                 switch(multiplier)
                 {
+                    case Multiplier.m:
+                        return "m";
                     case Multiplier.K:
                         return "k";
                     case Multiplier.M:
@@ -148,7 +162,7 @@ namespace IngameScript
                 return "";
             }
 
-            public ValueType pack()
+            public VISUnitType pack()
             {
                 double value = Value;
                 Multiplier multiplier = Multiplier;
@@ -159,19 +173,21 @@ namespace IngameScript
                     multiplier = getNextHeigher(multiplier);
                 }
 
-                while (value < 0.1 && multiplier != Multiplier.None)
+                while (value < 0.1 && multiplier != Multiplier.m)
                 {
                     value *= 1000.0;
                     multiplier = getNextLower(multiplier);
                 }
 
-                return new ValueType(value, multiplier, Unit);
+                return new VISUnitType(value, multiplier, Unit);
             }
 
             private Multiplier getNextHeigher(Multiplier multiplier)
             {
                 switch (multiplier)
                 {
+                    case Multiplier.m:
+                        return Multiplier.None;
                     case Multiplier.None:
                         return Multiplier.K;
                     case Multiplier.K:
@@ -201,6 +217,8 @@ namespace IngameScript
                         return Multiplier.K;
                     case Multiplier.K:
                         return Multiplier.None;
+                    case Multiplier.None:
+                        return Multiplier.m;
                 }
 
                 return multiplier;

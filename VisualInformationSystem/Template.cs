@@ -229,6 +229,9 @@ namespace IngameScript
                         case "slider":
                             graphic = new GraphicSlider(tpl_, options);
                             break;
+                        case "test":
+                            graphic = new GraphicTest(tpl_, options);
+                            break;
                     }
 
                     if (graphic != null)

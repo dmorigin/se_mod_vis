@@ -49,7 +49,7 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%pressurizeable%", pressurizeAble_.ToString())
-                    .Replace("%oxygenlevel%", new ValueType(oxygenLevel_, unit: Unit.Percent).pack().ToString());
+                    .Replace("%oxygenlevel%", new VISUnitType(oxygenLevel_, unit: Unit.Percent).pack());
             }
 
             #region Data Accessor
@@ -76,9 +76,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => (double)dc_.pressurizeAble_ / (double)dc_.Blocks.Count;
-                public override ValueType min() => new ValueType(0.0);
-                public override ValueType max() => new ValueType(dc_.Blocks.Count);
-                public override ValueType value() => new ValueType();
+                public override VISUnitType min() => new VISUnitType(0.0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType();
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -86,9 +86,9 @@ namespace IngameScript
                     foreach (var airvent in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.min = new ValueType(0.0);
-                        item.max = new ValueType(1.0);
-                        item.value = new ValueType(airvent.CanPressurize && !airvent.Depressurize ? 1.0 : 0.0);
+                        item.min = new VISUnitType(0.0);
+                        item.max = new VISUnitType(1.0);
+                        item.value = new VISUnitType(airvent.CanPressurize && !airvent.Depressurize ? 1.0 : 0.0);
                         item.indicator = item.value.Value;
                         item.name = airvent.CustomName;
 
@@ -107,9 +107,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => 0.0;
-                public override ValueType min() => new ValueType(0.0, unit: Unit.Percent);
-                public override ValueType max() => new ValueType(1.0, unit: Unit.Percent);
-                public override ValueType value() => new ValueType(dc_.oxygenLevel_, unit: Unit.Percent);
+                public override VISUnitType min() => new VISUnitType(0.0, unit: Unit.Percent);
+                public override VISUnitType max() => new VISUnitType(1.0, unit: Unit.Percent);
+                public override VISUnitType value() => new VISUnitType(dc_.oxygenLevel_, unit: Unit.Percent);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -117,9 +117,9 @@ namespace IngameScript
                     foreach (var airvent in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        item.min = new ValueType(0.0, unit: Unit.Percent);
-                        item.max = new ValueType(1.0, unit: Unit.Percent);
-                        item.value = new ValueType(airvent.GetOxygenLevel(), unit: Unit.Percent);
+                        item.min = new VISUnitType(0.0, unit: Unit.Percent);
+                        item.max = new VISUnitType(1.0, unit: Unit.Percent);
+                        item.value = new VISUnitType(airvent.GetOxygenLevel(), unit: Unit.Percent);
                         item.indicator = airvent.GetOxygenLevel();
                         item.name = airvent.CustomName;
 
