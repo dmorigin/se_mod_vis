@@ -69,6 +69,11 @@ namespace IngameScript
                 gfx.autoScroll_ = autoScroll_;
                 gfx.autoScrollInc_ = autoScrollInc_;
 
+                gfx.replace_ = new Dictionary<double, string>();
+                foreach (var pair in replace_)
+                    gfx.replace_.Add(pair.Key, pair.Value);
+                gfx.replace_ = gfx.replace_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
+
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
             }
@@ -231,15 +236,28 @@ namespace IngameScript
 
                         if (textStyle_ != TextStyle.OnlyName)
                         {
-                            string rightText = textStyle_ == TextStyle.MinValue ? $"{entry.value.pack()}" : $"{entry.value.pack()}/{entry.max.pack()}";
                             renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize,
                                 new Vector2(renderData_.textRightPositionX, textPositionY),
-                                getGradientColor((float)entry.indicator), rightText, TextAlignment.RIGHT);
+                                getGradientColor((float)entry.indicator), getRightText(entry), TextAlignment.RIGHT);
                         }
 
                         textPositionY += renderData_.lineHeight;
                     }
                 }
+            }
+
+            string getRightText(DataAccessor.ListContainer entry)
+            {
+                if (replace_.Count == 0)
+                    return textStyle_ == TextStyle.MinValue ? $"{entry.value.pack()}" : $"{entry.value.pack()}/{entry.max.pack()}";
+
+                foreach (var pair in replace_)
+                {
+                    if (pair.Key <= entry.value)
+                        return pair.Value;
+                }
+
+                return "";
             }
             #endregion // Rendering
 
@@ -254,6 +272,7 @@ namespace IngameScript
                     config.add("icon", configIcon);
                     config.add("setline", configSetLine);
                     config.add("autoscroll", configAutoScroll);
+                    config.add("replace", configReplace);
                 }
 
                 return config;
@@ -359,6 +378,16 @@ namespace IngameScript
             {
                 autoScroll_ = Configuration.asBoolean(value, true);
                 autoScrollInc_ = options.asInteger(0, 1);
+                return true;
+            }
+
+            Dictionary<double, string> replace_ = new Dictionary<double, string>();
+            bool configReplace(string key, string value, Configuration.Options options)
+            {
+                double val = Configuration.asFloat(value);
+                string text = options[0];
+                replace_[val] = text;
+                replace_ = replace_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 return true;
             }
             #endregion // Configuration
