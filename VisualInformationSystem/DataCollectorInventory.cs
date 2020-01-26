@@ -87,8 +87,10 @@ namespace IngameScript
                             }
                             else
                             {
-                                VISItemType itemType = Default.ItemTypeMap.FirstOrDefault(pair => pair.Key == itemTypeName.ToLower()).Value;
-                                if (!itemType) // try as typeId string
+                                VISItemType itemType;
+                                //VISItemType itemType = Default.ItemTypeMap.FirstOrDefault(pair => pair.Key == itemTypeName.ToLower()).Value;
+                                //if (!itemType) // try as typeId string
+                                if (!Default.ItemTypeMap.TryGetValue(itemTypeName.ToLower(), out itemType))
                                     itemType = itemTypeName;
 
                                 if (!itemType)
