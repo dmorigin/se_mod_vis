@@ -62,46 +62,47 @@ namespace IngameScript
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
 
+            public static string MyObjectBuilder = "MyObjectBuilder";
             public static long MaxAmountItems = 1000;
             public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()
             {
                 // individual amount values
-                { "MyObjectBuilder_Ore/Ice", 200000 },
-                { "MyObjectBuilder_Ore/Stone", 20000 },
-                { "MyObjectBuilder_Ore/Iron", 200000 },
+                { $"{MyObjectBuilder}_Ore/Ice", 200000 },
+                { $"{MyObjectBuilder}_Ore/Stone", 20000 },
+                { $"{MyObjectBuilder}_Ore/Iron", 200000 },
 
-                { "MyObjectBuilder_Component/SteelPlate", 10000 },
-                { "MyObjectBuilder_Component/Medical", 500 },
-                { "MyObjectBuilder_Component/Motor", 6000 },
-                { "MyObjectBuilder_Component/InteriorPlate", 10000 },
-                { "MyObjectBuilder_Component/Construction", 10000 },
-                { "MyObjectBuilder_Component/ZoneChip", 20 },
+                { $"{MyObjectBuilder}_Component/SteelPlate", 10000 },
+                { $"{MyObjectBuilder}_Component/Medical", 500 },
+                { $"{MyObjectBuilder}_Component/Motor", 6000 },
+                { $"{MyObjectBuilder}_Component/InteriorPlate", 10000 },
+                { $"{MyObjectBuilder}_Component/Construction", 10000 },
+                { $"{MyObjectBuilder}_Component/ZoneChip", 20 },
 
-                { "MyObjectBuilder_OxygenContainerObject/OxygenBottle", 5 },
-                { "MyObjectBuilder_GasContainerObject/HydrogenBottle", 5 },
+                { $"{MyObjectBuilder}_OxygenContainerObject/OxygenBottle", 5 },
+                { $"{MyObjectBuilder}_GasContainerObject/HydrogenBottle", 5 },
 
                 // amount values for type groups
-                { "MyObjectBuilder_AmmoMagazine/", 1000 },
-                { "MyObjectBuilder_Component/", 4000 },
-                { "MyObjectBuilder_PhysicalGunObject/", 20 },
-                { "MyObjectBuilder_Ore/", 200000 },
-                { "MyObjectBuilder_Ingot/", 40000 },
-                { "MyObjectBuilder_ConsumableItem/", 100 },
-                { "MyObjectBuilder_PhysicalObject/", 2000 },
-                { "MyObjectBuilder_Datapad/", 30 },
-                { "MyObjectBuilder_Package/", 100 }
+                { $"{MyObjectBuilder}_AmmoMagazine/", 1000 },
+                { $"{MyObjectBuilder}_Component/", 4000 },
+                { $"{MyObjectBuilder}_PhysicalGunObject/", 20 },
+                { $"{MyObjectBuilder}_Ore/", 200000 },
+                { $"{MyObjectBuilder}_Ingot/", 40000 },
+                { $"{MyObjectBuilder}_ConsumableItem/", 100 },
+                { $"{MyObjectBuilder}_PhysicalObject/", 2000 },
+                { $"{MyObjectBuilder}_Datapad/", 30 },
+                { $"{MyObjectBuilder}_Package/", 100 }
             };
 
             public static Dictionary<string, VISItemType> ItemTypeMap = new Dictionary<string, VISItemType>()
             {
-                { "ammo", "MyObjectBuilder_AmmoMagazine/" },
-                { "component", "MyObjectBuilder_Component/" },
-                { "handtool", "MyObjectBuilder_PhysicalGunObject/" },
-                { "ore", "MyObjectBuilder_Ore/" },
-                { "ingot", "MyObjectBuilder_Ingot/" },
-                { "consumable", "MyObjectBuilder_ConsumableItem/" },
-                { "ice", "MyObjectBuilder_Ore/Ice" },
-                { "uranium", "MyObjectBuilder_Ingot/Uranium" }
+                { "ammo", $"{MyObjectBuilder}_AmmoMagazine/" },
+                { "component", $"{MyObjectBuilder}_Component/" },
+                { "handtool", $"{MyObjectBuilder}_PhysicalGunObject/" },
+                { "ore", $"{MyObjectBuilder}_Ore/" },
+                { "ingot", $"{MyObjectBuilder}_Ingot/" },
+                { "consumable", $"{MyObjectBuilder}_ConsumableItem/" },
+                { "ice", $"{MyObjectBuilder}_Ore/Ice" },
+                { "uranium", $"{MyObjectBuilder}_Ingot/Uranium" }
             };
 
             public static int CharHeight = 29;

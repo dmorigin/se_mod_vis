@@ -64,7 +64,7 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxfuel%", new VISUnitType(fuelMax_, unit: Unit.Liter).pack())
                     .Replace("%currentfuel%", new VISUnitType(fuelCurrent_, unit: Unit.Liter).pack())
-                    .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent).pack());
+                    .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent));
             }
 
             static string pattern = @"^Filled: [0-9\.]+% \((?<cur>[0-9]+)L/(?<max>[0-9]+)L\)$";

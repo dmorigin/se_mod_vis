@@ -47,7 +47,8 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%locked%", locked_.ToString())
-                    .Replace("%ratio%", new VISUnitType(locked_ / (double)Blocks.Count, unit: Unit.Percent).pack());
+                    .Replace("%unlocked%", (Blocks.Count - locked_).ToString())
+                    .Replace("%ratio%", new VISUnitType(locked_ / (double)Blocks.Count, unit: Unit.Percent));
             }
 
             #region Data Accessor

@@ -102,9 +102,13 @@ namespace IngameScript
                             break;
                         case Multiplier.G:
                             unit = "T";
-                            multiplier = "M";
+                            multiplier = "k";
                             break;
                         case Multiplier.T:
+                            unit = "T";
+                            multiplier = "M";
+                            break;
+                        case Multiplier.P:
                             unit = "T";
                             multiplier = "G";
                             break;

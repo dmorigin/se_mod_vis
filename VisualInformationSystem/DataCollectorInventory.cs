@@ -88,8 +88,6 @@ namespace IngameScript
                             else
                             {
                                 VISItemType itemType;
-                                //VISItemType itemType = Default.ItemTypeMap.FirstOrDefault(pair => pair.Key == itemTypeName.ToLower()).Value;
-                                //if (!itemType) // try as typeId string
                                 if (!Default.ItemTypeMap.TryGetValue(itemTypeName.ToLower(), out itemType))
                                     itemType = itemTypeName;
 
@@ -275,10 +273,10 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxitems%", new VISUnitType(maxItems_).pack())
                     .Replace("%currentitems%", new VISUnitType(currentItems_).pack())
-                    .Replace("%itemratio%", new VISUnitType(itemRatio_, unit: Unit.Percent).pack())
+                    .Replace("%itemratio%", new VISUnitType(itemRatio_, unit: Unit.Percent))
                     .Replace("%maxvolume%", new VISUnitType(maxVolume_, unit: Unit.Liter).pack())
                     .Replace("%currentvolume%", new VISUnitType(currentVolume_, unit: Unit.Liter).pack())
-                    .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent).pack());
+                    .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent));
             }
 
             long defaultMaxAmountItems_ = Default.MaxAmountItems;
@@ -296,7 +294,6 @@ namespace IngameScript
             {
                 switch (name.ToLower())
                 {
-                    case "":
                     case "capacity":
                         return new Capacity(this);
                     case "items":

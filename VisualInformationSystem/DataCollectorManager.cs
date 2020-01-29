@@ -101,6 +101,15 @@ namespace IngameScript
                     case "shipcontroller":
                         dataCollector = new DataCollectorShipController(options);
                         break;
+                    case "production":
+                        dataCollector = new DataCollectorProduction<IMyProductionBlock>("production", "", Unit.None, options);
+                        break;
+                    case "refinery":
+                        dataCollector = new DataCollectorProduction<IMyRefinery>("refinery", "", Unit.Gram, options);
+                        break;
+                    case "assembler":
+                        dataCollector = new DataCollectorProduction<IMyAssembler>("assembler", "", Unit.None, options);
+                        break;
                 }
 
                 if (dataCollector != null)

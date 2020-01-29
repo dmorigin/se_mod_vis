@@ -65,7 +65,7 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxcapacity%", new VISUnitType(maxStoredPower_, Multiplier.M, Unit.WattHour).pack())
                     .Replace("%currentcapacity%", new VISUnitType(currentStoredPower_, Multiplier.M, Unit.WattHour).pack())
-                    .Replace("%capacityratio%", new VISUnitType(ratioStoredPower_, unit: Unit.Percent).pack())
+                    .Replace("%capacityratio%", new VISUnitType(ratioStoredPower_, unit: Unit.Percent))
                     .Replace("%amountcharging%", amountRecharging_.ToString())
                     .Replace("amountjumping", amountJumping_.ToString())
                     .Replace("%amountready", amountReady_.ToString());
@@ -76,7 +76,6 @@ namespace IngameScript
             {
                 switch(name.ToLower())
                 {
-                    case "":
                     case "capacity":
                         return new Capacity(this);
                     case "ready":

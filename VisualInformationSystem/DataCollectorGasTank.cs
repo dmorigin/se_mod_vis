@@ -50,11 +50,13 @@ namespace IngameScript
             protected override void update()
             {
                 double fillRation = 0.0;
+                stockpile_ = 0;
 
                 foreach (var tank in Blocks)
                 {
                     fillRation += tank.FilledRatio;
                     blocksOn_ += isOn(tank) ? 1 : 0;
+                    stockpile_ += tank.Stockpile ? 1 : 0;
                 }
 
                 fillRatio_ = Blocks.Count == 0 ? 0f : (float)(fillRation / Blocks.Count);
@@ -65,12 +67,14 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%capacity%", new VISUnitType(capacity_, unit: Unit.Liter).pack())
-                    .Replace("%fillratio%", new VISUnitType(fillRatio_, unit: Unit.Percent).pack())
-                    .Replace("%fillvalue", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack());
+                    .Replace("%fillratio%", new VISUnitType(fillRatio_, unit: Unit.Percent))
+                    .Replace("%fillvalue", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack())
+                    .Replace("%stockpile%", stockpile_.ToString());
             }
 
             float fillRatio_ = 0f;
             float capacity_ = 0f;
+            int stockpile_ = 0;
 
             #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
@@ -78,8 +82,9 @@ namespace IngameScript
                 switch (name.ToLower())
                 {
                     case "capacity":
-                    case "":
                         return new Capacity(this);
+                    case "stockpile":
+                        return new Stockpile(this);
                 }
 
                 return base.getDataAccessor(name);
@@ -87,7 +92,7 @@ namespace IngameScript
 
             public class Capacity : DataAccessor
             {
-                DataCollectorGasTank dc_ = null;
+                DataCollectorGasTank dc_;
                 public Capacity(DataCollectorGasTank collector)
                 {
                     dc_ = collector;
@@ -105,10 +110,41 @@ namespace IngameScript
                     {
                         ListContainer item = new ListContainer();
                         item.name = tank.CustomName;
-                        item.indicator = (float)tank.FilledRatio;
+                        item.indicator = (double)tank.FilledRatio;
                         item.min = new VISUnitType(0, unit:Unit.Liter);
                         item.max = new VISUnitType(tank.Capacity, unit: Unit.Liter);
                         item.value = new VISUnitType(tank.FilledRatio * tank.Capacity, unit: Unit.Liter);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+
+            public class Stockpile : DataAccessor
+            {
+                DataCollectorGasTank dc_;
+                public Stockpile(DataCollectorGasTank dc)
+                {
+                    dc_ = dc;
+                }
+
+                public override double indicator() => (double)dc_.stockpile_ / (double)dc_.Blocks.Count;
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.stockpile_);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (var tank in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = tank.CustomName;
+                        item.indicator = (double)dc_.stockpile_ / (double)dc_.Blocks.Count;
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(tank.Stockpile ? 1 : 0);
 
                         if (filter == null || (filter != null && filter(item)))
                             container.Add(item);

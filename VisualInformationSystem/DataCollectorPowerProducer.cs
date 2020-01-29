@@ -52,7 +52,7 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%usage%", new VISUnitType(powerAvailableUsing_, unit:Unit.Percent).pack())
+                    .Replace("%usage%", new VISUnitType(powerAvailableUsing_, unit:Unit.Percent))
                     .Replace("%maxoutput%", new VISUnitType(maxAvailableOutput_, Multiplier.M, Unit.Watt).pack())
                     .Replace("%currentoutput%", new VISUnitType(currentOutput_, Multiplier.M, Unit.Watt).pack());
             }
@@ -66,7 +66,6 @@ namespace IngameScript
             {
                 switch (name.ToLower())
                 {
-                    case "":
                     case "usage":
                         return new Usage(this);
                 }

@@ -136,14 +136,8 @@ namespace IngameScript
                         {
                             graphic_.DataCollector = dataCollector;
                             graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
-                            DataAccessor accessor = dataCollector.getDataAccessor(graphic_.DataAccessorName);
-                            if (accessor != null)
-                            {
-                                graphic_.DataAccessor = accessor;
-                                return true;
-                            }
-                            else
-                                graphic_.log(Console.LogType.Error, $"Data accessor {graphic_.DataAccessorName} isn't supported");
+                            graphic_.DataAccessor = dataCollector.getDataAccessor(graphic_.DataAccessorName);
+                            return true;
                         }
                     }
                     else

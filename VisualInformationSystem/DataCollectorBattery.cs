@@ -78,8 +78,8 @@ namespace IngameScript
             public override string getText(string data)
             {
                 return base.getText(data)
-                    .Replace("%powerleft%", new VISUnitType(powerAvailableLeft_, unit: Unit.Percent).pack())
-                    .Replace("%powerstoring%", new VISUnitType(powerAvailableStoring_, unit: Unit.Percent).pack())
+                    .Replace("%powerleft%", new VISUnitType(powerAvailableLeft_, unit: Unit.Percent))
+                    .Replace("%powerstoring%", new VISUnitType(powerAvailableStoring_, unit: Unit.Percent))
                     .Replace("%maxinput%", new VISUnitType(maxAvailableInput_, Multiplier.M, Unit.Watt).pack())
                     .Replace("%maxcapacity%", new VISUnitType(maxAvailableStored_, Multiplier.M, Unit.WattHour).pack())
                     .Replace("%currentinput%", new VISUnitType(currentInput_, Multiplier.M, Unit.Watt).pack())
@@ -91,7 +91,6 @@ namespace IngameScript
             {
                 switch(name.ToLower())
                 {
-                    case "":
                     case "capacity":
                         return new Capacity(this);
                     case "inout":

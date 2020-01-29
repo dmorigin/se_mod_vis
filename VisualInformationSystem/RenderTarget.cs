@@ -84,15 +84,20 @@ namespace IngameScript
                 drawInitScreen();
             }
 
-            public MySpriteDrawFrame getRenderFrame()
-            {
-                return surface_.DrawFrame();
-            }
+            public MySpriteDrawFrame getRenderFrame() => surface_.DrawFrame();
 
+            public delegate void SpriteMatchDelegate(System.Text.RegularExpressions.Match match);
             static List<string> sprites_ = new List<string>();
-            public static bool spriteExist(string name)
+            public static bool spriteExist(string name) => RenderTarget.sprites_.Exists(x => x == name);
+            public static void getSprites(string regexPattern, SpriteMatchDelegate callback)
             {
-                return RenderTarget.sprites_.Exists(x => x == name);
+                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(regexPattern);
+                foreach (string sprite in sprites_)
+                {
+                    var match = regex.Match(sprite);
+                    if (match.Success)
+                        callback(match);
+                }
             }
 
             void drawInitScreen()

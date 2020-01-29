@@ -65,7 +65,7 @@ namespace IngameScript
                         referenceController_ = controller;
                 }
 
-                speedMax_ = referenceController_.GetValue<Single>("SpeedLimit");
+                speedMax_ = 100.0f; // ToDo: Find a more generic way to support speed mods
                 speedCurrent_ = (float)referenceController_.GetShipSpeed();
                 speedRatio_ = clamp(speedCurrent_ / speedMax_);
 
@@ -101,11 +101,11 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxspeed%", new VISUnitType(speedMax_, unit: Unit.Speed).pack())
                     .Replace("%currentspeed%", new VISUnitType(speedCurrent_, unit: Unit.Speed).pack())
-                    .Replace("%speedratio%", new VISUnitType(speedRatio_, unit: Unit.Percent).pack())
-                    .Replace("%shipmass%", new VISUnitType(massShip_, unit: Unit.Gram).pack())
-                    .Replace("%totalmass%", new VISUnitType(massTotal_, unit: Unit.Gram).pack())
-                    .Replace("%inventorymass%", new VISUnitType(massInventory_, unit: Unit.Gram).pack())
-                    .Replace("%massratio%", new VISUnitType(massRatio_, unit: Unit.Gram).pack())
+                    .Replace("%speedratio%", new VISUnitType(speedRatio_, unit: Unit.Percent))
+                    .Replace("%shipmass%", new VISUnitType(massShip_, Multiplier.K ,Unit.Gram).pack())
+                    .Replace("%totalmass%", new VISUnitType(massTotal_, Multiplier.K, Unit.Gram).pack())
+                    .Replace("%inventorymass%", new VISUnitType(massInventory_, Multiplier.K, Unit.Gram).pack())
+                    .Replace("%massratio%", new VISUnitType(massRatio_, Multiplier.K, Unit.Gram).pack())
                     .Replace("%pgravity%", new VISUnitType(pGravity_, unit: Unit.Gravity).pack())
                     .Replace("%agravity%", new VISUnitType(aGravity_, unit: Unit.Gravity));
             }
@@ -113,6 +113,14 @@ namespace IngameScript
             #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
+                switch(name.ToLower())
+                {
+                    case "speed":
+                        return new Speed(this);
+                    case "mass":
+                        return new Mass(this);
+                }
+
                 return base.getDataAccessor(name);
             }
 
@@ -145,9 +153,9 @@ namespace IngameScript
                 }
 
                 public override double indicator() => 0;
-                public override VISUnitType min() => new VISUnitType(dc_.massShip_, unit: Unit.Gram);
-                public override VISUnitType max() => new VISUnitType(dc_.massShip_ * 1.5, unit: Unit.Gram);
-                public override VISUnitType value() => new VISUnitType(dc_.massTotal_, unit: Unit.Gram);
+                public override VISUnitType min() => new VISUnitType(dc_.massShip_, Multiplier.K, Unit.Gram);
+                public override VISUnitType max() => new VISUnitType(dc_.massShip_ * 1.5, Multiplier.K, Unit.Gram);
+                public override VISUnitType value() => new VISUnitType(dc_.massTotal_, Multiplier.K, Unit.Gram);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {

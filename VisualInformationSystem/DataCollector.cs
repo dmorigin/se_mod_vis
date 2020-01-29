@@ -78,8 +78,8 @@ namespace IngameScript
                     .Replace("%isgroup%", IsGroup ? "true" : "false")
                     .Replace("%on%", blocksOn_.ToString())
                     .Replace("%off%", blocksOff_.ToString())
-                    .Replace("%onratio%", new VISUnitType(onRatio_, unit: Unit.Percent).pack())
-                    .Replace("%offratio%", new VISUnitType(offRatio_, unit: Unit.Percent).pack());
+                    .Replace("%onratio%", new VISUnitType(onRatio_, unit: Unit.Percent))
+                    .Replace("%offratio%", new VISUnitType(offRatio_, unit: Unit.Percent));
             }
 
             #region Update System
@@ -184,8 +184,21 @@ namespace IngameScript
                         return new DAOff(this);
                 }
 
-                log(Console.LogType.Error, $"Invalid data retriever {name}");
-                return null;
+                if (name != "")
+                    log(Console.LogType.Error, $"Invalid data accessor {name}");
+                return new Dummy();
+            }
+
+            class Dummy : DataAccessor
+            {
+                public override double indicator() => 0;
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(0);
+                public override VISUnitType value() => new VISUnitType(0);
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                }
             }
 
             class DAOn : DataAccessor

@@ -64,7 +64,7 @@ namespace IngameScript
                 return base.getText(data)
                     .Replace("%maxfuel%", new VISUnitType(fuelMax_, Multiplier.K, Unit.Liter).pack())
                     .Replace("%currentfuel%", new VISUnitType(fuelCurrent_, Multiplier.K, Unit.Liter).pack())
-                    .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent).pack());
+                    .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent));
             }
 
             #region Data Accessor

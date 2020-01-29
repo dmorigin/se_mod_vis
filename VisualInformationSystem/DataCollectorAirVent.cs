@@ -49,7 +49,7 @@ namespace IngameScript
             {
                 return base.getText(data)
                     .Replace("%pressurizeable%", pressurizeAble_.ToString())
-                    .Replace("%oxygenlevel%", new VISUnitType(oxygenLevel_, unit: Unit.Percent).pack());
+                    .Replace("%oxygenlevel%", new VISUnitType(oxygenLevel_, unit: Unit.Percent));
             }
 
             #region Data Accessor
@@ -57,7 +57,6 @@ namespace IngameScript
             {
                 switch (name.ToLower())
                 {
-                    case "":
                     case "oxygenlevel":
                         return new OxygenLevel(this);
                     case "pressurizeable":
