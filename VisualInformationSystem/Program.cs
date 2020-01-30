@@ -38,6 +38,12 @@ namespace IngameScript
             statistics_.registerException(exp);
         }
 
+        static string removeFromEnd(string data, string search)
+        {
+            if (data.EndsWith(search))
+                return data.Remove(data.Length - search.Length);
+            return data;
+        }
 
         public Program()
         {

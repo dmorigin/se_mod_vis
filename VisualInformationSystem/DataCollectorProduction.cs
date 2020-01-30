@@ -176,11 +176,14 @@ namespace IngameScript
                     if (match.Success)
                         return $"{Default.MyObjectBuilder}_Ingot/{match.Groups["id"].Value}";
 
-                    int index = ItemTypeLookupMap.FindIndex((pair) => pair.Key == item.SubtypeName);
+                    string subtype = removeFromEnd(item.SubtypeName, "_Blueprint");
+                    subtype = removeFromEnd(subtype, "Magazine");
+
+                    int index = ItemTypeLookupMap.FindIndex((pair) => pair.Key == subtype);
                     if (index >= 0)
                         return ItemTypeLookupMap[index].Value;
 
-                    return VISItemType.EmptyType;
+                    return $"{item.TypeId.ToString()}/{subtype}";
                 }
             }
 
@@ -230,6 +233,7 @@ namespace IngameScript
                         entry.max = new VISUnitType(item.MaxAmount, unit: dc_.unit_);
                         entry.value = new VISUnitType(item.CurrentAmount, unit: dc_.unit_);
                         entry.name = item.Type.Type.SubtypeId;
+                        entry.type = item.Type;
 
                         if (filter == null || (filter != null && filter(entry)))
                             container.Add(entry);
