@@ -93,7 +93,7 @@ namespace IngameScript
             }
 
             string iconName_ = "";
-            Icon.Render icon_ = null;
+            Icon.Render icon_ = (addSprite, rt, name, position, size, rotation, color) => { };
             bool configIcon(string key, string value, Configuration.Options options)
             {
                 iconName_ = value;

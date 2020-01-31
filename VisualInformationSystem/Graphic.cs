@@ -412,6 +412,51 @@ namespace IngameScript
                 addSprite(sprite);
             }
 
+            protected static void renderEllipseBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
+                float degreeStart, float degreeEnd, int steps, float blockThickness, float ratio, 
+                Dictionary<float, Color> gradient, bool lerp, Color backgroundColor)
+            {
+                Vector2 rtPosition = position + rt.DisplayOffset;
+
+                float count = degreeEnd - degreeStart;
+                float step = count / steps;
+                float max = count * ratio;
+
+                // render marker
+                for (float c = 0, degree = degreeStart + step; degree < degreeEnd && c < max; degree += step, c += step)
+                {
+                    float t = (degree / 180f) * (float)Math.PI + (degree < 0f ? (float)Math.PI * 2f : 0f);
+
+                    float x = -(size.X * 0.5f) * (float)Math.Cos(t);
+                    float y = -(size.Y * 0.5f) * (float)Math.Sin(t);
+                    Vector2 point = new Vector2(x, y);
+
+                    // axis vector
+                    Vector2 axis;
+                    if (degree >= 0f && degree < 180f)
+                        axis = new Vector2(-1f, 0f);
+                    else// if (degree >= 180f && degree < 360f)
+                        axis = new Vector2(1f, 0f);
+
+                    float alpha = Vector2.Dot(Vector2.Normalize(point), axis);
+                    float delta = (float)Math.Acos(alpha);
+
+                    Color color;
+                    if (lerp)
+                        getGradientColorLerp(degree / count, gradient, out color);
+                    else
+                        getGradientColor(degree / count, gradient, out color);
+
+                    addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                        (point * 0.5f) + rtPosition,
+                        new Vector2(point.Length(), Math.Max(size.X, size.Y) * blockThickness),
+                        color, rotation: delta));
+                }
+
+                addSprite(new MySprite(SpriteType.TEXTURE, "Circle", rtPosition, size * 0.5f, backgroundColor));
+                addSprite(new MySprite(SpriteType.TEXTURE, "CircleHollow", rtPosition, size * 1.06f, backgroundColor));
+            }
+
             protected static void renderSimpleBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size, 
                 bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor)

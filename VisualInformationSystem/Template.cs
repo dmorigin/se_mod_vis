@@ -232,6 +232,9 @@ namespace IngameScript
                         case "test":
                             graphic = new GraphicTest(tpl_, options);
                             break;
+                        case "roundbar":
+                            graphic = new GraphicRoundBar(tpl_, options);
+                            break;
                     }
 
                     if (graphic != null)
