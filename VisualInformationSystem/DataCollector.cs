@@ -23,7 +23,9 @@ namespace IngameScript
     {
         public abstract class DataCollector<T> : VISObject, IDataCollector where T : class
         {
+            static int CollectorIDCounter = 0;
             public DataCollector(string collectorTypeName, string typeId, Configuration.Options options)
+                : base($"DC:{collectorTypeName}/{typeId}:{CollectorIDCounter++}")
             {
                 if (options == null)
                     Options = new Configuration.Options(new List<string>());
@@ -36,6 +38,7 @@ namespace IngameScript
                 AcceptBlock = (block) => Blocks.Add(block);
 
                 MaxUpdateInterval = Default.DCRefresh;
+                ReconstructRetry = Default.ReconstructRetry;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
 
                 UpdateFinished = false;
@@ -58,7 +61,7 @@ namespace IngameScript
                 }
 
                 if (Blocks.Count == 0)
-                    log(Console.LogType.Warning, $"No blocks found for {BlockName}:{(IsGroup ? "group" : "")}");
+                    log(Console.LogType.Warning, $"No blocks found for {BlockName}{(IsGroup ? ":group" : "")}");
                 Constructed = true;
                 return true;
             }
@@ -162,6 +165,12 @@ namespace IngameScript
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan nextReconstruct_ = new TimeSpan(0);
             public TimeSpan MaxUpdateInterval
+            {
+                get;
+                set;
+            }
+
+            int ReconstructRetry
             {
                 get;
                 set;
@@ -284,6 +293,7 @@ namespace IngameScript
                 {
                     dc_.finalizeUpdate();
                     dc_.nextUpdate_ = dc_.MaxUpdateInterval + Manager.Timer.Ticks;
+                    dc_.ReconstructRetry = Default.ReconstructRetry;
 
                     if (dc_.nextReconstruct_ <= Manager.Timer.Ticks)
                         JobManager.queueJob(new ReconstructJob(dc_));
@@ -293,6 +303,18 @@ namespace IngameScript
                 {
                     dc_.update();
                     JobFinished = dc_.UpdateFinished;
+                }
+
+                public override bool handleException()
+                {
+                    log(Console.LogType.Error, $"Update failed[{dc_.Name}]:Retry => {dc_.ReconstructRetry}");
+                    if (dc_.ReconstructRetry-- > 0)
+                    {
+                        JobManager.queueJob(new UpdateJob(dc_), true);
+                        JobManager.queueJob(new ReconstructJob(dc_), true);
+                        return true;
+                    }
+                    return false;
                 }
             }
 

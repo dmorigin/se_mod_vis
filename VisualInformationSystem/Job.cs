@@ -41,6 +41,8 @@ namespace IngameScript
             {
             }
 
+            public virtual bool handleException() => false;
+
             public JobManager JobManager
             {
                 get;

@@ -236,10 +236,7 @@ namespace IngameScript
                     });
 
                     if (!readConfigFailed)
-                    {
-                        log(Console.LogType.Info, "Init stage 1 successful");
                         initStateStage_ = 1;
-                    }
                     else
                     {
                         log(Console.LogType.Error, "Failed to read configuration");
@@ -268,7 +265,6 @@ namespace IngameScript
                         return false;
                     });
 
-                    log(Console.LogType.Info, "Init stage 2 successful");
                     initStateStage_ = 2;
                     dpIndex_ = 0;
                 }
@@ -276,7 +272,6 @@ namespace IngameScript
                 {
                     if (dpIndex_ >= displayProviders_.Count)
                     {
-                        log(Console.LogType.Info, "Init stage 3 successful");
                         displayProviders_.Clear();
                         initStateStage_ = 98; // 98 is success state
                         return;
@@ -346,11 +341,9 @@ namespace IngameScript
             bool reboot_ = true;
             #endregion // Application State System
 
-
             public void onSave()
             {
             }
-
 
             public void onTick(string args, UpdateType updateSource)
             {

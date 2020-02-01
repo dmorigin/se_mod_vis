@@ -23,7 +23,9 @@ namespace IngameScript
     {
         public abstract class Graphic : VISObject
         {
+            static int GraphicIDCounter = 0;
             public Graphic(Template template, Configuration.Options options)
+                : base($"GraphicObject:{GraphicIDCounter++}")
             {
                 Options = options;
                 Template = template;

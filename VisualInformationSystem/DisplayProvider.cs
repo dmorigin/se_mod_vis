@@ -101,13 +101,9 @@ namespace IngameScript
                         display = provider_.Manager.DisplayManager.getDisplayGroup(groupId);
                         if (display == null)
                         {
-                            provider_.log(Console.LogType.Info, $"Create new display group:{groupId}");
                             display = provider_.Manager.DisplayManager.createDisplay(groupId);
                             if (display == null)
-                            {
-                                provider_.log(Console.LogType.Error, $"Failed to create display group:{groupId}");
                                 return false;
-                            }
                         }
                     }
                     else

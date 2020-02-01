@@ -124,15 +124,20 @@ namespace IngameScript
             #endregion // Timed Jobs
 
             #region Queued Jobs
-            Queue<Job> queuedJobs_ = new Queue<Job>();
+            //Queue<Job> queuedJobs_ = new Queue<Job>();
+            LinkedList<Job> queuedJobs_ = new LinkedList<Job>();
             Job curQueuedJob_ = null;
             TimeSpan curQueuedJobLastExecute_ = new TimeSpan(0);
 
-            public bool queueJob(Job job)
+            public void queueJob(Job job, bool front = false)
             {
                 if (job != null)
-                    queuedJobs_.Enqueue(job);
-                return true;
+                {
+                    if (!front)
+                        queuedJobs_.AddLast(job);
+                    else
+                        queuedJobs_.AddFirst(job);
+                }
             }
             #endregion // Queued Jobs
 
@@ -141,26 +146,36 @@ namespace IngameScript
             {
                 if ((toggleRun_ = !toggleRun_) == true)
                 {
-                    // process queued jobs
-                    if (curQueuedJob_ != null)
+                    try
                     {
-                        curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
-                        curQueuedJobLastExecute_ = Manager.Timer.Ticks;
-                        queuedJobCountExecutes_++;
-
-                        if (curQueuedJob_.JobFinished)
+                        // process queued jobs
+                        if (curQueuedJob_ != null)
                         {
-                            curQueuedJob_.finalizeJob();
-                            curQueuedJob_.LastExecute = Manager.Timer.Ticks;
-                            queuedJobCountFinished_++;
-                            curQueuedJob_ = null;
+                            curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
+                            curQueuedJobLastExecute_ = Manager.Timer.Ticks;
+                            queuedJobCountExecutes_++;
+
+                            if (curQueuedJob_.JobFinished)
+                            {
+                                curQueuedJob_.finalizeJob();
+                                curQueuedJob_.LastExecute = Manager.Timer.Ticks;
+                                queuedJobCountFinished_++;
+                                curQueuedJob_ = null;
+                            }
+                        }
+                        else if (queuedJobs_.Count > 0)
+                        {
+                            curQueuedJob_ = queuedJobs_.First.Value;
+                            queuedJobs_.RemoveFirst();
+                            curQueuedJob_.prepareJob();
+                            curQueuedJobLastExecute_ = Manager.Timer.Ticks;
                         }
                     }
-                    else if (queuedJobs_.Count > 0)
+                    catch(Exception exp)
                     {
-                        curQueuedJob_ = queuedJobs_.Dequeue();
-                        curQueuedJob_.prepareJob();
-                        curQueuedJobLastExecute_ = Manager.Timer.Ticks;
+                        if (!curQueuedJob_.handleException())
+                            throw exp;
+                        curQueuedJob_ = null;
                     }
                 }
                 else

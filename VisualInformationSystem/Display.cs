@@ -139,22 +139,23 @@ namespace IngameScript
                     display_ = display;
                 }
 
-
                 Display display_ = null;
-
 
                 public override void tick(TimeSpan delta)
                 {
                     // start rendering
                     display_.render();
                 }
+
+                public override bool handleException()
+                {
+                    log(Console.LogType.Error, $"Render Job failed during execution");
+                    return true;
+                }
             }
 
             RectangleF renderArea_ = new RectangleF(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
-            public RectangleF RenderArea
-            {
-                get { return renderArea_; }
-            }
+            public RectangleF RenderArea => renderArea_;
 
             public Color BackgroundColor
             {
