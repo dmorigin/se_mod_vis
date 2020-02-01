@@ -31,17 +31,22 @@ namespace IngameScript
             protected override void update()
             {
                 locked_ = 0;
+                int ratio = 0;
 
                 foreach(var gear in Blocks)
                 {
                     blocksOn_ += isOn(gear) ? 1 : 0;
                     locked_ += gear.IsLocked ? 1 : 0;
+
+                    ratio += gear.LockMode == LandingGearMode.Locked ? 2 : (gear.LockMode == LandingGearMode.ReadyToLock ? 1 : 0);
                 }
 
+                ratio_ = (ratio * 0.5f) / Blocks.Count;
                 UpdateFinished = true;
             }
 
             int locked_ = 0;
+            float ratio_ = 0f;
 
             public override string getText(string data)
             {
@@ -67,10 +72,10 @@ namespace IngameScript
                     dc_ = dc;
                 }
 
-                public override double indicator() => dc_.locked_ / (double)dc_.Blocks.Count;
+                public override double indicator() => dc_.ratio_;
                 public override VISUnitType min() => new VISUnitType(0);
                 public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
-                public override VISUnitType value() => new VISUnitType(dc_.locked_);
+                public override VISUnitType value() => new VISUnitType(dc_.Blocks.Count * dc_.ratio_);
 
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
@@ -79,7 +84,7 @@ namespace IngameScript
                     {
                         ListContainer item = new ListContainer();
                         item.name = gear.CustomName;
-                        item.indicator = gear.IsLocked ? 1 : 0;
+                        item.indicator = gear.LockMode == LandingGearMode.Locked ? 1 : (gear.LockMode == LandingGearMode.ReadyToLock ? 0.5 : 0);
                         item.min = new VISUnitType(0);
                         item.max = new VISUnitType(1);
                         item.value = new VISUnitType(item.indicator);

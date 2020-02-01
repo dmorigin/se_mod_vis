@@ -27,7 +27,6 @@ namespace IngameScript
                 : base(collectorTypeName, typeId, options)
             {
                 unit_ = unit;
-                log(Console.LogType.Warning, "Production collector is beta");
             }
 
             static List<KeyValuePair<string, string>> ItemTypeLookupMap = new List<KeyValuePair<string, string>>();

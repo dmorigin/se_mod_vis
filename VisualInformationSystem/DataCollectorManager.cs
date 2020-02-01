@@ -113,6 +113,9 @@ namespace IngameScript
                     case "piston":
                         dataCollector = new DataCollectorPiston(options);
                         break;
+                    /*case "onoff":
+                        dataCollector = new DataCollector<IMyTerminalBlock>("onoff", "", options);
+                        break;*/
                 }
 
                 if (dataCollector != null)

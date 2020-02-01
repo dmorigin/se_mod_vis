@@ -76,8 +76,8 @@ namespace IngameScript
             {
                 switch(name.ToLower())
                 {
-                    case "extent":
-                        return new Extent(this);
+                    case "position":
+                        return new Position(this);
                     case "extending":
                         return new Extending(this);
                     case "retracting":
@@ -86,10 +86,10 @@ namespace IngameScript
                 return base.getDataAccessor(name);
             }
 
-            class Extent : DataAccessor
+            class Position : DataAccessor
             {
                 DataCollectorPiston dc_;
-                public Extent(DataCollectorPiston dc)
+                public Position(DataCollectorPiston dc)
                 {
                     dc_ = dc;
                 }

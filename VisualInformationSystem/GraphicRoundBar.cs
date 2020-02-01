@@ -26,7 +26,6 @@ namespace IngameScript
             public GraphicRoundBar(Template template, Configuration.Options options)
                 : base(template, options)
             {
-                log(Console.LogType.Warning, "Round bar graphic is beta");
             }
 
             public override Graphic clone()
