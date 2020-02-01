@@ -110,6 +110,9 @@ namespace IngameScript
                     case "assembler":
                         dataCollector = new DataCollectorProduction<IMyAssembler>("assembler", "", Unit.None, options);
                         break;
+                    case "piston":
+                        dataCollector = new DataCollectorPiston(options);
+                        break;
                 }
 
                 if (dataCollector != null)

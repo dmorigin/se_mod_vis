@@ -43,6 +43,7 @@
     <Compile Include="DataCollectorAirVent.cs" />
     <Compile Include="DataCollectorConnector.cs" />
     <Compile Include="DataCollectorLandingGear.cs" />
+    <Compile Include="DataCollectorPiston.cs" />
     <Compile Include="DataCollectorPowerProducer.cs" />
     <Compile Include="DataCollectorGenerator.cs" />
     <Compile Include="DataCollectorInventory.cs" />
