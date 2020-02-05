@@ -21,16 +21,16 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class GraphicRoundBar : Graphic
+        public class GraphicCurvedBar : Graphic
         {
-            public GraphicRoundBar(Template template, Configuration.Options options)
+            public GraphicCurvedBar(Template template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
             public override Graphic clone()
             {
-                GraphicRoundBar gfx = new GraphicRoundBar(Template, Options);
+                GraphicCurvedBar gfx = new GraphicCurvedBar(Template, Options);
 
                 gfx.DataCollector = DataCollector;
                 gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
@@ -48,7 +48,6 @@ namespace IngameScript
                 gfx.minDegree_ = minDegree_;
                 gfx.maxDegree_ = maxDegree_;
                 gfx.colorLerp_ = colorLerp_;
-                gfx.steps_ = steps_;
                 gfx.thickness_ = thickness_;
                 gfx.icon_ = icon_;
                 gfx.iconName_ = iconName_;
@@ -91,7 +90,7 @@ namespace IngameScript
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 Graphic.renderEllipseBar(addSprite, rt, renderData_.position, renderData_.size, minDegree_, maxDegree_, 
-                    steps_, thickness_, renderData_.ratio, Gradient, colorLerp_, Template.BackgroundColor);
+                    thickness_, renderData_.ratio, Gradient, colorLerp_, Template.BackgroundColor);
 
                 if (icon_ != null)
                     icon_(addSprite, rt, iconName_, renderData_.position, renderData_.iconSize, 0f, renderData_.iconColor);
@@ -111,8 +110,7 @@ namespace IngameScript
             float minDegree_ = -50f;
             float maxDegree_ = 230f;
             bool colorLerp_ = true;
-            int steps_ = 40;
-            float thickness_ = 0.07f;
+            float thickness_ = 5f;
             bool configStyle(string key, string value, Configuration.Options options)
             {
                 minDegree_ = Configuration.asFloat(value, minDegree_);
@@ -122,8 +120,7 @@ namespace IngameScript
                 if (minDegree_ > maxDegree_)
                     minDegree_ -= 360f;
 
-                steps_ = options.asInteger(2, steps_);
-                thickness_ = options.asFloat(3, thickness_);
+                thickness_ = options.asFloat(2, thickness_);
 
                 return true;
             }

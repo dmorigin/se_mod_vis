@@ -28,7 +28,7 @@ namespace IngameScript
                 config_ = new ConfigHandler(this);
                 CurrentState = State.Stopped;
 
-                console_ = new Console();
+                Console = new Console();
                 Timer = new Timer();
                 CollectorManager = new DataCollectorManager();
                 JobManager = new JobManager();
@@ -39,41 +39,32 @@ namespace IngameScript
 
             public bool construct()
             {
-                if (console_.construct())
-                {
-                    // setup state handler
-                    stateHandlers_[State.Run] = handleRunState;
-                    stateHandlers_[State.Stopped] = handleStoppedState;
-                    stateHandlers_[State.Init] = handleInitState;
-                    stateHandlers_[State.Shutdown] = handleShutdownState;
-                    stateHandlers_[State.Error] = handleErrorState;
+                // setup state handler
+                stateHandlers_[State.Run] = handleRunState;
+                stateHandlers_[State.Stopped] = handleStoppedState;
+                stateHandlers_[State.Init] = handleInitState;
+                stateHandlers_[State.Shutdown] = handleShutdownState;
+                stateHandlers_[State.Error] = handleErrorState;
 
-                    if (CollectorManager.construct())
+                Console.construct();
+                CollectorManager.construct();
+                TemplateManager.construct();
+
+                // construct job manager
+                if (JobManager.construct())
+                {
+                    // construct display manager
+                    if (DisplayManager.construct())
                     {
-                        if (TemplateManager.construct())
-                        {
-                            // construct job manager
-                            if (JobManager.construct())
-                            {
-                                // construct display manager
-                                if (DisplayManager.construct())
-                                {
-                                    log(Console.LogType.Info, "VIS Manager constructed");
-                                    Timer.start();
-                                    return true;
-                                }
-                                else
-                                    log(Console.LogType.Error, "Failed to construct display manager");
-                            }
-                            else
-                                log(Console.LogType.Error, "Failed to construct template manager");
-                        }
-                        else
-                            log(Console.LogType.Error, "Failed to construct job manager");
+                        log(Console.LogType.Info, "VIS Manager constructed");
+                        Timer.start();
+                        return true;
                     }
                     else
-                        log(Console.LogType.Error, "Failed to construct data collector manager");
+                        log(Console.LogType.Error, "Failed to construct display manager");
                 }
+                else
+                    log(Console.LogType.Error, "Failed to construct job manager");
 
                 return false;
             }
@@ -111,15 +102,14 @@ namespace IngameScript
             List<DisplayProvider> displayProviders_ = new List<DisplayProvider>();
 
             #region Console
-            Console console_ = null;
             public Console Console
             {
-                get { return console_; }
+                get;
+                set;
             }
-
             public void log(Console.LogType logType, string messsage)
             {
-                console_.log(logType, messsage);
+                Console.log(logType, messsage);
             }
             #endregion // Console
 
@@ -128,10 +118,6 @@ namespace IngameScript
 
             class ConfigHandler : Configuration.Handler
             {
-                // default configuration
-                public string vDisplayNameTag_ = Default.DisplayNameTag;
-
-
                 VISManager manager_ = null;
                 public ConfigHandler(VISManager manager)
                 {
@@ -140,10 +126,11 @@ namespace IngameScript
                     // setup configuration
                     add("displaytag", configDisplayNameTag);
                     add("template", configTemplate);
+                    add("console", configConsole);
                 }
 
-
-                public bool configDisplayNameTag(string key, string value, Configuration.Options options)
+                public string vDisplayNameTag_ = Default.DisplayNameTag;
+                bool configDisplayNameTag(string key, string value, Configuration.Options options)
                 {
                     if (value == "")
                         return false;
@@ -152,11 +139,22 @@ namespace IngameScript
                     return true;
                 }
 
-
-                public bool configTemplate(string key, string value, Configuration.Options options)
+                bool configTemplate(string key, string value, Configuration.Options options)
                 {
                     // create new template
                     manager_.log(Console.LogType.Error, "The template configuration isnt' fully implemented yet");
+                    return false;
+                }
+
+                bool configConsole(string key, string value, Configuration.Options options)
+                {
+                    var block = App.GridTerminalSystem.GetBlockWithName(value);
+                    if (block != null)
+                    {
+                        manager_.log(Console.LogType.Info, $"Console redirected to {block.CustomName}");
+                        return manager_.Console.redirectConsole(block as IMyTextSurfaceProvider);
+                    }
+
                     return false;
                 }
             }
@@ -356,7 +354,7 @@ namespace IngameScript
                     stateHandlers_[CurrentState]();
 
                     // process console
-                    console_.flush();
+                    Console.flush();
                 }
                 catch (Exception exp)
                 {

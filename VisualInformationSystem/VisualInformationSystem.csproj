@@ -64,7 +64,7 @@
     <Compile Include="GraphicBattery.cs" />
     <Compile Include="GraphicIcon.cs" />
     <Compile Include="GraphicList.cs" />
-    <Compile Include="GraphicRoundBar.cs" />
+    <Compile Include="GraphicCurvedBar.cs" />
     <Compile Include="GraphicSlider.cs" />
     <Compile Include="GraphicTest.cs" />
     <Compile Include="GraphicText.cs" />

@@ -27,6 +27,7 @@ namespace IngameScript
             {
                 GroupId = groupId;
                 PanelConnector = null;
+                RenderingRetry = Default.ExceptionRetry;
             }
 
             public override bool construct()
@@ -132,6 +133,12 @@ namespace IngameScript
             }
 
             #region Rendering
+            int RenderingRetry
+            {
+                get;
+                set;
+            }
+
             class RenderJob : Job
             {
                 public RenderJob(Display display)
@@ -145,12 +152,13 @@ namespace IngameScript
                 {
                     // start rendering
                     display_.render();
+                    display_.RenderingRetry = Default.ExceptionRetry;
                 }
 
                 public override bool handleException()
                 {
-                    log(Console.LogType.Error, $"Render Job failed during execution");
-                    return true;
+                    log(Console.LogType.Error, $"Rendering failed: {display_.Name}:{display_.Id} => {display_.RenderingRetry}");
+                    return display_.RenderingRetry-- >= 0;
                 }
             }
 

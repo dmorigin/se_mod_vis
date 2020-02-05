@@ -84,6 +84,11 @@ namespace IngameScript
                 drawInitScreen();
             }
 
+            public void releaseSurface()
+            {
+                surface_.ContentType = ContentType.NONE;
+            }
+
             public MySpriteDrawFrame getRenderFrame() => surface_.DrawFrame();
 
             public delegate void SpriteMatchDelegate(System.Text.RegularExpressions.Match match);

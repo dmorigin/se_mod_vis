@@ -61,7 +61,7 @@ namespace IngameScript
             public static float DCRefreshInSec = 5.0f;
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
-            public static int ReconstructRetry = 3;
+            public static int ExceptionRetry = 3;
 
             public static string MyObjectBuilder = "MyObjectBuilder";
             public static long MaxAmountItems = 1000;

@@ -30,19 +30,30 @@ namespace IngameScript
 
             public override bool construct()
             {
-                renderTarget_ = new RenderTarget(new Vector2I(0, 0));
-                renderTarget_.setupSurface(App.Me.GetSurface(0));
-                renderTarget_.BackgroundColor = Color.Black;
-
-                float lineCount = (renderTarget_.Size.Y / (Default.CharHeight * fontSize_));
-                lineHeight_ = renderTarget_.Size.Y / (int)lineCount;
-                lineCorrection_ = (lineCount - (int)lineCount) * (int)(lineCount + 1);
-
-                log(LogType.Info, "Console System constructed");
+                redirectConsole(App.Me as IMyTextSurfaceProvider);
                 Constructed = true;
                 return true;
             }
 
+            public bool redirectConsole(IMyTextSurfaceProvider provider)
+            {
+                if (provider != null && provider.SurfaceCount > 0)
+                {
+                    if (renderTarget_ != null)
+                        renderTarget_.releaseSurface();
+
+                    renderTarget_ = new RenderTarget(new Vector2I(0, 0));
+                    renderTarget_.setupSurface(provider.GetSurface(0));
+                    renderTarget_.BackgroundColor = Color.Black;
+
+                    float lineCount = (renderTarget_.Size.Y / (Default.CharHeight * fontSize_));
+                    lineHeight_ = renderTarget_.Size.Y / (int)lineCount;
+                    lineCorrection_ = (lineCount - (int)lineCount) * (int)(lineCount + 1);
+                    return true;
+                }
+
+                return false;
+            }
 
             int maxStoreLines_ = 30;
             public int MaxStoreLines

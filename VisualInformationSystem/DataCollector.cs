@@ -38,7 +38,7 @@ namespace IngameScript
                 AcceptBlock = (block) => Blocks.Add(block);
 
                 MaxUpdateInterval = Default.DCRefresh;
-                ReconstructRetry = Default.ReconstructRetry;
+                ReconstructRetry = Default.ExceptionRetry;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
 
                 UpdateFinished = false;
@@ -293,7 +293,7 @@ namespace IngameScript
                 {
                     dc_.finalizeUpdate();
                     dc_.nextUpdate_ = dc_.MaxUpdateInterval + Manager.Timer.Ticks;
-                    dc_.ReconstructRetry = Default.ReconstructRetry;
+                    dc_.ReconstructRetry = Default.ExceptionRetry;
 
                     if (dc_.nextReconstruct_ <= Manager.Timer.Ticks)
                         JobManager.queueJob(new ReconstructJob(dc_));

@@ -415,23 +415,28 @@ namespace IngameScript
             }
 
             protected static void renderEllipseBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                float degreeStart, float degreeEnd, int steps, float blockThickness, float ratio, 
+                float degreeStart, float degreeEnd, float blockThickness, float ratio,
                 Dictionary<float, Color> gradient, bool lerp, Color backgroundColor)
             {
                 Vector2 rtPosition = position + rt.DisplayOffset;
 
-                float count = degreeEnd - degreeStart;
-                float step = count / steps;
-                float max = count * ratio;
+                Vector2 halfSize = size * 0.5f;
+                float range = Math.Abs(degreeEnd - degreeStart);
+                float length = (float)(Math.PI * Math.Sqrt(2f * (halfSize.X * halfSize.X + halfSize.Y * halfSize.Y)));
+                float thickness = Math.Max(size.X, size.Y) * ((blockThickness * 0.01f) * (range / 360f));
+                float step = range / (length / thickness);
+                float max = range * ratio;
 
                 // render marker
-                for (float c = 0, degree = degreeStart + step; degree < degreeEnd && c < max; degree += step, c += step)
+                for (float c = 0, degree = degreeStart + step; degree < degreeEnd; degree += step, c += step)
                 {
-                    float t = (degree / 180f) * (float)Math.PI + (degree < 0f ? (float)Math.PI * 2f : 0f);
+                    if (c >= max)
+                        break;
 
-                    float x = -(size.X * 0.5f) * (float)Math.Cos(t);
-                    float y = -(size.Y * 0.5f) * (float)Math.Sin(t);
-                    Vector2 point = new Vector2(x, y);
+                    float t = (degree / 180f) * (float)Math.PI + (degree < 0f ? (float)Math.PI * 2f : 0f);
+                    Vector2 point = new Vector2(
+                        -halfSize.X * (float)Math.Cos(t),
+                        -halfSize.Y * (float)Math.Sin(t));
 
                     // axis vector
                     Vector2 axis;
@@ -440,18 +445,17 @@ namespace IngameScript
                     else// if (degree >= 180f && degree < 360f)
                         axis = new Vector2(1f, 0f);
 
-                    float alpha = Vector2.Dot(Vector2.Normalize(point), axis);
-                    float delta = (float)Math.Acos(alpha);
+                    float delta = (float)Math.Acos(Vector2.Dot(Vector2.Normalize(point), axis));
 
                     Color color;
                     if (lerp)
-                        getGradientColorLerp(degree / count, gradient, out color);
+                        getGradientColorLerp(c / range, gradient, out color);
                     else
-                        getGradientColor(degree / count, gradient, out color);
+                        getGradientColor(c / range, gradient, out color);
 
                     addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
                         (point * 0.5f) + rtPosition,
-                        new Vector2(point.Length(), Math.Max(size.X, size.Y) * blockThickness),
+                        new Vector2(point.Length(), thickness),
                         color, rotation: delta));
                 }
 
