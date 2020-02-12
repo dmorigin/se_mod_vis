@@ -235,64 +235,16 @@ namespace IngameScript
                 }
 
 
-                public bool asBoolean(int index, bool defaultValue = true)
-                {
-                    return Configuration.asBoolean(this[index], defaultValue);
-                }
-
-
-                public int asInteger(int index, int defaultValue = 0)
-                {
-                    return Configuration.asInteger(this[index], defaultValue);
-                }
-
-
-                public float asFloat(int index, float defaultValue = 0f)
-                {
-                    return Configuration.asFloat(this[index], defaultValue);
-                }
-
-
-                public Color asColor(int index, Color defaultValue = new Color())
-                {
-                    return Configuration.asColor(this[index], defaultValue);
-                }
-
-
-                public Vector2 asVector(int index, Vector2 defaultValue = new Vector2())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
-
-
-                public Vector3 asVector(int index, Vector3 defaultValue = new Vector3())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
-
-
-                public Vector4 asVector(int index, Vector4 defaultValue = new Vector4())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
-
-
-                public Vector2I asVector(int index, Vector2I defaultValue = new Vector2I())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
-
-
-                public Vector3I asVector(int index, Vector3I defaultValue = new Vector3I())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
-
-
-                public Vector4I asVector(int index, Vector4I defaultValue = new Vector4I())
-                {
-                    return Configuration.asVector(this[index], defaultValue);
-                }
+                public bool asBoolean(int index, bool defaultValue = true) => Configuration.asBoolean(this[index], defaultValue);
+                public int asInteger(int index, int defaultValue = 0) => Configuration.asInteger(this[index], defaultValue);
+                public float asFloat(int index, float defaultValue = 0f) => Configuration.asFloat(this[index], defaultValue);
+                public Color asColor(int index, Color defaultValue = new Color()) => Configuration.asColor(this[index], defaultValue);
+                public Vector2 asVector(int index, Vector2 defaultValue = new Vector2()) => Configuration.asVector(this[index], defaultValue);
+                public Vector3 asVector(int index, Vector3 defaultValue = new Vector3()) => Configuration.asVector(this[index], defaultValue);
+                public Vector4 asVector(int index, Vector4 defaultValue = new Vector4()) => Configuration.asVector(this[index], defaultValue);
+                public Vector2I asVector(int index, Vector2I defaultValue = new Vector2I()) => Configuration.asVector(this[index], defaultValue);
+                public Vector3I asVector(int index, Vector3I defaultValue = new Vector3I()) => Configuration.asVector(this[index], defaultValue);
+                public Vector4I asVector(int index, Vector4I defaultValue = new Vector4I()) => Configuration.asVector(this[index], defaultValue);
             }
 
 

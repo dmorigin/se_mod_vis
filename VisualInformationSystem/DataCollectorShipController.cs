@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorShipController : DataCollector<IMyShipController>
         {
-            public DataCollectorShipController(Configuration.Options options)
-                : base("shipcontroller", "", options)
+            public DataCollectorShipController(Configuration.Options options, string connector)
+                : base("shipcontroller", "", options, connector)
             {
             }
 

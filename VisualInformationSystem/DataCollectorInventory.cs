@@ -23,14 +23,19 @@ namespace IngameScript
     {
         public class DataCollectorInventory : DataCollector<IMyTerminalBlock>
         {
-            public DataCollectorInventory(Configuration.Options options)
-                : base("inventory", "", options)
+            public DataCollectorInventory(Configuration.Options options, string connector)
+                : base("inventory", "", options, connector)
             {
+                AcceptBlock = (block) =>
+                {
+                    if (block.HasInventory)
+                        constructBlocks_.Add(block);
+                };
             }
 
             #region Construction Part
             int constructStage_ = 0;
-            List<IMyTerminalBlock> construtBlocks_ = new List<IMyTerminalBlock>();
+            List<IMyTerminalBlock> constructBlocks_ = new List<IMyTerminalBlock>();
             int constructIndex_ = 0;
 
             void addInventoryBlock(IMyTerminalBlock block)
@@ -67,64 +72,50 @@ namespace IngameScript
             {
                 if (constructStage_ == 0)
                 {
-                    BlockName = Options[0];
-                    IsGroup = Options.asBoolean(1, false);
+                    if (ConnectorName != "" && Connector == null)
+                        log(Console.LogType.Error, $"Connector \"{ConnectorName}\" not found");
 
-                    // process item type
-                    if (Options.Count > 2)
+                    if (ReferenceGrid != null)
                     {
-                        for (int it = 2; it < Options.Count; ++it)
-                        {
-                            string itemTypeName = Options[it];
-                            int amount = 0;
+                        if (BlockName != "")
+                            getBlocks<IMyTerminalBlock>(BlockName, IsGroup, AcceptBlock, TypeID);
+                        else if (!getBlocks<IMyTerminalBlock>(AcceptBlock, TypeID))
+                            return false;
 
-                            if (int.TryParse(itemTypeName, out amount))
-                            {
-                                if (itemTypes_.Count > 0)
-                                    itemTypes_[itemTypes_.Count - 1].amount = amount;
-                                else
-                                    defaultMaxAmountItems_ = amount;
-                            }
-                            else
-                            {
-                                VISItemType itemType;
-                                if (!Default.ItemTypeMap.TryGetValue(itemTypeName.ToLower(), out itemType))
-                                    itemType = itemTypeName;
-
-                                if (!itemType)
-                                {
-                                    log(Console.LogType.Error, $"Invalid item type:{itemTypeName}");
-                                    return false;
-                                }
-
-                                long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key == itemType).Value;
-                                itemTypes_.Add(new ItemType(itemType, defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_));
-                            }
-                        }
+                        constructStage_ = 1;
                     }
-
-                    constructStage_ = 1;
+                    else
+                        Constructed = true;
                 }
                 else if (constructStage_ == 1)
                 {
-                    if (BlockName != "")
+                    // process item type
+                    for (int it = ConnectorName != "" ? 3 : 2; it < Options.Count; ++it)
                     {
-                        getBlocks<IMyTerminalBlock>(BlockName, IsGroup, (block) =>
+                        string itemTypeName = Options[it];
+                        int amount = 0;
+
+                        if (int.TryParse(itemTypeName, out amount))
                         {
-                            if (block.HasInventory)
-                                construtBlocks_.Add(block);
-                        }, TypeID);
-                    }
-                    else
-                    {
-                        if (!getBlocks<IMyTerminalBlock>((block) =>
+                            if (itemTypes_.Count > 0)
+                                itemTypes_[itemTypes_.Count - 1].amount = amount;
+                            else
+                                defaultMaxAmountItems_ = amount;
+                        }
+                        else
                         {
-                            if (block.HasInventory)
-                                construtBlocks_.Add(block);
-                        }, TypeID))
-                        {
-                            log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
-                            return false;
+                            VISItemType itemType;
+                            if (!Default.ItemTypeMap.TryGetValue(itemTypeName.ToLower(), out itemType))
+                                itemType = itemTypeName;
+
+                            if (!itemType)
+                            {
+                                log(Console.LogType.Error, $"Invalid item type:{itemTypeName}");
+                                return false;
+                            }
+
+                            long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key == itemType).Value;
+                            itemTypes_.Add(new ItemType(itemType, defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_));
                         }
                     }
 
@@ -132,17 +123,17 @@ namespace IngameScript
                 }
                 else if (constructStage_ == 2)
                 {
-                    for (; constructIndex_ < construtBlocks_.Count && 
+                    for (; constructIndex_ < constructBlocks_.Count && 
                         App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
                         constructIndex_++)
-                        addInventoryBlock(construtBlocks_[constructIndex_]);
+                        addInventoryBlock(constructBlocks_[constructIndex_]);
 
-                    if (constructIndex_ >= construtBlocks_.Count)
+                    if (constructIndex_ >= constructBlocks_.Count)
                         constructStage_ = 3;
                 }
                 else if (constructStage_ == 3)
                 {
-                    construtBlocks_.Clear();
+                    constructBlocks_.Clear();
                     if (inventories_.Count == 0)
                         log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
 
@@ -169,7 +160,7 @@ namespace IngameScript
                 inventories_.Clear();
                 constructStage_ = 0;
                 constructIndex_ = 0;
-                construtBlocks_.Clear();
+                constructBlocks_.Clear();
                 return base.reconstruct();
             }
             #endregion // Construction Part

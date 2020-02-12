@@ -43,75 +43,75 @@ namespace IngameScript
                 protected set;
             }
 
-            public IDataCollector getDataCollector(string name, Configuration.Options options)
+            public IDataCollector getDataCollector(string name, Configuration.Options options, string connector = "")
             {
                 Requested++;
-                IDataCollector collector = dataCollectors_.Find(x => x.isSameCollector(name, options));
+                IDataCollector collector = dataCollectors_.Find(x => x.isSameCollector(name, options, connector));
                 if (collector != null)
                     return collector;
 
-                return createDataCollector(name, options);
+                return createDataCollector(name, options, connector);
             }
 
 
-            IDataCollector createDataCollector(string name, Configuration.Options options)
+            IDataCollector createDataCollector(string name, Configuration.Options options, string connector)
             {
                 IDataCollector dataCollector = null;
                 switch (name)
                 {
                     case "hydrogen":
-                        dataCollector = new DataCollectorGasTank("hydrogentank", "Hydrogen Tank", options);
+                        dataCollector = new DataCollectorGasTank("hydrogentank", "Hydrogen Tank", options, connector);
                         break;
                     case "oxygen":
-                        dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen Tank", options);
+                        dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen Tank", options, connector);
                         break;
                     case "inventory":
-                        dataCollector = new DataCollectorInventory(options);
+                        dataCollector = new DataCollectorInventory(options, connector);
                         break;
                     case "battery":
-                        dataCollector = new DataCollectorBattery(options);
+                        dataCollector = new DataCollectorBattery(options, connector);
                         break;
                     case "solar":
-                        dataCollector = new DataCollectorPowerProducer<IMySolarPanel>("solar", "", options);
+                        dataCollector = new DataCollectorPowerProducer<IMySolarPanel>("solar", "", options, connector);
                         break;
                     case "windturbine":
-                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("windturbine", "MyObjectBuilder_WindTurbine", options);
+                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("windturbine", "MyObjectBuilder_WindTurbine", options, connector);
                         break;
                     case "reactor":
-                        dataCollector = new DataCollectorReactor(options);
+                        dataCollector = new DataCollectorReactor(options, connector);
                         break;
                     case "generator":
-                        dataCollector = new DataCollectorGenerator(options);
+                        dataCollector = new DataCollectorGenerator(options, connector);
                         break;
                     case "powerproducer":
-                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("powerproducer", "", options);
+                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("powerproducer", "", options, connector);
                         break;
                     case "airvent":
-                        dataCollector = new DataCollectorAirVent(options);
+                        dataCollector = new DataCollectorAirVent(options, connector);
                         break;
                     case "jumpdrive":
-                        dataCollector = new DataCollectorJumpDrive(options);
+                        dataCollector = new DataCollectorJumpDrive(options, connector);
                         break;
                     case "landinggear":
-                        dataCollector = new DataCollectorLandingGear(options);
+                        dataCollector = new DataCollectorLandingGear(options, connector);
                         break;
                     case "connector":
-                        dataCollector = new DataCollectorConnector(options);
+                        dataCollector = new DataCollectorConnector(options, connector);
                         break;
                     case "shipcontroller":
-                        dataCollector = new DataCollectorShipController(options);
+                        dataCollector = new DataCollectorShipController(options, connector);
                         break;
                     case "production":
-                        dataCollector = new DataCollectorProduction<IMyProductionBlock>("production", "", Unit.None, options);
+                        dataCollector = new DataCollectorProduction<IMyProductionBlock>("production", "", Unit.None, options, connector);
                         break;
                     case "refinery":
-                        dataCollector = new DataCollectorProduction<IMyRefinery>("refinery", "", Unit.Gram, options);
+                        dataCollector = new DataCollectorProduction<IMyRefinery>("refinery", "", Unit.Gram, options, connector);
                         break;
                     case "assembler":
-                        dataCollector = new DataCollectorProduction<IMyAssembler>("assembler", "", Unit.None, options);
+                        dataCollector = new DataCollectorProduction<IMyAssembler>("assembler", "", Unit.None, options, connector);
                         break;
                     case "piston":
-                        dataCollector = new DataCollectorPiston(options);
+                        dataCollector = new DataCollectorPiston(options, connector);
                         break;
                     /*case "onoff":
                         dataCollector = new DataCollector<IMyTerminalBlock>("onoff", "", options);

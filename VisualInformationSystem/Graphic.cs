@@ -33,7 +33,6 @@ namespace IngameScript
 
                 // defaults
                 MaxDCUpdateInterval = Default.DCRefresh;
-                ZPosition = Default.ZPosition;
                 Position = Default.Position;
                 PositionType = Default.PositionType;
                 Size = Default.Size;
@@ -62,24 +61,17 @@ namespace IngameScript
                 {
                     graphic_ = graphic;
 
-                    add("zposition", configZPosition);
                     add("position", configPosition);
                     add("size", configSize);
                     add("color", configColor);
                     add("gradient", configGradient);
                     add("check", configCheck);
+                    add("checkremote", configCheckRemote);
                     add("dcrefresh", configDCRefresh);
                     add("visibility", configVisibility);
                 }
 
                 Graphic graphic_ = null;
-
-                protected virtual bool configZPosition(string key, string value, Configuration.Options options)
-                {
-                    graphic_.ZPosition = Configuration.asInteger(value, Default.ZPosition);
-                    graphic_.log(Console.LogType.Error, "The z position configuration isn't fully implemented yet");
-                    return false;
-                }
 
                 protected virtual bool configPosition(string key, string value, Configuration.Options options)
                 {
@@ -134,6 +126,26 @@ namespace IngameScript
                     if (graphic_.supportCheck(name))
                     {
                         IDataCollector dataCollector = graphic_.CollectorManager.getDataCollector(name, options);
+                        if (dataCollector != null)
+                        {
+                            graphic_.DataCollector = dataCollector;
+                            graphic_.DataCollector.MaxUpdateInterval = graphic_.MaxDCUpdateInterval;
+                            graphic_.DataAccessor = dataCollector.getDataAccessor(graphic_.DataAccessorName);
+                            return true;
+                        }
+                    }
+                    else
+                        graphic_.log(Console.LogType.Error, $"Check type {value} isn't supported");
+
+                    return false;
+                }
+
+                bool configCheckRemote(string key, string value, Configuration.Options options)
+                {
+                    string name = value.ToLower();
+                    if (graphic_.supportCheck(name))
+                    {
+                        IDataCollector dataCollector = graphic_.CollectorManager.getDataCollector(name, options, options[0]);
                         if (dataCollector != null)
                         {
                             graphic_.DataCollector = dataCollector;
@@ -276,12 +288,6 @@ namespace IngameScript
             }
 
             public TimeSpan MaxDCUpdateInterval
-            {
-                get;
-                protected set;
-            }
-
-            public int ZPosition
             {
                 get;
                 protected set;

@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorConnector : DataCollector<IMyShipConnector>
         {
-            public DataCollectorConnector(Configuration.Options options)
-                : base("connector", "", options)
+            public DataCollectorConnector(Configuration.Options options, string connector)
+                : base("connector", "", options, connector)
             {
             }
 

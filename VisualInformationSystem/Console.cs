@@ -30,20 +30,20 @@ namespace IngameScript
 
             public override bool construct()
             {
-                redirectConsole(App.Me as IMyTextSurfaceProvider);
+                redirectConsole(App.Me as IMyTextSurfaceProvider, 0);
                 Constructed = true;
                 return true;
             }
 
-            public bool redirectConsole(IMyTextSurfaceProvider provider)
+            public bool redirectConsole(IMyTextSurfaceProvider provider, int displayId)
             {
-                if (provider != null && provider.SurfaceCount > 0)
+                if (provider != null && displayId < provider.SurfaceCount && displayId >= 0)
                 {
                     if (renderTarget_ != null)
                         renderTarget_.releaseSurface();
 
-                    renderTarget_ = new RenderTarget(new Vector2I(0, 0));
-                    renderTarget_.setupSurface(provider.GetSurface(0));
+                    renderTarget_ = new RenderTarget(RenderTargetID.fromSurfaceProvider(provider, displayId), new Vector2I(0, 0));
+                    renderTarget_.setupSurface(provider.GetSurface(displayId));
                     renderTarget_.BackgroundColor = Color.Black;
 
                     float lineCount = (renderTarget_.Size.Y / (Default.CharHeight * fontSize_));

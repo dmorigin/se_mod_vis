@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorLandingGear : DataCollector<IMyLandingGear>
         {
-            public DataCollectorLandingGear(Configuration.Options options)
-                : base("landinggear", "", options)
+            public DataCollectorLandingGear(Configuration.Options options, string connector)
+                : base("landinggear", "", options, connector)
             {
             }
 

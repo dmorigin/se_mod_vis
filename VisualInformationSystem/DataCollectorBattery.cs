@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorBattery : DataCollectorPowerProducer<IMyBatteryBlock>
         {
-            public DataCollectorBattery(Configuration.Options options)
-                : base("battery", "", options)
+            public DataCollectorBattery(Configuration.Options options, string connector)
+                : base("battery", "", options, connector)
             {
             }
 

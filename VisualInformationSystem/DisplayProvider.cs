@@ -93,28 +93,19 @@ namespace IngameScript
                         coordinate = options.asVector(1, Default.DisplayCoordinate);
                     }
 
-                    Display display = null;
+                    if (displayId < 0 || displayId >= provider_.surfaceProvider_.SurfaceCount)
+                    {
+                        provider_.log(Console.LogType.Error, $"Invalid display id: {displayId}");
+                        return false;
+                    }
 
-                    // create as group
-                    if (groupId != Default.EmptyDisplayGroupID)
-                    {
-                        display = provider_.Manager.DisplayManager.getDisplayGroup(groupId);
-                        if (display == null)
-                        {
-                            display = provider_.Manager.DisplayManager.createDisplay(groupId);
-                            if (display == null)
-                                return false;
-                        }
-                    }
-                    else
-                    {
-                        display = provider_.Manager.DisplayManager.createDisplay(Default.EmptyDisplayGroupID);
-                        if (display == null)
-                            return false;
-                    }
+                    Display display = Display.createDisplay(groupId);
+                    if (display == null)
+                        return false;
 
                     // create render target to display
-                    if (!display.addRenderTarget(provider_.surfaceProvider_.GetSurface(displayId), coordinate))
+                    RenderTargetID RTID = RenderTargetID.fromSurfaceProvider(provider_.surfaceProvider_, displayId);
+                    if (!display.addRenderTarget(provider_.surfaceProvider_.GetSurface(displayId), RTID, coordinate))
                     {
                         provider_.log(Console.LogType.Error, $"Render target exists: {groupId}:{coordinate}");
                         return false;

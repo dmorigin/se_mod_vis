@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorGasTank : DataCollector<IMyGasTank>
         {
-            public DataCollectorGasTank(string name, string typeId, Configuration.Options options)
-                : base(name, "MyObjectBuilder_OxygenTank", options)
+            public DataCollectorGasTank(string name, string typeId, Configuration.Options options, string connector)
+                : base(name, "MyObjectBuilder_OxygenTank", options, connector)
             {
                 subType_ = typeId;
             }

@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorJumpDrive: DataCollector<IMyJumpDrive>
         {
-            public DataCollectorJumpDrive(Configuration.Options options)
-                : base("jumpdrive", "", options)
+            public DataCollectorJumpDrive(Configuration.Options options, string connector)
+                : base("jumpdrive", "", options, connector)
             {
             }
 

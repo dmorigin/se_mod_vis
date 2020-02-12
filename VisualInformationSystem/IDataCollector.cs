@@ -27,7 +27,7 @@ namespace IngameScript
             void prepareUpdate();
             void finalizeUpdate();
 
-            Job getUpdateJob();
+            void queueJob();
 
             bool UpdateFinished { get; }
             string CollectorTypeName { get; }
@@ -38,7 +38,7 @@ namespace IngameScript
             TimeSpan MaxUpdateInterval { get; set; }
 
             string getText(string data);
-            bool isSameCollector(string name, Configuration.Options options);
+            bool isSameCollector(string name, Configuration.Options options, string connector);
 
             DataAccessor getDataAccessor(string name);
         }

@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorGenerator : DataCollectorPowerProducer<IMyPowerProducer>
         {
-            public DataCollectorGenerator(Configuration.Options options)
-                : base("generator", "MyObjectBuilder_HydrogenEngine", options)
+            public DataCollectorGenerator(Configuration.Options options, string connector)
+                : base("generator", "MyObjectBuilder_HydrogenEngine", options, connector)
             {
             }
 

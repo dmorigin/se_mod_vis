@@ -74,7 +74,7 @@ namespace IngameScript
                     foreach (var graphic in Template.getGraphics())
                     {
                         if (graphic.DataCollector != null)
-                            JobManager.queueJob(graphic.DataCollector.getUpdateJob());
+                            graphic.DataCollector.queueJob();
                     }
 
                     // queue render job
@@ -178,11 +178,11 @@ namespace IngameScript
             List<RenderTarget> renderTargets_ = new List<RenderTarget>();
             RenderTarget reference_ = null;
 
-            public bool addRenderTarget(IMyTextSurface surface, Vector2I coordinate)
+            public bool addRenderTarget(IMyTextSurface surface, RenderTargetID id, Vector2I coordinate)
             {
                 if (getRenderTarget(coordinate) == null && surface != null)
                 {
-                    RenderTarget rt = new RenderTarget(coordinate);
+                    RenderTarget rt = new RenderTarget(id, coordinate);
                     rt.construct();
                     rt.setupSurface(surface);
 
@@ -240,6 +240,33 @@ namespace IngameScript
                 }
             }
             #endregion // Rendering
+
+            #region Management
+            static List<Display> displays_ = new List<Display>();
+            static int genericDisplayGroupId_ = 0;
+
+            public static Display createDisplay(string groupId)
+            {
+                Display display;
+
+                if (groupId == Default.EmptyDisplayGroupID)
+                {
+                    groupId = $"genericDisplayGroup_{++genericDisplayGroupId_}";
+                    display = new Display(groupId);
+                }
+                else if ((display = getDisplayGroup(groupId)) != null)
+                    return display;
+                else
+                    display = new Display(groupId);
+
+                display.log(Console.LogType.Info, $"Create new display: group({groupId})");
+                display.Manager.JobManager.queueJob(display.getConstructionJob());
+                displays_.Add(display);
+                return display;
+            }
+
+            static Display getDisplayGroup(string id) => displays_.Find((display) => display.GroupId == id);
+            #endregion // Management
         }
     }
 }

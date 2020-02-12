@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorPowerProducer<T> : DataCollector<T> where T: class
         {
-            public DataCollectorPowerProducer(string collectorTypeName, string typeId, Configuration.Options options)
-                : base(collectorTypeName, typeId, options)
+            public DataCollectorPowerProducer(string collectorTypeName, string typeId, Configuration.Options options, string connector)
+                : base(collectorTypeName, typeId, options, connector)
             {
             }
 

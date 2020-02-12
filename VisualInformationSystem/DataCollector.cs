@@ -24,7 +24,7 @@ namespace IngameScript
         public abstract class DataCollector<T> : VISObject, IDataCollector where T : class
         {
             static int CollectorIDCounter = 0;
-            public DataCollector(string collectorTypeName, string typeId, Configuration.Options options)
+            public DataCollector(string collectorTypeName, string typeId, Configuration.Options options, string connector)
                 : base($"DC:{collectorTypeName}/{typeId}:{CollectorIDCounter++}")
             {
                 if (options == null)
@@ -34,6 +34,9 @@ namespace IngameScript
 
                 TypeID = typeId;
                 CollectorTypeName = collectorTypeName;
+                ReferenceGrid = App.Me;
+                Connector = null;
+                ConnectorName = connector;
                 Blocks = new List<T>();
                 AcceptBlock = (block) => Blocks.Add(block);
 
@@ -41,27 +44,37 @@ namespace IngameScript
                 ReconstructRetry = Default.ExceptionRetry;
                 nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
 
+                if (connector == "")
+                {
+                    BlockName = Options[0];
+                    IsGroup = Options.asBoolean(1, false);
+                }
+                else
+                {
+                    BlockName = Options[1];
+                    IsGroup = Options.asBoolean(2, false);
+                    Manager.JobManager.registerTimedJob(new WatchConnector(this));
+                }
+
                 UpdateFinished = false;
             }
 
+            #region Construction
             public override bool construct()
             {
-                BlockName = Options[0];
-                IsGroup = Options.asBoolean(1, false);
+                if (ConnectorName != "" && Connector == null)
+                    log(Console.LogType.Error, $"Connector \"{ConnectorName}\" not found");
 
-                if (BlockName != "")
-                    getBlocks<T>(BlockName, IsGroup, AcceptBlock, TypeID);
-                else
+                if (ReferenceGrid != null)
                 {
-                    if (!getBlocks<T>(AcceptBlock, TypeID))
-                    {
-                        log(Console.LogType.Error, $"Failed to find blocks of type {TypeID}");
+                    if (BlockName != "")
+                        getBlocks<T>(BlockName, IsGroup, AcceptBlock, TypeID);
+                    else if (!getBlocks<T>(AcceptBlock, TypeID))
                         return false;
-                    }
                 }
 
-                if (Blocks.Count == 0)
-                    log(Console.LogType.Warning, $"No blocks found for {BlockName}{(IsGroup ? ":group" : "")}");
+                if (Blocks.Count == 0 && ConnectorName == "")
+                    log(Console.LogType.Warning, $"No blocks found [{BlockName}{(IsGroup ? ":group" : "")}]");
                 Constructed = true;
                 return true;
             }
@@ -72,6 +85,39 @@ namespace IngameScript
                 Constructed = false;
                 return true;
             }
+
+            bool NeedReconstruct => (nextReconstruct_ <= Manager.Timer.Ticks) || ReconstructOnConnector;
+
+            protected bool ReconstructOnConnector
+            {
+                get;
+                set;
+            }
+
+            protected IMyTerminalBlock ReferenceGrid
+            {
+                get;
+                set;
+            }
+
+            protected IMyShipConnector Connector
+            {
+                get;
+                set;
+            }
+
+            protected string ConnectorName
+            {
+                get;
+                private set;
+            }
+
+            int ReconstructRetry
+            {
+                get;
+                set;
+            }
+            #endregion // Construction
 
             public virtual string getText(string data)
             {
@@ -109,13 +155,6 @@ namespace IngameScript
                 foreach (IMyTerminalBlock block in Blocks)
                     blocksOn_ += isOn(block) ? 1 : 0;
                 UpdateFinished = true;
-            }
-
-            public virtual Job getUpdateJob()
-            {
-                if (nextUpdate_ <= Manager.Timer.Ticks)
-                    return new UpdateJob(this);
-                return null;
             }
             #endregion // Update System
 
@@ -165,12 +204,6 @@ namespace IngameScript
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan nextReconstruct_ = new TimeSpan(0);
             public TimeSpan MaxUpdateInterval
-            {
-                get;
-                set;
-            }
-
-            int ReconstructRetry
             {
                 get;
                 set;
@@ -274,6 +307,15 @@ namespace IngameScript
             #endregion // Data Accessor
 
             #region Jobs
+            public void queueJob()
+            {
+                if (NeedReconstruct)
+                    Manager.JobManager.queueJob(new ReconstructJob(this));
+
+                if (nextUpdate_ <= Manager.Timer.Ticks)
+                    Manager.JobManager.queueJob(new UpdateJob(this));
+            }
+
             class UpdateJob : Job
             {
                 public UpdateJob(DataCollector<T> dc)
@@ -281,7 +323,7 @@ namespace IngameScript
                     dc_ = dc;
                 }
 
-                DataCollector<T> dc_ = null;
+                DataCollector<T> dc_;
 
                 public override void prepareJob()
                 {
@@ -294,9 +336,6 @@ namespace IngameScript
                     dc_.finalizeUpdate();
                     dc_.nextUpdate_ = dc_.MaxUpdateInterval + Manager.Timer.Ticks;
                     dc_.ReconstructRetry = Default.ExceptionRetry;
-
-                    if (dc_.nextReconstruct_ <= Manager.Timer.Ticks)
-                        JobManager.queueJob(new ReconstructJob(dc_));
                 }
 
                 public override void tick(TimeSpan delta)
@@ -318,7 +357,6 @@ namespace IngameScript
                 }
             }
 
-
             class ReconstructJob : Job
             {
                 public ReconstructJob(DataCollector<T> dc)
@@ -326,7 +364,7 @@ namespace IngameScript
                     dc_ = dc;
                 }
 
-                DataCollector<T> dc_ = null;
+                DataCollector<T> dc_;
 
                 public override void prepareJob()
                 {
@@ -337,26 +375,53 @@ namespace IngameScript
                 public override void finalizeJob()
                 {
                     dc_.nextReconstruct_ = Manager.Timer.Ticks + Default.ReconstructInterval;
+                    dc_.ReconstructOnConnector = false;
                 }
 
                 public override void tick(TimeSpan delta)
                 {
                     if (dc_.construct() == false)
                     {
-                        log(Console.LogType.Error, "Reconstruction job failed");
+                        log(Console.LogType.Error, $"Reconstruction failed[{dc_.Name}]");
                         Manager.switchState(VISManager.State.Error);
                     }
 
                     JobFinished = dc_.Constructed;
                 }
             }
+
+
+            class WatchConnector : JobTimed
+            {
+                DataCollector<T> dc_;
+                bool connected_ = false;
+
+                public WatchConnector(DataCollector<T> dc)
+                {
+                    dc_ = dc;
+                    Interval = Default.WatchConnectorInterval;
+                }
+
+                public override void tick(TimeSpan delta)
+                {
+                    dc_.Connector = App.GridTerminalSystem.GetBlockWithName(dc_.ConnectorName) as IMyShipConnector;
+                    if (dc_.Connector != null && dc_.Constructed)
+                    {
+                        bool connected = dc_.Connector.Status == MyShipConnectorStatus.Connected;
+                        if (connected != connected_)
+                            dc_.ReconstructOnConnector = true;
+                        connected_ = connected;
+                        dc_.ReferenceGrid = connected ? dc_.Connector.OtherConnector : null;
+                    }
+                    else
+                        dc_.ReferenceGrid = null;
+                }
+            }
             #endregion // Jobs
 
             #region Helper
-            public virtual bool isSameCollector(string name, Configuration.Options options)
-            {
-                return CollectorTypeName == name && Options.equals(options);
-            }
+            public virtual bool isSameCollector(string name, Configuration.Options options, string connector) => 
+                CollectorTypeName == name && Options.equals(options) && ConnectorName == connector;
 
             protected delegate void GetBlockDelegate<BlockType>(BlockType block) where BlockType: class;
 
@@ -370,13 +435,14 @@ namespace IngameScript
                     BlockType type = block as BlockType;
                     if (type != null)
                     {
-                        if (!block.IsSameConstructAs(App.Me))
+                        if (!block.IsSameConstructAs(ReferenceGrid))
                             return false;
 
                         if (typeId == "" || (typeId != "" && block.BlockDefinition.TypeIdString == typeId))
                             callback(type);
                     }
 
+                    //log(Console.LogType.Error, $"Failed to find blocks of type {typeId}");
                     return false;
                 });
 
@@ -392,7 +458,8 @@ namespace IngameScript
                     BlockType type = terminalBlock as BlockType;
                     if (type != null)
                     {
-                        if (typeId == "" || (typeId != "" && terminalBlock.BlockDefinition.TypeIdString == typeId))
+                        if ((typeId == "" || (typeId != "" && terminalBlock.BlockDefinition.TypeIdString == typeId)) &&
+                            terminalBlock.IsSameConstructAs(ReferenceGrid))
                         {
                             callback(type);
                             return true;
@@ -401,7 +468,7 @@ namespace IngameScript
                             log(Console.LogType.Error, $"Block isn't of type {typeId}");
                     }
                     else if (!ignoreTypeErr)
-                        log(Console.LogType.Error, $"Block {name} has type missmatch");
+                        log(Console.LogType.Error, $"Block \"{name}\" has type missmatch");
 
                     return false;
                 };
@@ -422,12 +489,9 @@ namespace IngameScript
                 {
                     IMyTerminalBlock block = App.GridTerminalSystem.GetBlockWithName(name);
                     if (block == null)
-                    {
-                        log(Console.LogType.Error, $"Block of name {name} dosen't exists");
-                        return false;
-                    }
-
-                    return check(block, false);
+                        log(Console.LogType.Error, $"Block \"{name}\" dosen't exists");
+                    else
+                        return check(block, false);
                 }
 
                 return false;

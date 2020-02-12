@@ -54,7 +54,6 @@ namespace IngameScript
 
                 foreach (var gfx in template.graphics_)
                     graphics_.Add(gfx.clone());
-                graphics_.OrderBy(x => x.ZPosition);
             }
 
             #region Properties
@@ -243,7 +242,6 @@ namespace IngameScript
                         {
                             setSubHandler(graphic.getConfigHandler());
                             tpl_.graphics_.Add(graphic);
-                            tpl_.graphics_.OrderBy(x => x.ZPosition);
                             return true;
                         }
                         else

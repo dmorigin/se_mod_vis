@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorPiston : DataCollector<IMyPistonBase>
         {
-            public DataCollectorPiston(Configuration.Options options)
-                : base("piston", "", options)
+            public DataCollectorPiston(Configuration.Options options, string connector)
+                : base("piston", "", options, connector)
             {
             }
 

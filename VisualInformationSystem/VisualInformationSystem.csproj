@@ -85,6 +85,7 @@
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="RenderTarget.cs" />
+    <Compile Include="RenderTargetID.cs" />
     <Compile Include="RuntimeObject.cs" />
     <Compile Include="Statistics.cs" />
     <Compile Include="Template.cs" />

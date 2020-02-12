@@ -25,6 +25,12 @@ namespace IngameScript
         {
             IMyTextSurface surface_ = null;
 
+            public RenderTargetID ID
+            {
+                get;
+                private set;
+            }
+
             public Vector2 Position
             {
                 get;
@@ -55,15 +61,15 @@ namespace IngameScript
                 set { surface_.ScriptBackgroundColor = value; }
             }
 
-            public RenderTarget(Vector2I coordinate)
+            public RenderTarget(RenderTargetID id, Vector2I coordinate)
             {
                 Coordinate = coordinate;
+                ID = id;
             }
 
             public void setupSurface(IMyTextSurface surface)
             {
                 surface_ = surface;
-                //surface_.WriteText("");
                 surface_.Script = "";
                 surface_.ContentType = ContentType.SCRIPT;
                 surface_.Font = Default.Font;
@@ -73,8 +79,17 @@ namespace IngameScript
                 surface_.BackgroundColor = Color.Black;
                 surface_.ScriptBackgroundColor = Color.Black;
 
-                Size = surface_.SurfaceSize;
-                Position = (surface_.TextureSize - Size) * 0.5f;
+                Vector2 size;
+                if (!RenderTargetID.tryGetFixed(ID, out size))
+                {
+                    Size = surface_.SurfaceSize;
+                    Position = (surface_.TextureSize - Size) * 0.5f;
+                }
+                else
+                {
+                    Size = size;
+                    Position = new Vector2(0f, 0f);
+                }
 
                 DisplayOffset = -(Size * Coordinate) + Position;
 

@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorAirVent : DataCollector<IMyAirVent>
         {
-            public DataCollectorAirVent(Configuration.Options options)
-                : base("airvent", "", options)
+            public DataCollectorAirVent(Configuration.Options options, string connector)
+                : base("airvent", "", options, connector)
             {
             }
 

@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorProduction<BlockType> : DataCollector<BlockType> where BlockType: class
         {
-            public DataCollectorProduction(string collectorTypeName, string typeId, Unit unit, Configuration.Options options)
-                : base(collectorTypeName, typeId, options)
+            public DataCollectorProduction(string collectorTypeName, string typeId, Unit unit, Configuration.Options options, string connector)
+                : base(collectorTypeName, typeId, options, connector)
             {
                 unit_ = unit;
             }

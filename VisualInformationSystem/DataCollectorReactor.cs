@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorReactor : DataCollectorPowerProducer<IMyReactor>
         {
-            public DataCollectorReactor(Configuration.Options options)
-                : base("reactor", "", options)
+            public DataCollectorReactor(Configuration.Options options, string connector)
+                : base("reactor", "", options, connector)
             {
             }
 

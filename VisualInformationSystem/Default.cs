@@ -54,16 +54,32 @@ namespace IngameScript
             public static Vector2I DisplayCoordinate = new Vector2I(0, 0);
             public static int DisplayID = 0;
             public static string EmptyDisplayGroupID = "";
+            public static string MyObjectBuilder = "MyObjectBuilder";
+            public static string TextPanel = $"{MyObjectBuilder}_TextPanel";
+            public static string LargeBlockCorner = $"{TextPanel}/LargeBlockCorner_LCD";
+            public static string SmallBlockCorner = $"{TextPanel}/SmallBlockCorner_LCD";
+
+            public static Dictionary<RenderTargetID, Vector2> RenderTargetFixSize = new Dictionary<RenderTargetID, Vector2>()
+            {
+                { $"{LargeBlockCorner}_1:0", new Vector2(512, 77) },
+                { $"{LargeBlockCorner}_2:0", new Vector2(512, 77) },
+                { $"{LargeBlockCorner}_Flat_1:0", new Vector2(512, 88) },
+                { $"{LargeBlockCorner}_Flat_2:0", new Vector2(512, 88) },
+                { $"{SmallBlockCorner}_1:0", new Vector2(512, 135) },
+                { $"{SmallBlockCorner}_2:0", new Vector2(512, 135) },
+                { $"{SmallBlockCorner}_Flat_1:0", new Vector2(512, 159) },
+                { $"{SmallBlockCorner}_Flat_2:0", new Vector2(512, 159) }
+            };
 
             public static float RefreshInSec = 5.0f;
             public static TimeSpan Refresh = TimeSpan.FromSeconds(RefreshInSec);
             public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(30.0);
+            public static TimeSpan WatchConnectorInterval = TimeSpan.FromSeconds(1.0);
             public static float DCRefreshInSec = 5.0f;
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 7000;
             public static int ExceptionRetry = 3;
 
-            public static string MyObjectBuilder = "MyObjectBuilder";
             public static long MaxAmountItems = 1000;
             public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()
             {

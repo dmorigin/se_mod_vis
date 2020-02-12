@@ -33,7 +33,6 @@ namespace IngameScript
                 CollectorManager = new DataCollectorManager();
                 JobManager = new JobManager();
                 TemplateManager = new TemplateManager();
-                DisplayManager = new DisplayManager();
             }
 
 
@@ -53,15 +52,8 @@ namespace IngameScript
                 // construct job manager
                 if (JobManager.construct())
                 {
-                    // construct display manager
-                    if (DisplayManager.construct())
-                    {
-                        log(Console.LogType.Info, "VIS Manager constructed");
-                        Timer.start();
-                        return true;
-                    }
-                    else
-                        log(Console.LogType.Error, "Failed to construct display manager");
+                    Timer.start();
+                    return true;
                 }
                 else
                     log(Console.LogType.Error, "Failed to construct job manager");
@@ -76,12 +68,6 @@ namespace IngameScript
             }
 
             public TemplateManager TemplateManager
-            {
-                get;
-                private set;
-            }
-
-            public DisplayManager DisplayManager
             {
                 get;
                 private set;
@@ -127,6 +113,7 @@ namespace IngameScript
                     add("displaytag", configDisplayNameTag);
                     add("template", configTemplate);
                     add("console", configConsole);
+                    add("rtfixsize", configRTFixSize);
                 }
 
                 public string vDisplayNameTag_ = Default.DisplayNameTag;
@@ -152,10 +139,29 @@ namespace IngameScript
                     if (block != null)
                     {
                         manager_.log(Console.LogType.Info, $"Console redirected to {block.CustomName}");
-                        return manager_.Console.redirectConsole(block as IMyTextSurfaceProvider);
+                        return manager_.Console.redirectConsole(block as IMyTextSurfaceProvider, options.asInteger(0, 0));
                     }
 
                     return false;
+                }
+
+                bool configRTFixSize(string key, string value, Configuration.Options options)
+                {
+                    int index = options.asInteger(0, 0);
+                    RenderTargetID id = $"{value}:{index}";
+
+                    if (id == RenderTargetID.Invalid)
+                    {
+                        manager_.log(Console.LogType.Error, $"Invalid block id \"{value}\"");
+                        return false;
+                    }
+
+                    if (Default.RenderTargetFixSize.ToList().Exists((pair) => pair.Key.Equals(id)))
+                        Default.RenderTargetFixSize[id] = options.asVector(1, new Vector2());
+                    else
+                        Default.RenderTargetFixSize.Add(id, options.asVector(1, new Vector2()));
+
+                    return true;
                 }
             }
             #endregion // Configuration
