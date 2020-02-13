@@ -135,7 +135,7 @@ namespace IngameScript
                 {
                     constructBlocks_.Clear();
                     if (inventories_.Count == 0)
-                        log(Console.LogType.Warning, $"No inventory blocks found:{BlockName}/{TypeID}");
+                        log(Console.LogType.Warning, $"No blocks found {Name}[{BlockName}{(IsGroup ? ":group" : "")}]");
 
                     if (itemTypes_.Count > 0)
                         foreach (var it in itemTypes_)

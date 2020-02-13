@@ -249,7 +249,7 @@ namespace IngameScript
             string getRightText(DataAccessor.ListContainer entry)
             {
                 if (replace_.Count == 0)
-                    return textStyle_ == TextStyle.MinValue ? $"{entry.value.pack()}" : $"{entry.value.pack()}/{entry.max.pack()}";
+                    return textStyle_ == TextStyle.CurrentValue ? $"{entry.value.pack()}" : $"{entry.value.pack()}/{entry.max.pack()}";
 
                 foreach (var pair in replace_)
                 {
@@ -282,7 +282,7 @@ namespace IngameScript
             {
                 Normal,
                 OnlyName,
-                MinValue,
+                CurrentValue,
             };
             bool textShow_ = true;
             TextStyle textStyle_ = TextStyle.Normal;
@@ -301,7 +301,8 @@ namespace IngameScript
                             textStyle_ = TextStyle.OnlyName;
                             break;
                         case "minvalue":
-                            textStyle_ = TextStyle.MinValue;
+                        case "currentvalue":
+                            textStyle_ = TextStyle.CurrentValue;
                             break;
                         default:
                             return false;

@@ -74,7 +74,7 @@ namespace IngameScript
                 }
 
                 if (Blocks.Count == 0 && ConnectorName == "")
-                    log(Console.LogType.Warning, $"No blocks found [{BlockName}{(IsGroup ? ":group" : "")}]");
+                    log(Console.LogType.Warning, $"No blocks found {Name}[{BlockName}{(IsGroup ? ":group" : "")}]");
                 Constructed = true;
                 return true;
             }
