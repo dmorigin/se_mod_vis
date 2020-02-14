@@ -59,16 +59,16 @@ namespace IngameScript
             public static string LargeBlockCorner = $"{TextPanel}/LargeBlockCorner_LCD";
             public static string SmallBlockCorner = $"{TextPanel}/SmallBlockCorner_LCD";
 
-            public static Dictionary<RenderTargetID, Vector2> RenderTargetFixSize = new Dictionary<RenderTargetID, Vector2>()
+            public static Dictionary<RenderTargetID, RectangleF> RenderTargetFixSize = new Dictionary<RenderTargetID, RectangleF>()
             {
-                { $"{LargeBlockCorner}_1:0", new Vector2(512, 77) },
-                { $"{LargeBlockCorner}_2:0", new Vector2(512, 77) },
-                { $"{LargeBlockCorner}_Flat_1:0", new Vector2(512, 88) },
-                { $"{LargeBlockCorner}_Flat_2:0", new Vector2(512, 88) },
-                { $"{SmallBlockCorner}_1:0", new Vector2(512, 135) },
-                { $"{SmallBlockCorner}_2:0", new Vector2(512, 135) },
-                { $"{SmallBlockCorner}_Flat_1:0", new Vector2(512, 159) },
-                { $"{SmallBlockCorner}_Flat_2:0", new Vector2(512, 159) }
+                { $"{LargeBlockCorner}_1:0", new RectangleF(new Vector2(), new Vector2(512, 77)) },
+                { $"{LargeBlockCorner}_2:0", new RectangleF(new Vector2(), new Vector2(512, 77)) },
+                { $"{LargeBlockCorner}_Flat_1:0", new RectangleF(new Vector2(), new Vector2(512, 88)) },
+                { $"{LargeBlockCorner}_Flat_2:0", new RectangleF(new Vector2(), new Vector2(512, 88)) },
+                { $"{SmallBlockCorner}_1:0", new RectangleF(new Vector2(), new Vector2(512, 135)) },
+                { $"{SmallBlockCorner}_2:0", new RectangleF(new Vector2(), new Vector2(512, 135)) },
+                { $"{SmallBlockCorner}_Flat_1:0", new RectangleF(new Vector2(), new Vector2(512, 159)) },
+                { $"{SmallBlockCorner}_Flat_2:0", new RectangleF(new Vector2(), new Vector2(512, 159)) }
             };
 
             public static float RefreshInSec = 5.0f;

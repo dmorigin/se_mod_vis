@@ -58,7 +58,11 @@ namespace IngameScript
             public Color BackgroundColor
             {
                 get { return surface_.ScriptBackgroundColor; }
-                set { surface_.ScriptBackgroundColor = value; }
+                set
+                {
+                    surface_.ScriptBackgroundColor = value;
+                    surface_.BackgroundColor = value;
+                }
             }
 
             public RenderTarget(RenderTargetID id, Vector2I coordinate)
@@ -76,19 +80,20 @@ namespace IngameScript
                 surface_.FontSize = 1f;
                 surface_.TextPadding = 0f;
 
-                surface_.BackgroundColor = Color.Black;
-                surface_.ScriptBackgroundColor = Color.Black;
+                BackgroundColor = Color.Black;
+                //surface_.BackgroundColor = Color.Black;
+                //surface_.ScriptBackgroundColor = Color.Black;
 
-                Vector2 size;
-                if (!RenderTargetID.tryGetFixed(ID, out size))
+                RectangleF rect;
+                if (!RenderTargetID.tryGetFixed(ID, out rect))
                 {
                     Size = surface_.SurfaceSize;
                     Position = (surface_.TextureSize - Size) * 0.5f;
                 }
                 else
                 {
-                    Size = size;
-                    Position = new Vector2(0f, 0f);
+                    Size = rect.Size;
+                    Position = rect.Position;
                 }
 
                 DisplayOffset = -(Size * Coordinate) + Position;

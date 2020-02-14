@@ -156,10 +156,11 @@ namespace IngameScript
                         return false;
                     }
 
+                    RectangleF rect = new RectangleF(options.asVector(2, new Vector2()), options.asVector(1, new Vector2()));
                     if (Default.RenderTargetFixSize.ToList().Exists((pair) => pair.Key.Equals(id)))
-                        Default.RenderTargetFixSize[id] = options.asVector(1, new Vector2());
+                        Default.RenderTargetFixSize[id] = rect;
                     else
-                        Default.RenderTargetFixSize.Add(id, options.asVector(1, new Vector2()));
+                        Default.RenderTargetFixSize.Add(id, rect);
 
                     return true;
                 }

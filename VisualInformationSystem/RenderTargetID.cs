@@ -57,17 +57,17 @@ namespace IngameScript
                 return Invalid;
             }
 
-            public static bool tryGetFixed(RenderTargetID id, out Vector2 size)
+            public static bool tryGetFixed(RenderTargetID id, out RectangleF rect)
             {
                 var list = Default.RenderTargetFixSize.ToList();
                 int index = list.FindIndex((pair) => pair.Key.Equals(id));
                 if (index >= 0)
                 {
-                    size = list[index].Value;
+                    rect = list[index].Value;
                     return true;
                 }
 
-                size = new Vector2();
+                rect = new RectangleF();
                 return false;
             }
 

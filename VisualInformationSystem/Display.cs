@@ -230,10 +230,14 @@ namespace IngameScript
 
                 foreach (var rt in renderTargets_)
                 {
-                    rt.BackgroundColor = Template.BackgroundColor;
+                    //rt.BackgroundColor = Template.BackgroundColor;
 
                     using (var frame = rt.getRenderFrame())
                     {
+                        // render background frame
+                        frame.Add(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                            rt.Position + (rt.Size * 0.5f), rt.Size, Template.BackgroundColor));
+
                         foreach (var graphic in Template.getGraphics())
                             graphic.getSprite(this, rt, sprite => frame.Add(sprite));
                     }
