@@ -114,6 +114,8 @@ namespace IngameScript
                     add("template", configTemplate);
                     add("console", configConsole);
                     add("rtfixsize", configRTFixSize);
+                    add("maxspeed", configMaxSpeed);
+                    add("itemamount", configMaxAmountItem);
                 }
 
                 public string vDisplayNameTag_ = Default.DisplayNameTag;
@@ -163,6 +165,39 @@ namespace IngameScript
                         Default.RenderTargetFixSize.Add(id, rect);
 
                     return true;
+                }
+
+                bool configMaxSpeed(string key, string value, Configuration.Options options)
+                {
+                    Default.MaxShipSpeed = Configuration.asFloat(value, Default.MaxShipSpeed);
+                    return true;
+                }
+
+                bool configMaxAmountItem(string key, string value, Configuration.Options options)
+                {
+                    long amount = options.asInteger(0, (int)Default.MaxAmountItems);
+                    if (amount <= 0)
+                        return false;
+
+                    VISItemType item = $"{Default.MyObjectBuilder}_{value}";
+                    if (item.Valid)
+                    {
+                        var list = Default.AmountItems.ToList();
+                        var index = list.FindIndex(pair => pair.Key == item);
+                        if (index >= 0)
+                            list.RemoveAt(index);
+
+                        if (!item.Group)
+                            list.Insert(0, new KeyValuePair<VISItemType, long>(item, amount));
+                        else
+                            list.Add(new KeyValuePair<VISItemType, long>(item, amount));
+
+                        Default.AmountItems = list.ToDictionary((ik) => ik.Key, (iv) => iv.Value);
+                        return true;
+                    }
+
+                    manager_.log(Console.LogType.Error, $"Invalid item type \"{value}\"");
+                    return false;
                 }
             }
             #endregion // Configuration

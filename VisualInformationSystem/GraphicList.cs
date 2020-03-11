@@ -26,8 +26,8 @@ namespace IngameScript
             public GraphicList(Template template, Configuration.Options options)
                 : base(template, options)
             {
-                VisibleOperator = greater;
-                VisibleThreshold = 0.0;
+                VisibleOperatorA = greater;
+                VisibleThresholdA = 0.0;
             }
 
             protected override bool supportCheck(string name)
@@ -46,8 +46,11 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
-                gfx.VisibleThreshold = VisibleThreshold;
-                gfx.VisibleOperator = VisibleOperator;
+                gfx.VisibleThresholdA = VisibleThresholdA;
+                gfx.VisibleOperatorA = VisibleOperatorA;
+                gfx.VisibleThresholdB = VisibleThresholdB;
+                gfx.VisibleOperatorB = VisibleOperatorB;
+                gfx.VisibleCondition = VisibleCondition;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
@@ -171,7 +174,8 @@ namespace IngameScript
                 renderData_.textRightPositionX = position.X + (size.X * 0.5f);
 
                 // filter list
-                DataAccessor.list(out renderData_.container, (item) => VisibleOperator(item.indicator, VisibleThreshold));
+                //DataAccessor.list(out renderData_.container, (item) => VisibleOperator(item.indicator, VisibleThreshold));
+                DataAccessor.list(out renderData_.container, (item) => isVisible(item.indicator));
 
                 // auto scroll
                 if (autoScroll_ == true)

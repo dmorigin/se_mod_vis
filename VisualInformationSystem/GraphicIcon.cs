@@ -39,8 +39,11 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
-                gfx.VisibleThreshold = VisibleThreshold;
-                gfx.VisibleOperator = VisibleOperator;
+                gfx.VisibleThresholdA = VisibleThresholdA;
+                gfx.VisibleOperatorA = VisibleOperatorA;
+                gfx.VisibleThresholdB = VisibleThresholdB;
+                gfx.VisibleOperatorB = VisibleOperatorB;
+                gfx.VisibleCondition = VisibleCondition;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
@@ -68,7 +71,7 @@ namespace IngameScript
                 bool visible = true;
                 if (DataAccessor != null)
                 {
-                    visible = VisibleOperator(DataAccessor.indicator(), VisibleThreshold);
+                    visible = isVisible(DataAccessor.indicator());//VisibleOperator(DataAccessor.indicator(), VisibleThreshold);
                     getGradientColorLerp((float)DataAccessor.indicator(), Gradient, out color);
                 }
 

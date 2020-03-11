@@ -37,8 +37,11 @@ namespace IngameScript
                 PositionType = Default.PositionType;
                 Size = Default.Size;
                 SizeType = Default.SizeType;
-                VisibleThreshold = -1.0;
-                VisibleOperator = greaterequal;
+                VisibleThresholdA = -1.0;
+                VisibleOperatorA = greaterequal;
+                VisibleThresholdB = -1.0;
+                VisibleOperatorB = val_true;
+                VisibleCondition = cond_and;
             }
 
             public override bool construct()
@@ -171,60 +174,128 @@ namespace IngameScript
 
                 bool configVisibility(string key, string value, Configuration.Options options)
                 {
-                    switch (value.ToLower())
+                    Func<string, OperatorDelegate> func = (op) =>
                     {
-                        case "equal":
-                        case "==":
-                            graphic_.VisibleOperator = equal;
-                            break;
-                        case "unequal":
-                        case "!=":
-                            graphic_.VisibleOperator = unequal;
-                            break;
-                        case "less":
-                        case "<":
-                            graphic_.VisibleOperator = less;
-                            break;
-                        case "greater":
-                        case ">":
-                            graphic_.VisibleOperator = greater;
-                            break;
-                        case "lessequal":
-                        case "<=":
-                            graphic_.VisibleOperator = lessequal;
-                            break;
-                        case "greaterequal":
-                        case ">=":
-                            graphic_.VisibleOperator = greaterequal;
-                            break;
-                        default:
-                            return false;
+                        switch (op)
+                        {
+                            case "equal":
+                            case "==":
+                                return equal;
+                            case "unequal":
+                            case "!=":
+                                return unequal;
+                            case "less":
+                            case "<":
+                                return less;
+                            case "greater":
+                            case ">":
+                                return greater;
+                            case "lessequal":
+                            case "<=":
+                                return lessequal;
+                            case "greaterequal":
+                            case ">=":
+                                return greaterequal;
+                            default:
+                                return val_false;
+                        }
+                    };
+
+                    graphic_.VisibleOperatorA = func(value.ToLower());
+                    graphic_.VisibleThresholdA = options.asFloat(0, 0f);
+
+                    if (options.Count >= 4)
+                    {
+                        switch (options[1].ToLower())
+                        {
+                            case "||":
+                            case "or":
+                                graphic_.VisibleCondition = cond_or;
+                                break;
+                            case "&&":
+                            case "and":
+                                graphic_.VisibleCondition = cond_and;
+                                break;
+                            default:
+                                return false;
+                        }
+                        graphic_.VisibleOperatorB = func(options[2].ToLower());
+                        graphic_.VisibleThresholdB = options.asFloat(3, 0f);
                     }
 
-                    graphic_.VisibleThreshold = options.asFloat(0, 0f);
                     return true;
                 }
             }
-
-            #region Condition
-            // indicator is greater then threshold
-            // example indicator > 0.1
-            // visibility:less:0.1
-            protected delegate bool OperatorDelegate(double a, double b);
-
-            protected static bool equal(double a, double b) => a == b;
-            protected static bool unequal(double a, double b) => a != b;
-            protected static bool less(double a, double b) => a < b;
-            protected static bool greater(double a, double b) => a > b;
-            protected static bool lessequal(double a, double b) => a <= b;
-            protected static bool greaterequal(double a, double b) => a >= b;
-            #endregion // Condition
 
             public virtual ConfigHandler getConfigHandler()
             {
                 return new ConfigHandler(this);
             }
             #endregion // Configuration
+
+            #region Condition
+            // indicator is greater then threshold
+            // example indicator > 0.1
+            // visibility:less:0.1
+            protected delegate bool OperatorDelegate(double a, double b);
+            protected delegate bool ConditionDelegate(OperatorDelegate a, OperatorDelegate b, double indicator, double thresholdA, double thresholdB);
+
+            protected static bool val_true(double a, double b) => true;
+            protected static bool val_false(double a, double b) => false;
+            protected static bool equal(double a, double b) => a == b;
+            protected static bool unequal(double a, double b) => a != b;
+            protected static bool less(double a, double b) => a < b;
+            protected static bool greater(double a, double b) => a > b;
+            protected static bool lessequal(double a, double b) => a <= b;
+            protected static bool greaterequal(double a, double b) => a >= b;
+
+            static bool cond_and(OperatorDelegate a, OperatorDelegate b, double indicator, double thresholdA, double thresholdB) => a(indicator, thresholdA) && b(indicator, thresholdB);
+            static bool cond_or(OperatorDelegate a, OperatorDelegate b, double indicator, double thresholdA, double thresholdB) => a(indicator, thresholdA) || b(indicator, thresholdB);
+
+            /*protected double VisibleThreshold
+            {
+                get;
+                set;
+            }
+
+            protected OperatorDelegate VisibleOperator
+            {
+                get;
+                set;
+            }*/
+
+            protected double VisibleThresholdA
+            {
+                get;
+                set;
+            }
+
+            protected double VisibleThresholdB
+            {
+                get;
+                set;
+            }
+
+            protected OperatorDelegate VisibleOperatorA
+            {
+                get;
+                set;
+            }
+
+            protected OperatorDelegate VisibleOperatorB
+            {
+                get;
+                set;
+            }
+
+            protected ConditionDelegate VisibleCondition
+            {
+                get;
+                set;
+            }
+
+            protected bool isVisible(double indicator) => VisibleCondition(VisibleOperatorA, VisibleOperatorB, indicator, VisibleThresholdA, VisibleThresholdB);
+            #endregion // Condition
 
             public enum ValueType
             {
@@ -388,18 +459,6 @@ namespace IngameScript
                     colorGradient_.Add(threshold, color);
                     colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
-            }
-
-            protected double VisibleThreshold
-            {
-                get;
-                set;
-            }
-
-            protected OperatorDelegate VisibleOperator
-            {
-                get;
-                set;
             }
             #endregion // Properties
 

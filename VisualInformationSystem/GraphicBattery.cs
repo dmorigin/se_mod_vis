@@ -46,8 +46,11 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
-                gfx.VisibleThreshold = VisibleThreshold;
-                gfx.VisibleOperator = VisibleOperator;
+                gfx.VisibleThresholdA = VisibleThresholdA;
+                gfx.VisibleOperatorA = VisibleOperatorA;
+                gfx.VisibleThresholdB = VisibleThresholdB;
+                gfx.VisibleOperatorB = VisibleOperatorB;
+                gfx.VisibleCondition = VisibleCondition;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);

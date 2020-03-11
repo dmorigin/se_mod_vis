@@ -50,6 +50,7 @@
     <Compile Include="DataCollectorJumpDrive.cs" />
     <Compile Include="DataCollectorManager.cs" />
     <Compile Include="DataCollectorProduction.cs" />
+    <Compile Include="DataCollectorProperty.cs" />
     <Compile Include="DataCollectorReactor.cs" />
     <Compile Include="DataCollectorShipController.cs" />
     <Compile Include="Default.cs" />

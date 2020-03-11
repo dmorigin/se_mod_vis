@@ -78,8 +78,8 @@ namespace IngameScript
 
             public bool Group => Type.SubtypeId == "";
 
-            public bool Equals(VISItemType other) => VISItemType.compareItemTypes(this.Type, other.Type);
-            public bool Equals(MyItemType other) => VISItemType.compareItemTypes(this.Type, other);
+            public bool Equals(VISItemType other) => compareItemTypes(Type, other.Type);
+            public bool Equals(MyItemType other) => compareItemTypes(Type, other);
             public override bool Equals(object obj) => Equals(obj as VISItemType);
             public override int GetHashCode() => base.GetHashCode();
             public override string ToString() => $"{Type.TypeId}/{Type.SubtypeId}";

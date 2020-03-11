@@ -32,7 +32,6 @@ namespace IngameScript
 
             public static Color Color = Color.White;
             public static Color BackgroundColor = new Color(0, 88, 151);
-            public static int ZPosition = 0;
             public static Vector2 Position = new Vector2(0.5f, 0.5f);
             public static Graphic.ValueType PositionType = ValueType;
             public static Vector2 Size = new Vector2(1f, 1f);
@@ -49,6 +48,7 @@ namespace IngameScript
 
             public static float ListBarThickness = 1f;
             public static Graphic.ValueType ListBarThicknessType = ValueType;
+            public static float MaxShipSpeed = 100.0f;
 
             public static string DisplayNameTag = "[VIS]";
             public static Vector2I DisplayCoordinate = new Vector2I(0, 0);
@@ -58,6 +58,7 @@ namespace IngameScript
             public static string TextPanel = $"{MyObjectBuilder}_TextPanel";
             public static string LargeBlockCorner = $"{TextPanel}/LargeBlockCorner_LCD";
             public static string SmallBlockCorner = $"{TextPanel}/SmallBlockCorner_LCD";
+            public static string Component = $"{MyObjectBuilder}_Component";
 
             public static Dictionary<RenderTargetID, RectangleF> RenderTargetFixSize = new Dictionary<RenderTargetID, RectangleF>()
             {
@@ -88,12 +89,12 @@ namespace IngameScript
                 { $"{MyObjectBuilder}_Ore/Stone", 20000 },
                 { $"{MyObjectBuilder}_Ore/Iron", 200000 },
 
-                { $"{MyObjectBuilder}_Component/SteelPlate", 10000 },
-                { $"{MyObjectBuilder}_Component/Medical", 500 },
-                { $"{MyObjectBuilder}_Component/Motor", 6000 },
-                { $"{MyObjectBuilder}_Component/InteriorPlate", 10000 },
-                { $"{MyObjectBuilder}_Component/Construction", 10000 },
-                { $"{MyObjectBuilder}_Component/ZoneChip", 20 },
+                { $"{Component}/SteelPlate", 10000 },
+                { $"{Component}/Medical", 500 },
+                { $"{Component}/Motor", 6000 },
+                { $"{Component}/InteriorPlate", 10000 },
+                { $"{Component}/Construction", 10000 },
+                { $"{Component}/ZoneChip", 20 },
 
                 { $"{MyObjectBuilder}_OxygenContainerObject/OxygenBottle", 5 },
                 { $"{MyObjectBuilder}_GasContainerObject/HydrogenBottle", 5 },

@@ -65,7 +65,7 @@ namespace IngameScript
                         referenceController_ = controller;
                 }
 
-                speedMax_ = 100.0f; // ToDo: Find a more generic way to support speed mods
+                speedMax_ = Default.MaxShipSpeed; // ToDo: Find a more generic way to support speed mods
                 speedCurrent_ = (float)referenceController_.GetShipSpeed();
                 speedRatio_ = clamp(speedCurrent_ / speedMax_);
 

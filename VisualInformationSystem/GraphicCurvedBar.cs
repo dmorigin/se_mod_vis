@@ -39,8 +39,11 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
-                gfx.VisibleThreshold = VisibleThreshold;
-                gfx.VisibleOperator = VisibleOperator;
+                gfx.VisibleThresholdA = VisibleThresholdA;
+                gfx.VisibleOperatorA = VisibleOperatorA;
+                gfx.VisibleThresholdB = VisibleThresholdB;
+                gfx.VisibleOperatorB = VisibleOperatorB;
+                gfx.VisibleCondition = VisibleCondition;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
@@ -89,6 +92,9 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
+                if (!isVisible(DataAccessor.indicator()))
+                    return;
+
                 Graphic.renderEllipseBar(addSprite, rt, renderData_.position, renderData_.size, minDegree_, maxDegree_, 
                     thickness_, renderData_.ratio, Gradient, colorLerp_, Template.BackgroundColor);
 

@@ -40,8 +40,11 @@ namespace IngameScript
                 gfx.PositionType = PositionType;
                 gfx.Size = Size;
                 gfx.SizeType = SizeType;
-                gfx.VisibleThreshold = VisibleThreshold;
-                gfx.VisibleOperator = VisibleOperator;
+                gfx.VisibleThresholdA = VisibleThresholdA;
+                gfx.VisibleOperatorA = VisibleOperatorA;
+                gfx.VisibleThresholdB = VisibleThresholdB;
+                gfx.VisibleOperatorB = VisibleOperatorB;
+                gfx.VisibleCondition = VisibleCondition;
 
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
@@ -228,7 +231,8 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (DataAccessor != null && !VisibleOperator(DataAccessor.indicator(), VisibleThreshold))
+                //if (DataAccessor != null && !VisibleOperator(DataAccessor.indicator(), VisibleThreshold))
+                if (DataAccessor != null && !isVisible(DataAccessor.indicator()))
                     return;
 
                 for (int c = 0; c < renderData_.lines.Count; c++)

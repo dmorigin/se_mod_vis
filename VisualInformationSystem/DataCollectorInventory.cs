@@ -106,7 +106,7 @@ namespace IngameScript
                         {
                             VISItemType itemType;
                             if (!Default.ItemTypeMap.TryGetValue(itemTypeName.ToLower(), out itemType))
-                                itemType = itemTypeName;
+                                itemType = $"{Default.MyObjectBuilder}_{itemTypeName}";
 
                             if (!itemType)
                             {
@@ -123,6 +123,8 @@ namespace IngameScript
                 }
                 else if (constructStage_ == 2)
                 {
+                    itemTypes_.Sort((a, b) => a.type.Group && !b.type.Group ? 1 : (!a.type.Group && b.type.Group ? -1 : 0));
+
                     for (; constructIndex_ < constructBlocks_.Count && 
                         App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
                         constructIndex_++)
