@@ -29,7 +29,7 @@ namespace IngameScript
                 subType_ = typeId;
             }
 
-            static string typePattern = @"^Type: (?<type>Oxygen Tank|Hydrogen Tank)$";
+            static string typePattern = @"^Type: [\w\s]*(?<type>Oxygen|Hydrogen)[\w\s]*$";
             string subType_ = "";
             public override bool construct()
             {

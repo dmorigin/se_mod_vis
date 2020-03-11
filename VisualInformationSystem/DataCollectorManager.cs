@@ -60,10 +60,10 @@ namespace IngameScript
                 switch (name)
                 {
                     case "hydrogen":
-                        dataCollector = new DataCollectorGasTank("hydrogentank", "Hydrogen Tank", options, connector);
+                        dataCollector = new DataCollectorGasTank("hydrogentank", "Hydrogen", options, connector);
                         break;
                     case "oxygen":
-                        dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen Tank", options, connector);
+                        dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen", options, connector);
                         break;
                     case "inventory":
                         dataCollector = new DataCollectorInventory(options, connector);
