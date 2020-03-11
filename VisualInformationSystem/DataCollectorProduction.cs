@@ -76,7 +76,7 @@ namespace IngameScript
             public override void finalizeUpdate()
             {
                 maxQueuedItems_ = currentQueuedItems_ == 0 ? 0 : Math.Max(maxQueuedItems_, currentQueuedItems_);
-                ratio_ = (float)currentQueuedItems_ / (float)maxQueuedItems_;
+                ratio_ = maxQueuedItems_ == 0 ? 0 : (float)currentQueuedItems_ / (float)maxQueuedItems_;
 
                 // remove finished items
                 items_.RemoveAll((item) => item.CurrentAmount == 0);

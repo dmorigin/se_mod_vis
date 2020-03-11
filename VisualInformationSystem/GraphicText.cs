@@ -64,7 +64,7 @@ namespace IngameScript
             bool useDefaultFont_ = true;
             bool sizeIsSet = false;
             string font_ = Default.Font;
-            float fontSize_ = 0f;
+            float fontSize_ = Default.FontSize;
             bool useDefaultAlignment_ = true;
             TextAlignment alignment_ = Default.FontAlignment;
 
