@@ -34,6 +34,9 @@ namespace IngameScript
 
                 maxStoredPower_ = 0f;
                 currentStoredPower_ = 0f;
+                amountRecharging_ = 0;
+                amountJumping_ = 0;
+                amountReady_ = 0;
             }
 
             protected override void update()
@@ -67,8 +70,8 @@ namespace IngameScript
                     .Replace("%currentcapacity%", new VISUnitType(currentStoredPower_, Multiplier.M, Unit.WattHour).pack())
                     .Replace("%capacityratio%", new VISUnitType(ratioStoredPower_, unit: Unit.Percent))
                     .Replace("%amountcharging%", amountRecharging_.ToString())
-                    .Replace("amountjumping", amountJumping_.ToString())
-                    .Replace("%amountready", amountReady_.ToString());
+                    .Replace("%amountjumping%", amountJumping_.ToString())
+                    .Replace("%amountready%", amountReady_.ToString());
             }
 
             #region Data Accessor

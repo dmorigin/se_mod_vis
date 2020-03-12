@@ -40,6 +40,8 @@ namespace IngameScript
 
             void addInventoryBlock(IMyTerminalBlock block)
             {
+                bool addBlock = false;
+
                 for (int i = 0; i < block.InventoryCount; i++)
                 {
                     IMyInventory inventory = block.GetInventory(i);
@@ -53,7 +55,8 @@ namespace IngameScript
                             if (acceptedItems.Exists(x => item.type.Equals(x)))
                             {
                                 inventories_.Add(inventory);
-                                Blocks.Add(block);
+                                //Blocks.Add(block);
+                                addBlock = true;
                                 maxVolume_ += (double)inventory.MaxVolume;
                                 break;
                             }
@@ -62,10 +65,14 @@ namespace IngameScript
                     else
                     {
                         inventories_.Add(inventory);
-                        Blocks.Add(block);
+                        //Blocks.Add(block);
+                        addBlock = true;
                         maxVolume_ += (double)inventory.MaxVolume;
                     }
                 }
+
+                if (addBlock == true)
+                    Blocks.Add(block);
             }
 
             public override bool construct()
