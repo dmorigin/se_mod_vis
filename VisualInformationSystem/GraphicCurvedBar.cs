@@ -138,7 +138,7 @@ namespace IngameScript
             bool configIcon(string key, string value, Configuration.Options options)
             {
                 iconName_ = value;
-                Graphic.Icon.getIcon(value);
+                icon_ = Icon.getIcon(iconName_);
 
                 if (options.Count >= 1)
                 {
