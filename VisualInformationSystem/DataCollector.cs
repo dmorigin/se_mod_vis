@@ -128,7 +128,9 @@ namespace IngameScript
                     .Replace("%on%", blocksOn_.ToString())
                     .Replace("%off%", blocksOff_.ToString())
                     .Replace("%onratio%", new VISUnitType(onRatio_, unit: Unit.Percent))
-                    .Replace("%offratio%", new VISUnitType(offRatio_, unit: Unit.Percent));
+                    .Replace("%offratio%", new VISUnitType(offRatio_, unit: Unit.Percent))
+                    .Replace("%functional%", blocksFunctional_.ToString())
+                    .Replace("%functionalratio%", new VISUnitType(blocksFunctionalRatio_, unit: Unit.Percent));
             }
 
             #region Update System
@@ -141,19 +143,36 @@ namespace IngameScript
             public virtual void prepareUpdate()
             {
                 blocksOn_ = 0;
+                blocksFunctional_ = 0;
             }
 
             public virtual void finalizeUpdate()
             {
-                blocksOff_ = Blocks.Count - blocksOn_;
-                onRatio_ = (float)blocksOn_ / (float)Blocks.Count;
-                offRatio_ = (float)blocksOff_ / (float)Blocks.Count;
+                if (Blocks.Count > 0)
+                {
+                    blocksOff_ = Blocks.Count - blocksOn_;
+                    onRatio_ = (float)blocksOn_ / (float)Blocks.Count;
+                    offRatio_ = (float)blocksOff_ / (float)Blocks.Count;
+
+                    blocksFunctionalRatio_ = (float)blocksFunctional_ / (float)Blocks.Count;
+                }
+                else
+                {
+                    blocksOff_ = 0;
+                    onRatio_ = 0f;
+                    offRatio_ = 0f;
+                    blocksFunctionalRatio_ = 0f;
+                }
             }
 
             protected virtual void update()
             {
                 foreach (IMyTerminalBlock block in Blocks)
+                {
                     blocksOn_ += isOn(block) ? 1 : 0;
+                    blocksFunctional_ += block.IsFunctional ? 1 : 0;
+                }
+
                 UpdateFinished = true;
             }
             #endregion // Update System
@@ -216,6 +235,9 @@ namespace IngameScript
             protected float onRatio_ = 0f;
             protected float offRatio_ = 0f;
 
+            protected int blocksFunctional_ = 0;
+            protected float blocksFunctionalRatio_ = 0f;
+
             public virtual DataAccessor getDataAccessor(string name)
             {
                 switch(name.ToLower())
@@ -224,6 +246,8 @@ namespace IngameScript
                         return new DAOn(this);
                     case "off":
                         return new DAOff(this);
+                    case "functional":
+                        return new DAFunctional(this);
                 }
 
                 if (name != "")
@@ -240,6 +264,37 @@ namespace IngameScript
                 public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
                 {
                     container = new List<ListContainer>();
+                }
+            }
+
+            class DAFunctional : DataAccessor
+            {
+                DataCollector<T> dc_;
+                public DAFunctional(DataCollector<T> dc)
+                {
+                    dc_ = dc;
+                }
+
+                public override double indicator() => dc_.blocksFunctionalRatio_;
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.blocksFunctional_);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (IMyTerminalBlock block in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = block.CustomName;
+                        item.indicator = block.IsFunctional ? 1.0 : 0.0;
+                        item.value = new VISUnitType(item.indicator);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
                 }
             }
 

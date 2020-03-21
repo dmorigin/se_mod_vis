@@ -98,6 +98,7 @@ namespace IngameScript
                     IMyProductionBlock block = Blocks[blockIndex_] as IMyProductionBlock;
 
                     blocksOn_ += isOn(block) ? 1 : 0;
+                    blocksFunctional_ += block.IsFunctional ? 1 : 0;
 
                     // get list of all items in the queue
                     List<MyProductionItem> queue = new List<MyProductionItem>();

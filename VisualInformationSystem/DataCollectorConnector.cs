@@ -37,6 +37,7 @@ namespace IngameScript
                 foreach(var connector in Blocks)
                 {
                     blocksOn_ += isOn(connector) ? 1 : 0;
+                    blocksFunctional_ += connector.IsFunctional ? 1 : 0;
 
                     connected_ += connector.Status == MyShipConnectorStatus.Connected ? 1 : 0;
                     disconnected_ += connector.Status == MyShipConnectorStatus.Unconnected ? 1 : 0;

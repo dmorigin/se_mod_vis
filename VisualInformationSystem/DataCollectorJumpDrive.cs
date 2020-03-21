@@ -50,6 +50,7 @@ namespace IngameScript
                     amountReady_ += jd.Status == MyJumpDriveStatus.Ready ? 1 : 0;
 
                     blocksOn_ += isOn(jd) ? 1 : 0;
+                    blocksFunctional_ += jd.IsFunctional ? 1 : 0;
                 }
 
                 ratioStoredPower_ = maxStoredPower_ != 0f ? currentStoredPower_ / maxStoredPower_ : 0f;

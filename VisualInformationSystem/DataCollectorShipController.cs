@@ -60,6 +60,7 @@ namespace IngameScript
                 foreach(var controller in Blocks)
                 {
                     blocksOn_ += isOn(controller) ? 1 : 0;
+                    blocksFunctional_ += controller.IsFunctional ? 1 : 0;
 
                     if (controller.CanControlShip && controller.CanControlShip)
                         referenceController_ = controller;

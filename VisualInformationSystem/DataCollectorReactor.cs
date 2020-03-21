@@ -48,6 +48,7 @@ namespace IngameScript
                     fuelMax_ += (double)inventory.MaxVolume;
 
                     blocksOn_ += isOn(reactor) ? 1 : 0;
+                    blocksFunctional_ += reactor.IsFunctional ? 1 : 0;
                 }
 
                 powerAvailableUsing_ = maxAvailableOutput_ != 0f ? currentOutput_ / maxAvailableOutput_ : 0f;

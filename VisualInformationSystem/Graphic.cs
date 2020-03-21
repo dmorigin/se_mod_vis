@@ -529,7 +529,7 @@ namespace IngameScript
             }
 
             protected static void renderSimpleBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size, 
-                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor)
             {
                 Vector2 innerSize = size - (borderSize * 2f);
@@ -576,7 +576,7 @@ namespace IngameScript
             }
 
             protected static void renderSegmentedBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor)
             {
                 Vector2 innerSize = size - (borderSize * 2f);
@@ -654,7 +654,7 @@ namespace IngameScript
             }
 
             protected static void renderTiledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor)
             {
                 Vector2 innerSize = size - (borderSize * 2f);
@@ -703,7 +703,7 @@ namespace IngameScript
 
                         Color color;
                         getGradientColorLerp(t * step, gradient, out color);
-                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", tilePosition, tileSize, color));
+                        addSprite(new MySprite(SpriteType.TEXTURE, tileName, tilePosition, tileSize, color));
                     }
                 }
                 else
@@ -718,7 +718,7 @@ namespace IngameScript
 
                         Color color;
                         getGradientColorLerp(t * step, gradient, out color);
-                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", tilePosition, tileSize, color));
+                        addSprite(new MySprite(SpriteType.TEXTURE, tileName, tilePosition, tileSize, color));
                     }
                 }
             }
@@ -784,10 +784,10 @@ namespace IngameScript
                     foreach (var pair in barGradient)
                         clamped.Add((pair.Key * 0.5f) + 0.5f, pair.Value);
 
-                    renderSegmentedBar(addSprite, rt, barPosition, barSize, vertical, false, 0, 0f, 1f, clamped, 0f, Color.White, new Color(0, 0, 0, 0));
+                    renderSegmentedBar(addSprite, rt, barPosition, barSize, vertical, false, 0, 0f, "", 1f, clamped, 0f, Color.White, new Color(0, 0, 0, 0));
                 }
                 else
-                    renderSegmentedBar(addSprite, rt, barPosition, barSize, vertical, false, 0, 0f, 1f, barGradient, 0f, Color.White, new Color(0, 0, 0, 0));
+                    renderSegmentedBar(addSprite, rt, barPosition, barSize, vertical, false, 0, 0f, "", 1f, barGradient, 0f, Color.White, new Color(0, 0, 0, 0));
 
                 // draw slider
                 if (vertical)

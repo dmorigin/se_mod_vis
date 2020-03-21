@@ -56,6 +56,7 @@ namespace IngameScript
                 gfx.borderColor_ = borderColor_;
                 gfx.tiles_ = tiles_;
                 gfx.tileSpace_ = tileSpace_;
+                gfx.tileName_ = tileName_;
                 gfx.tileSpaceType_ = tileSpaceType_;
                 gfx.renderStyledBar_ = renderStyledBar_;
 
@@ -81,7 +82,7 @@ namespace IngameScript
                 float borderSize = borderSizeType_ == ValueType.Relative ? borderSize_ * (size.X < size.Y ? size.X : size.Y) : borderSize_;
                 float tileSpace = tileSpaceType_ == ValueType.Relative ? tileSpace_ * (size.X < size.Y ? size.X : size.Y) : tileSpace_;
 
-                renderStyledBar_(addSprite, rt, position, size, vertical_, DataAccessor.min() < 0.0, tiles_, tileSpace,
+                renderStyledBar_(addSprite, rt, position, size, vertical_, DataAccessor.min() < 0.0, tiles_, tileSpace, tileName_,
                     (float)DataAccessor.indicator(), Gradient, borderSize, borderColor_, backgroundColor_);
             }
 
@@ -121,13 +122,14 @@ namespace IngameScript
             }
 
             delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size, 
-                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor);
             RenderStyledBar renderStyledBar_;
             bool vertical_ = Default.BarVertical;
             int tiles_ = 0;
             float tileSpace_ = Default.BarTileSpace;
             ValueType tileSpaceType_ = Default.BarTileSpaceType;
+            string tileName_ = "SquareSimple";
             bool configBarStyle(string key, string value, Configuration.Options options)
             {
                 vertical_ = options.asBoolean(0, Default.BarVertical);
@@ -147,6 +149,14 @@ namespace IngameScript
                         if (options.Count >= 4)
                         {
                             if (!toValueType(options[3], out tileSpaceType_, Default.BarTileSpaceType))
+                                return false;
+                        }
+
+                        if (options.Count >= 5)
+                        {
+                            if (RenderTarget.spriteExist(options[4]))
+                                tileName_ = options[4];
+                            else
                                 return false;
                         }
                         break;

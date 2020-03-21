@@ -36,6 +36,7 @@ namespace IngameScript
                 foreach(var gear in Blocks)
                 {
                     blocksOn_ += isOn(gear) ? 1 : 0;
+                    blocksFunctional_ += gear.IsFunctional ? 1 : 0;
                     locked_ += gear.IsLocked ? 1 : 0;
 
                     ratio += gear.LockMode == LandingGearMode.Locked ? 2 : (gear.LockMode == LandingGearMode.ReadyToLock ? 1 : 0);

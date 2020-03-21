@@ -56,6 +56,7 @@ namespace IngameScript
                 {
                     fillRation += tank.FilledRatio;
                     blocksOn_ += isOn(tank) ? 1 : 0;
+                    blocksFunctional_ += tank.IsFunctional ? 1 : 0;
                     stockpile_ += tank.Stockpile ? 1 : 0;
                 }
 

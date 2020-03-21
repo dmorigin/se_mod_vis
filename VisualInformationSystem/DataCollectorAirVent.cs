@@ -36,6 +36,7 @@ namespace IngameScript
                     oxygenLevel_ += airvent.GetOxygenLevel();
                     pressurizeAble_ += airvent.CanPressurize && !airvent.Depressurize ? 1 : 0;
                     blocksOn_ += isOn(airvent) ? 1 : 0;
+                    blocksFunctional_ += airvent.IsFunctional ? 1 : 0;
                 }
 
                 oxygenLevel_ /= Blocks.Count;

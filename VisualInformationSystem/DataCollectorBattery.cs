@@ -54,6 +54,7 @@ namespace IngameScript
                     maxAvailableStored_ += battery.MaxStoredPower;
 
                     blocksOn_ += isOn(battery) ? 1 : 0;
+                    blocksFunctional_ += battery.IsFunctional ? 1 : 0;
                 }
 
                 powerAvailableUsing_ = currentOutput_ / maxAvailableOutput_;

@@ -227,7 +227,7 @@ namespace IngameScript
                     if (barShow_)
                     {
                         barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, false, false, renderData_.barTiles, 
-                            renderData_.barTileSpacing, (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
+                            renderData_.barTileSpacing, "SquareSimple", (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
                         barPosition.Y += renderData_.lineHeight;
                     }
 
@@ -317,7 +317,7 @@ namespace IngameScript
             }
 
             delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                bool vertical, bool doubleSided, int tiles, float tileSpace, float ratio, Dictionary<float, Color> gradient,
+                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor);
             
             bool barShow_ = false;

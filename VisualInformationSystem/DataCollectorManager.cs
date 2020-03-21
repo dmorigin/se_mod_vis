@@ -113,6 +113,9 @@ namespace IngameScript
                     case "piston":
                         dataCollector = new DataCollectorPiston(options, connector);
                         break;
+                    case "thruster":
+                        dataCollector = new DataCollectorThruster(options, connector);
+                        break;
                     case "onoff":
                         dataCollector = new DataCollectorProperty("onoff", "", options, connector);
                         break;

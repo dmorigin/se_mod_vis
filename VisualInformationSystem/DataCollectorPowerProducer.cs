@@ -43,6 +43,7 @@ namespace IngameScript
                     currentOutput_ += pp.CurrentOutput;
                     maxAvailableOutput_ += pp.MaxOutput;
                     blocksOn_ += isOn(pp) ? 1 : 0;
+                    blocksFunctional_ += pp.IsFunctional ? 1 : 0;
                 }
 
                 powerAvailableUsing_ = maxAvailableOutput_ != 0f ? currentOutput_ / maxAvailableOutput_ : 0f;

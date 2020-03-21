@@ -39,6 +39,7 @@ namespace IngameScript
                 foreach (var piston in Blocks)
                 {
                     blocksOn_ += isOn(piston) ? 1 : 0;
+                    blocksFunctional_ += piston.IsFunctional ? 1 : 0;
 
                     minPosition_ += piston.MinLimit;
                     maxPosition_ += piston.MaxLimit;

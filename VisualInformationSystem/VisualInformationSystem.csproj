@@ -53,6 +53,7 @@
     <Compile Include="DataCollectorProperty.cs" />
     <Compile Include="DataCollectorReactor.cs" />
     <Compile Include="DataCollectorShipController.cs" />
+    <Compile Include="DataCollectorThruster.cs" />
     <Compile Include="Default.cs" />
     <Compile Include="Display.cs" />
     <Compile Include="DisplayManager.cs" />
