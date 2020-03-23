@@ -42,10 +42,17 @@ namespace IngameScript
                         var orientation = Base6Directions.GetDirection(myself);
                         */
 
+                        /*
                         Matrix matrix;
                         block.Orientation.GetMatrix(out matrix);
                         var orientation = Base6Directions.GetDirection((matrix * referenceControllerMatrix_).
                             GetDirectionVector(referenceController_.Orientation.Forward));
+                        */
+
+                        Matrix thrusterMatrix;
+                        block.Orientation.GetMatrix(out thrusterMatrix);
+                        var directionVector = Vector3D.Rotate(thrusterMatrix.Forward, referenceControllerMatrix_);
+                        var orientation = Base6Directions.GetDirection(directionVector);
 
                         if (sameThrusterDirection(orientation) && sameThrusterType(block.DetailedInfo))
                             Blocks.Add(block);
@@ -122,7 +129,7 @@ namespace IngameScript
                 else
                 {
                     referenceController_.Orientation.GetMatrix(out referenceControllerMatrix_);
-                    referenceControllerMatrix_ = Matrix.Transpose(referenceControllerMatrix_);
+                    //referenceControllerMatrix_ = Matrix.Transpose(referenceControllerMatrix_);
                 }
 
                 // step through filter
@@ -170,8 +177,8 @@ namespace IngameScript
             ThrusterType thrusterType_ = 0;
 
             bool sameThrusterDirection(Base6Directions.Direction orientation) =>
-                (orientation == Base6Directions.Direction.Up && ((thrusterDirection_ & ThrusterDirection.Lift) != 0)) ||
-                (orientation == Base6Directions.Direction.Down && ((thrusterDirection_ & ThrusterDirection.Lower) != 0)) ||
+                (orientation == Base6Directions.Direction.Up && ((thrusterDirection_ & ThrusterDirection.Lower) != 0)) ||
+                (orientation == Base6Directions.Direction.Down && ((thrusterDirection_ & ThrusterDirection.Lift) != 0)) ||
                 (orientation == Base6Directions.Direction.Left && ((thrusterDirection_ & ThrusterDirection.Right) != 0)) ||
                 (orientation == Base6Directions.Direction.Right && ((thrusterDirection_ & ThrusterDirection.Left) != 0)) ||
                 (orientation == Base6Directions.Direction.Forward && ((thrusterDirection_ & ThrusterDirection.Break) != 0)) ||

@@ -116,7 +116,7 @@ namespace IngameScript
                 renderData_.lineHeight = fontHeight + spacing_;
                 if (barShow_)
                 {
-                    renderData_.barSize = new Vector2(size.X, barThickness_);
+                    renderData_.barSize = new Vector2(size.X, barThickness);
                     renderData_.lineHeight += barEmbedded_ ? 0f : renderData_.barSize.Y;
                 }
                 else
