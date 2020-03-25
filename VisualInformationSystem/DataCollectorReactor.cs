@@ -43,7 +43,7 @@ namespace IngameScript
                     currentOutput_ += reactor.CurrentOutput;
                     maxAvailableOutput_ += reactor.MaxOutput;
 
-                    IMyInventory inventory = reactor.GetInventory();
+                    var inventory = reactor.GetInventory();
                     fuelCurrent_ += (double)inventory.CurrentVolume;
                     fuelMax_ += (double)inventory.MaxVolume;
 
@@ -95,7 +95,7 @@ namespace IngameScript
                     foreach(IMyReactor entry in dc_.Blocks)
                     {
                         ListContainer item = new ListContainer();
-                        IMyInventory inventory = entry.GetInventory();
+                        var inventory = entry.GetInventory();
                         item.name = entry.CustomName;
                         item.indicator = (double)inventory.CurrentVolume / (double)inventory.MaxVolume;
                         item.min = new VISUnitType(0.0, unit: Unit.Liter);

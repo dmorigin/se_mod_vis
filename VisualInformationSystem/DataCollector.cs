@@ -124,6 +124,7 @@ namespace IngameScript
                 return data
                     .Replace("%blockcount%", Blocks.Count.ToString())
                     .Replace("%blockname%", BlockName)
+                    .Replace("%gridname%", ReferenceGrid != null ? ReferenceGrid.CubeGrid.CustomName : "")
                     .Replace("%isgroup%", IsGroup ? "true" : "false")
                     .Replace("%on%", blocksOn_.ToString())
                     .Replace("%off%", blocksOff_.ToString())
