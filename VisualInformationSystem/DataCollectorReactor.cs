@@ -60,9 +60,9 @@ namespace IngameScript
             double fuelCurrent_ = 0.0;
             float fuelRatio_ = 0f;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%maxfuel%", new VISUnitType(fuelMax_, Multiplier.K, Unit.Liter).pack())
                     .Replace("%currentfuel%", new VISUnitType(fuelCurrent_, Multiplier.K, Unit.Liter).pack())
                     .Replace("%fuelratio%", new VISUnitType(fuelRatio_, unit: Unit.Percent));

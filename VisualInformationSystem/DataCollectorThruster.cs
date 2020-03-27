@@ -36,19 +36,6 @@ namespace IngameScript
                     if (referenceController_ != null)
                     {
                         // direction
-                        /*
-                        Vector3D myself = block.WorldMatrix.Up;
-                        myself = Vector3D.Rotate(myself, Matrix.Invert(referenceController_.WorldMatrix));
-                        var orientation = Base6Directions.GetDirection(myself);
-                        */
-
-                        /*
-                        Matrix matrix;
-                        block.Orientation.GetMatrix(out matrix);
-                        var orientation = Base6Directions.GetDirection((matrix * referenceControllerMatrix_).
-                            GetDirectionVector(referenceController_.Orientation.Forward));
-                        */
-
                         Matrix thrusterMatrix;
                         block.Orientation.GetMatrix(out thrusterMatrix);
                         var directionVector = Vector3D.Rotate(thrusterMatrix.Forward, referenceControllerMatrix_);
@@ -129,11 +116,11 @@ namespace IngameScript
                 else
                 {
                     referenceController_.Orientation.GetMatrix(out referenceControllerMatrix_);
-                    //referenceControllerMatrix_ = Matrix.Transpose(referenceControllerMatrix_);
+                    referenceControllerMatrix_ = Matrix.Invert(referenceControllerMatrix_);
                 }
 
                 // step through filter
-                for (; cfgIndex < Options.Count; ++cfgIndex)
+                for (++cfgIndex; cfgIndex < Options.Count; ++cfgIndex)
                 {
                     thrusterType_ |= getThrusterType(Options[cfgIndex].ToLower());
                     thrusterDirection_ |= getThrusterDirection(Options[cfgIndex].ToLower());
@@ -147,6 +134,42 @@ namespace IngameScript
             #endregion // Construction
 
             #region Update
+            float thrustCurrent_ = 0.0f;
+            float thrustMax_ = 0.0f;
+            float thrustRate_ = 0.0f;
+
+            float overrideCurrent_ = 0.0f;
+            float overrideRate_ = 0.0f;
+            float overrideMax_ = 0.0f;
+
+            public override void prepareUpdate()
+            {
+                base.prepareUpdate();
+
+                thrustMax_ = 0.0f;
+                thrustCurrent_ = 0.0f;
+                overrideCurrent_ = 0.0f;
+                overrideMax_ = 0.0f;
+            }
+
+            protected override void update()
+            {
+                foreach(var thruster in Blocks)
+                {
+                    thrustMax_ += thruster.MaxEffectiveThrust;
+                    thrustCurrent_ += thruster.CurrentThrust;
+
+                    overrideCurrent_ += thruster.ThrustOverride;
+                    overrideMax_ += thruster.MaxThrust;
+
+                    blocksOn_ += isOn(thruster) ? 1 : 0;
+                    blocksFunctional_ += thruster.IsFunctional ? 1 : 0;
+                }
+
+                thrustRate_ = thrustMax_ > 0.0f ? thrustCurrent_ / thrustMax_ : 0.0f;
+                overrideRate_ = overrideMax_ > 0.0f ? overrideCurrent_ / overrideMax_ : 0.0f;
+                UpdateFinished = true;
+            }
             #endregion // Update
 
             string referenceControllerName_ = "";
@@ -200,6 +223,95 @@ namespace IngameScript
 
                 return false;
             }
+
+            public override string getVariable(string data)
+            {
+                return base.getVariable(data)
+                    .Replace("%currentthrust%", new VISUnitType(thrustCurrent_, unit: Unit.Newton).pack())
+                    .Replace("%maxthrust%", new VISUnitType(thrustMax_, unit: Unit.Newton).pack())
+                    .Replace("%thrustrate%", new VISUnitType(thrustRate_, unit: Unit.Percent).pack())
+                    .Replace("%currentoverride%", new VISUnitType(overrideCurrent_, unit: Unit.Newton).pack())
+                    .Replace("%maxoverride%", new VISUnitType(overrideMax_, unit: Unit.Newton).pack())
+                    .Replace("%overriderate%", new VISUnitType(overrideRate_, unit: Unit.Percent).pack());
+            }
+
+            #region Accessors
+            public override DataAccessor getDataAccessor(string name)
+            {
+                switch (name.ToLower())
+                {
+                    case "thrust":
+                        return new Thrust(this);
+                    case "override":
+                        return new Override(this);
+                }
+
+                return base.getDataAccessor(name);
+            }
+
+            class Thrust : DataAccessor
+            {
+                DataCollectorThruster da_;
+
+                public Thrust(DataCollectorThruster da)
+                {
+                    da_ = da;
+                }
+
+                public override double indicator() => da_.thrustRate_;
+                public override VISUnitType min() => new VISUnitType(0.0, unit: Unit.Newton);
+                public override VISUnitType max() => new VISUnitType(da_.thrustMax_, unit: Unit.Newton);
+                public override VISUnitType value() => new VISUnitType(da_.thrustCurrent_, unit: Unit.Newton);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (var thruster in da_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = thruster.CustomName;
+                        item.indicator = thruster.CurrentThrust / thruster.MaxEffectiveThrust;
+                        item.min = new VISUnitType(0, unit: Unit.Newton);
+                        item.max = new VISUnitType(thruster.MaxEffectiveThrust, unit: Unit.Newton);
+                        item.value = new VISUnitType(thruster.CurrentThrust, unit: Unit.Newton);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+
+            class Override : DataAccessor
+            {
+                DataCollectorThruster da_;
+                public Override(DataCollectorThruster da)
+                {
+                    da_ = da;
+                }
+
+                public override double indicator() => da_.overrideRate_;
+                public override VISUnitType min() => new VISUnitType(0.0, unit: Unit.Newton);
+                public override VISUnitType max() => new VISUnitType(da_.overrideMax_, unit: Unit.Newton);
+                public override VISUnitType value() => new VISUnitType(da_.overrideCurrent_, unit: Unit.Newton);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (var thruster in da_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = thruster.CustomName;
+                        item.indicator = thruster.ThrustOverridePercentage;
+                        item.min = new VISUnitType(0, unit: Unit.Newton);
+                        item.max = new VISUnitType(thruster.MaxThrust, unit: Unit.Newton);
+                        item.value = new VISUnitType(thruster.ThrustOverride, unit: Unit.Newton);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+            #endregion // Accessors
         }
     }
 }

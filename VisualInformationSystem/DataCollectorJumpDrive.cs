@@ -64,9 +64,9 @@ namespace IngameScript
             int amountJumping_ = 0;
             int amountReady_ = 0;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%maxcapacity%", new VISUnitType(maxStoredPower_, Multiplier.M, Unit.WattHour).pack())
                     .Replace("%currentcapacity%", new VISUnitType(currentStoredPower_, Multiplier.M, Unit.WattHour).pack())
                     .Replace("%capacityratio%", new VISUnitType(ratioStoredPower_, unit: Unit.Percent))

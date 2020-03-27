@@ -76,9 +76,9 @@ namespace IngameScript
             float powerAvailableLeft_ = 0f;
             float powerAvailableStoring_ = 0f;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%powerleft%", new VISUnitType(powerAvailableLeft_, unit: Unit.Percent))
                     .Replace("%powerstoring%", new VISUnitType(powerAvailableStoring_, unit: Unit.Percent))
                     .Replace("%maxinput%", new VISUnitType(maxAvailableInput_, Multiplier.M, Unit.Watt).pack())

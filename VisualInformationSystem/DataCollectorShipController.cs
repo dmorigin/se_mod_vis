@@ -97,9 +97,9 @@ namespace IngameScript
             float massInventory_ = 0f;
             float massRatio_ = 0f;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%maxspeed%", new VISUnitType(speedMax_, unit: Unit.Speed).pack())
                     .Replace("%currentspeed%", new VISUnitType(speedCurrent_, unit: Unit.Speed).pack())
                     .Replace("%speedratio%", new VISUnitType(speedRatio_, unit: Unit.Percent))

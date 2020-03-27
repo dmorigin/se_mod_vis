@@ -50,9 +50,9 @@ namespace IngameScript
                 UpdateFinished = true;
             }
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%usage%", new VISUnitType(powerAvailableUsing_, unit:Unit.Percent))
                     .Replace("%maxoutput%", new VISUnitType(maxAvailableOutput_, Multiplier.M, Unit.Watt).pack())
                     .Replace("%currentoutput%", new VISUnitType(currentOutput_, Multiplier.M, Unit.Watt).pack());

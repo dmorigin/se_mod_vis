@@ -119,7 +119,7 @@ namespace IngameScript
             }
             #endregion // Construction
 
-            public virtual string getText(string data)
+            public virtual string getVariable(string data)
             {
                 return data
                     .Replace("%blockcount%", Blocks.Count.ToString())

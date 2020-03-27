@@ -173,7 +173,7 @@ namespace IngameScript
                         .Replace("%indicator%", new Program.VISUnitType(DataAccessor.indicator(), unit: Unit.Percent).pack());
                 }
 
-                return DataCollector != null ? DataCollector.getText(line) : line;
+                return DataCollector != null ? DataCollector.getVariable(line) : line;
             }
 
             public override void prepareRendering(Display display)

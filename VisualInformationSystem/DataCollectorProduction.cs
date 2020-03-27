@@ -188,9 +188,9 @@ namespace IngameScript
                 }
             }
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%maxamount%", new VISUnitType(maxQueuedItems_, unit: unit_).pack().ToString())
                     .Replace("%currentamount%", new VISUnitType(currentQueuedItems_, unit: unit_).pack().ToString())
                     .Replace("%ratio%", new VISUnitType(ratio_, unit: Unit.Percent));

@@ -64,9 +64,9 @@ namespace IngameScript
                 UpdateFinished = true;
             }
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%capacity%", new VISUnitType(capacity_, unit: Unit.Liter).pack())
                     .Replace("%fillratio%", new VISUnitType(fillRatio_, unit: Unit.Percent))
                     .Replace("%fillvalue", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack())

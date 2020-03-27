@@ -61,9 +61,9 @@ namespace IngameScript
             int extending_ = 0;
             int retracting_ = 0;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%minpos%", new VISUnitType(minPosition_, unit: Unit.Meter))
                     .Replace("%maxpos%", new VISUnitType(maxPosition_, unit: Unit.Meter))
                     .Replace("%currentpos%", new VISUnitType(currentPosition_, unit: Unit.Meter))

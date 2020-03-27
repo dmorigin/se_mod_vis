@@ -51,9 +51,9 @@ namespace IngameScript
             int disconnected_ = 0;
             int connectable_ = 0;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%connected%", connected_.ToString())
                     .Replace("%disconnected%", disconnected_.ToString())
                     .Replace("%connectable%", connectable_.ToString());

@@ -49,9 +49,9 @@ namespace IngameScript
             int locked_ = 0;
             float ratio_ = 0f;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%locked%", locked_.ToString())
                     .Replace("%unlocked%", (Blocks.Count - locked_).ToString())
                     .Replace("%ratio%", new VISUnitType(locked_ / (double)Blocks.Count, unit: Unit.Percent));

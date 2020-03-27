@@ -268,9 +268,9 @@ namespace IngameScript
             long currentItems_ = 0;
             double itemRatio_ = 0;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%maxitems%", new VISUnitType(maxItems_).pack())
                     .Replace("%currentitems%", new VISUnitType(currentItems_).pack())
                     .Replace("%itemratio%", new VISUnitType(itemRatio_, unit: Unit.Percent))

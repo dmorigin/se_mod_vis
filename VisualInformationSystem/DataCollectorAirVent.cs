@@ -46,9 +46,9 @@ namespace IngameScript
             float oxygenLevel_ = 0f;
             int pressurizeAble_ = 0;
 
-            public override string getText(string data)
+            public override string getVariable(string data)
             {
-                return base.getText(data)
+                return base.getVariable(data)
                     .Replace("%pressurizeable%", pressurizeAble_.ToString())
                     .Replace("%oxygenlevel%", new VISUnitType(oxygenLevel_, unit: Unit.Percent));
             }

@@ -37,7 +37,7 @@ namespace IngameScript
             string TypeID { get; }
             TimeSpan MaxUpdateInterval { get; set; }
 
-            string getText(string data);
+            string getVariable(string data);
             bool isSameCollector(string name, Configuration.Options options, string connector);
 
             DataAccessor getDataAccessor(string name);
