@@ -49,7 +49,7 @@ namespace IngameScript
                 foreach (var color in Gradient)
                     gfx.addGradientColor(color.Key, color.Value);
 
-                gfx.vertical_ = vertical_;
+                gfx.rotation_ = rotation_;
                 gfx.backgroundColor_ = backgroundColor_;
                 gfx.borderSize_ = borderSize_;
                 gfx.borderSizeType_ = borderSizeType_;
@@ -82,7 +82,7 @@ namespace IngameScript
                 float borderSize = borderSizeType_ == ValueType.Relative ? borderSize_ * (size.X < size.Y ? size.X : size.Y) : borderSize_;
                 float tileSpace = tileSpaceType_ == ValueType.Relative ? tileSpace_ * (size.X < size.Y ? size.X : size.Y) : tileSpace_;
 
-                renderStyledBar_(addSprite, rt, position, size, vertical_, DataAccessor.min() < 0.0, tiles_, tileSpace, tileName_,
+                renderStyledBar_(addSprite, rt, position, size, rotation_, DataAccessor.min() < 0.0, tiles_, tileSpace, tileName_,
                     (float)DataAccessor.indicator(), Gradient, borderSize, borderColor_, backgroundColor_);
             }
 
@@ -121,18 +121,15 @@ namespace IngameScript
                 return true;
             }
 
-            delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size, 
-                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
-                float borderSize, Color borderColor, Color backgroundColor);
             RenderStyledBar renderStyledBar_;
-            bool vertical_ = Default.BarVertical;
+            float rotation_ = Default.BarRotation;
             int tiles_ = 0;
             float tileSpace_ = Default.BarTileSpace;
             ValueType tileSpaceType_ = Default.BarTileSpaceType;
-            string tileName_ = "SquareSimple";
+            string tileName_ = Default.BarTileIcon;
             bool configBarStyle(string key, string value, Configuration.Options options)
             {
-                vertical_ = options.asBoolean(0, Default.BarVertical);
+                rotation_ = (options.asFloat(0, Default.BarRotation) / 180f) * (float)Math.PI;
 
                 switch (value.ToLower())
                 {

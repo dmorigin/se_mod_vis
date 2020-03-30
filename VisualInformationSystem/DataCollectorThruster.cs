@@ -120,7 +120,7 @@ namespace IngameScript
                 }
 
                 // step through filter
-                for (++cfgIndex; cfgIndex < Options.Count; ++cfgIndex)
+                for (; cfgIndex < Options.Count; ++cfgIndex)
                 {
                     thrusterType_ |= getThrusterType(Options[cfgIndex].ToLower());
                     thrusterDirection_ |= getThrusterDirection(Options[cfgIndex].ToLower());

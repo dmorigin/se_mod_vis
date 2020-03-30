@@ -172,9 +172,9 @@ namespace IngameScript
                 renderData_.barPosition.X = position.X - (size.X * 0.5f) + (renderData_.barSize.X * 0.5f) + (barEmbedded_ ? renderData_.iconSize.X : 0f);
                 renderData_.textLeftPositionX = position.X - (size.X * 0.5f) + renderData_.iconSize.X;
                 renderData_.textRightPositionX = position.X + (size.X * 0.5f);
+                renderData_.barSize = new Vector2(renderData_.barSize.Y, renderData_.barSize.X);
 
                 // filter list
-                //DataAccessor.list(out renderData_.container, (item) => VisibleOperator(item.indicator, VisibleThreshold));
                 DataAccessor.list(out renderData_.container, (item) => isVisible(item.indicator));
 
                 // auto scroll
@@ -226,7 +226,7 @@ namespace IngameScript
                     // draw bar
                     if (barShow_)
                     {
-                        barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, false, false, renderData_.barTiles, 
+                        barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, (float)Math.PI * 0.5f, false, renderData_.barTiles, 
                             renderData_.barTileSpacing, "SquareSimple", (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
                         barPosition.Y += renderData_.lineHeight;
                     }
@@ -315,10 +315,6 @@ namespace IngameScript
 
                 return true;
             }
-
-            delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                bool vertical, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
-                float borderSize, Color borderColor, Color backgroundColor);
             
             bool barShow_ = false;
             bool barEmbedded_ = false;

@@ -44,7 +44,8 @@ namespace IngameScript
             public static float BarTileSpace = 0.04f;
             public static Graphic.ValueType BarTileSpaceType = ValueType;
             public static int BarTileCount = 10;
-            public static bool BarVertical = true;
+            public static string BarTileIcon = "SquareSimple";
+            public static float BarRotation = 0f;
 
             public static float ListBarThickness = 1f;
             public static Graphic.ValueType ListBarThicknessType = ValueType;
