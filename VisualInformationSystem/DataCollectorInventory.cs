@@ -55,7 +55,6 @@ namespace IngameScript
                             if (acceptedItems.Exists(x => item.type.Equals(x)))
                             {
                                 inventories_.Add(inventory);
-                                //Blocks.Add(block);
                                 addBlock = true;
                                 maxVolume_ += (double)inventory.MaxVolume;
                                 break;
@@ -65,7 +64,6 @@ namespace IngameScript
                     else
                     {
                         inventories_.Add(inventory);
-                        //Blocks.Add(block);
                         addBlock = true;
                         maxVolume_ += (double)inventory.MaxVolume;
                     }
@@ -85,8 +83,8 @@ namespace IngameScript
                     if (ReferenceGrid != null)
                     {
                         if (BlockName != "")
-                            getBlocks<IMyTerminalBlock>(BlockName, IsGroup, AcceptBlock, TypeID);
-                        else if (!getBlocks<IMyTerminalBlock>(AcceptBlock, TypeID))
+                            getBlocks(BlockName, IsGroup, AcceptBlock, TypeID);
+                        else if (!getBlocks(AcceptBlock, TypeID))
                             return false;
 
                         constructStage_ = 1;
@@ -214,10 +212,7 @@ namespace IngameScript
                         var amount = inventory.GetItemAmount(itemType);
                         int index = items_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
                         if (index >= 0)
-                        {
                             items_[index].currentAmount += (long)amount;
-                            currentItems_ += (long)amount;
-                        }
                         else
                         {
                             InventoryItem item = new InventoryItem();
@@ -235,6 +230,7 @@ namespace IngameScript
                             items_.Add(item);
                         }
 
+                        currentItems_ += (long)amount;
                         return false;
                     });
                 }
@@ -276,7 +272,9 @@ namespace IngameScript
                     .Replace("%itemratio%", new VISUnitType(itemRatio_, unit: Unit.Percent))
                     .Replace("%maxvolume%", new VISUnitType(maxVolume_, unit: Unit.Liter).pack())
                     .Replace("%currentvolume%", new VISUnitType(currentVolume_, unit: Unit.Liter).pack())
-                    .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent));
+                    .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent))
+                    .Replace("%inventories%", inventories_.Count.ToString())
+                    .Replace("%itemtypes%", itemTypes_.Count.ToString());
             }
 
             long defaultMaxAmountItems_ = Default.MaxAmountItems;
