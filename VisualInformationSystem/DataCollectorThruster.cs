@@ -48,6 +48,7 @@ namespace IngameScript
             }
 
             #region Construction
+            int constructionStage_ = 0;
             public override bool construct()
             {
                 int cfgIndex = ConnectorName != "" ? 3 : 2;
@@ -65,7 +66,7 @@ namespace IngameScript
                             return ThrusterType.Hydrogen;
                     }
 
-                    return 0; //ThrusterType.All;
+                    return 0;
                 };
 
                 Func<string, ThrusterDirection> getThrusterDirection = (direction) =>
@@ -87,49 +88,67 @@ namespace IngameScript
                             return ThrusterDirection.Break;
                     }
 
-                    return 0; //ThrusterDirection.All;
+                    return 0;
                 };
 
-                // search for ship controller
-                referenceControllerName_ = Options[cfgIndex];
-                App.GridTerminalSystem.GetBlocksOfType<IMyShipController>(null, (scblock) =>
+                if (constructionStage_ == 0)
                 {
-                    IMyShipController controller = scblock as IMyShipController;
-                    if (controller != null && controller.IsSameConstructAs(ReferenceGrid))
+                    // search for ship controller
+                    referenceControllerName_ = Options[cfgIndex];
+                    App.GridTerminalSystem.GetBlocksOfType<IMyShipController>(null, (scblock) =>
                     {
-                        if (!controller.ControlThrusters)
-                            return false;
+                        IMyShipController controller = scblock as IMyShipController;
+                        if (controller != null && controller.IsSameConstructAs(ReferenceGrid))
+                        {
+                            if (!controller.ControlThrusters)
+                                return false;
 
-                        if (controller.CustomName == referenceControllerName_)
-                            referenceController_ = controller;
-                        else if (controller.IsMainCockpit)
-                            referenceController_ = controller;
-                        else if (controller.IsUnderControl)
-                            referenceController_ = controller;
+                            if (controller.CustomName == referenceControllerName_)
+                                referenceController_ = controller;
+                            else if (controller.IsMainCockpit)
+                                referenceController_ = controller;
+                            else if (controller.IsUnderControl)
+                                referenceController_ = controller;
+                        }
+
+                        return false;
+                    });
+
+                    if (referenceController_ == null)
+                        log(Console.LogType.Error, "No reference controller");
+                    else
+                    {
+                        referenceController_.Orientation.GetMatrix(out referenceControllerMatrix_);
+                        referenceControllerMatrix_ = Matrix.Invert(referenceControllerMatrix_);
                     }
 
-                    return false;
-                });
-
-                if (referenceController_ == null)
-                    log(Console.LogType.Error, "No reference controller");
-                else
+                    constructionStage_ = 1;
+                }
+                else if (constructionStage_ == 1)
                 {
-                    referenceController_.Orientation.GetMatrix(out referenceControllerMatrix_);
-                    referenceControllerMatrix_ = Matrix.Invert(referenceControllerMatrix_);
+                    // step through filter
+                    for (; cfgIndex < Options.Count; ++cfgIndex)
+                    {
+                        thrusterType_ |= getThrusterType(Options[cfgIndex].ToLower());
+                        thrusterDirection_ |= getThrusterDirection(Options[cfgIndex].ToLower());
+                    }
+
+                    thrusterType_ = thrusterType_ == 0 ? ThrusterType.All : thrusterType_;
+                    thrusterDirection_ = thrusterDirection_ == 0 ? ThrusterDirection.All : thrusterDirection_;
+
+                    return base.construct();
                 }
 
-                // step through filter
-                for (; cfgIndex < Options.Count; ++cfgIndex)
-                {
-                    thrusterType_ |= getThrusterType(Options[cfgIndex].ToLower());
-                    thrusterDirection_ |= getThrusterDirection(Options[cfgIndex].ToLower());
-                }
+                return true;
+            }
 
-                thrusterType_ = thrusterType_ == 0 ? ThrusterType.All : thrusterType_;
-                thrusterDirection_ = thrusterDirection_ == 0 ? ThrusterDirection.All : thrusterDirection_;
-
-                return base.construct();
+            public override bool reconstruct()
+            {
+                constructionStage_ = 0;
+                referenceController_ = null;
+                thrusterType_ = 0;
+                thrusterDirection_ = 0;
+                return base.reconstruct();
             }
             #endregion // Construction
 
@@ -146,16 +165,23 @@ namespace IngameScript
             {
                 base.prepareUpdate();
 
+                updateIndex = 0;
+
                 thrustMax_ = 0.0f;
                 thrustCurrent_ = 0.0f;
                 overrideCurrent_ = 0.0f;
                 overrideMax_ = 0.0f;
             }
 
+            int updateIndex = 0;
             protected override void update()
             {
-                foreach(var thruster in Blocks)
+                for (;
+                    updateIndex < Blocks.Count && App.Runtime.CurrentInstructionCount < App.Runtime.MaxInstructionCount;
+                    ++updateIndex)
                 {
+                    var thruster = Blocks[updateIndex];
+
                     thrustMax_ += thruster.MaxEffectiveThrust;
                     thrustCurrent_ += thruster.CurrentThrust;
 
@@ -166,9 +192,15 @@ namespace IngameScript
                     blocksFunctional_ += thruster.IsFunctional ? 1 : 0;
                 }
 
+                if (updateIndex >= Blocks.Count)
+                    UpdateFinished = true;
+            }
+
+            public override void finalizeUpdate()
+            {
                 thrustRate_ = thrustMax_ > 0.0f ? thrustCurrent_ / thrustMax_ : 0.0f;
                 overrideRate_ = overrideMax_ > 0.0f ? overrideCurrent_ / overrideMax_ : 0.0f;
-                UpdateFinished = true;
+                base.finalizeUpdate();
             }
             #endregion // Update
 
