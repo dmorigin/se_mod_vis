@@ -47,6 +47,12 @@ namespace IngameScript
                 return base.construct();
             }
 
+            public override bool reconstruct()
+            {
+                capacity_ = 0.0f;
+                return base.reconstruct();
+            }
+
             protected override void update()
             {
                 double fillRation = 0.0;
@@ -69,7 +75,7 @@ namespace IngameScript
                 return base.getVariable(data)
                     .Replace("%capacity%", new VISUnitType(capacity_, unit: Unit.Liter).pack())
                     .Replace("%fillratio%", new VISUnitType(fillRatio_, unit: Unit.Percent))
-                    .Replace("%fillvalue", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack())
+                    .Replace("%fillvalue%", new VISUnitType(fillRatio_ * capacity_, unit: Unit.Liter).pack())
                     .Replace("%stockpile%", stockpile_.ToString());
             }
 

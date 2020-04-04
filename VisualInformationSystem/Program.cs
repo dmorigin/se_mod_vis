@@ -22,7 +22,7 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        const string VERSION = "0.45b";
+        const string VERSION = "0.45c";
 
         static Program App = null;
 
