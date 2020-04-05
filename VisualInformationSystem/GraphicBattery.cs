@@ -255,17 +255,17 @@ namespace IngameScript
                     (load <= 0f ? borderColors_[1] : borderColors_[2])));
 
                 // draw plus pole
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
                     new Vector2(position.X, position.Y - backgroundSize.Y * 0.5f),
                     poleSize, borderColor));
 
                 // draw background
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
                     new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
                     backgroundSize, borderColor));
 
                 // draw inner section
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
                     new Vector2(position.X, position.Y + poleSize.Y * 0.5f),
                     InnerSectionSize, Template.BackgroundColor));
 
@@ -284,7 +284,7 @@ namespace IngameScript
                         if (capacity <= lerp)
                             break;
 
-                        addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple",
+                        addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
                             new Vector2(position.X, capacityYPosition - (capacityYOffset * s)),
                             capacitySize, Color.Lerp(barColors_[0], barColors_[1], lerp)));
                     }

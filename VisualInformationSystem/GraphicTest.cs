@@ -68,11 +68,11 @@ namespace IngameScript
                 // render edges
                 Vector2 blockSize = new Vector2(20f, 20f);
 
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", (rt.Size / 2f) + rt.DisplayOffset, blockSize, Color.White));
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", (blockSize / 2f) + rt.DisplayOffset, blockSize, Color.Red));
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", new Vector2(rt.Size.X - blockSize.X / 2f, blockSize.Y / 2f) + rt.DisplayOffset, blockSize, Color.Green));
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", new Vector2(blockSize.X / 2f, rt.Size.Y - blockSize.Y / 2f) + rt.DisplayOffset, blockSize, Color.Blue));
-                addSprite(new MySprite(SpriteType.TEXTURE, "SquareSimple", (rt.Size - (blockSize / 2f)) + rt.DisplayOffset, blockSize, Color.Yellow));
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, (rt.Size / 2f) + rt.DisplayOffset, blockSize, Color.White));
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, (blockSize / 2f) + rt.DisplayOffset, blockSize, Color.Red));
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, new Vector2(rt.Size.X - blockSize.X / 2f, blockSize.Y / 2f) + rt.DisplayOffset, blockSize, Color.Green));
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, new Vector2(blockSize.X / 2f, rt.Size.Y - blockSize.Y / 2f) + rt.DisplayOffset, blockSize, Color.Blue));
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, (rt.Size - (blockSize / 2f)) + rt.DisplayOffset, blockSize, Color.Yellow));
             }
         }
     }

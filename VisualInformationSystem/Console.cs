@@ -141,9 +141,7 @@ namespace IngameScript
                     using (MySpriteDrawFrame frame = renderTarget_.getRenderFrame())
                     {
                         // background
-                        frame.Add(new MySprite(SpriteType.TEXTURE, "SquareSimple",
-                            renderTarget_.Position + (renderTarget_.Size * 0.5f),
-                            renderTarget_.Size, Color.Black));
+                        renderTarget_.clearDrawArea(sprite => frame.Add(sprite));
 
                         // flush message lines
                         foreach (var message in messages_)

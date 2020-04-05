@@ -227,7 +227,7 @@ namespace IngameScript
                     if (barShow_)
                     {
                         barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, (float)Math.PI * 0.5f, false, renderData_.barTiles, 
-                            renderData_.barTileSpacing, "SquareSimple", (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
+                            renderData_.barTileSpacing, IconNameSquareSimple, (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
                         barPosition.Y += renderData_.lineHeight;
                     }
 

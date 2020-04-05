@@ -473,9 +473,6 @@ namespace IngameScript
                 float borderSize, Color borderColor, Color backgroundColor);
 
             #region Render Helper
-            static readonly string IconNameSquareSimple = "SquareSimple";
-            static readonly string IconNameCircle = "Circle";
-
             protected static void renderTextLine(Display display, RenderTarget rt, AddSpriteDelegate addSprite, 
                 string font, float fontSize, Vector2 position, Color fontColor, string textLine, TextAlignment alignment)
             {

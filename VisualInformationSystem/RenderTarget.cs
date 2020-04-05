@@ -57,13 +57,20 @@ namespace IngameScript
 
             public Color BackgroundColor
             {
+                get;
+                set;
+            }
+
+            /*
+            public Color BackgroundColor
+            {
                 get { return surface_.ScriptBackgroundColor; }
                 set
                 {
                     surface_.ScriptBackgroundColor = value;
                     surface_.BackgroundColor = value;
                 }
-            }
+            }*/
 
             public RenderTarget(RenderTargetID id, Vector2I coordinate)
             {
@@ -81,8 +88,6 @@ namespace IngameScript
                 surface_.TextPadding = 0f;
 
                 BackgroundColor = Color.Black;
-                //surface_.BackgroundColor = Color.Black;
-                //surface_.ScriptBackgroundColor = Color.Black;
 
                 RectangleF rect;
                 if (!RenderTargetID.tryGetFixed(ID, out rect))
@@ -131,8 +136,15 @@ namespace IngameScript
                 {
                     MySprite textInit = MySprite.CreateText("Initilize screen", "debug", Color.LawnGreen, 1f, TextAlignment.LEFT);
                     textInit.Position = new Vector2(5f, Default.CharHeight) + Position;
+
+                    clearDrawArea(sprite => frame.Add(sprite));
                     frame.Add(textInit);
                 }
+            }
+
+            public void clearDrawArea(Graphic.AddSpriteDelegate addSprite)
+            {
+                addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, Position + (Size * 0.5f), Size, BackgroundColor));
             }
         }
     }
