@@ -117,7 +117,10 @@ namespace IngameScript
                         dataCollector = new DataCollectorThruster(options, connector);
                         break;
                     case "onoff":
-                        dataCollector = new DataCollectorProperty("onoff", "", options, connector);
+                        dataCollector = new DataCollectorProperty("OnOff", "", options, connector);
+                        break;
+                    case "property":
+                        dataCollector = new DataCollectorProperty("property", "", options, connector);
                         break;
                 }
 

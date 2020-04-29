@@ -193,7 +193,6 @@ namespace IngameScript
             }
             #endregion
 
-
             public class Options
             {
                 List<string> options_ = null;
@@ -246,7 +245,6 @@ namespace IngameScript
                 public Vector3I asVector(int index, Vector3I defaultValue = new Vector3I()) => Configuration.asVector(this[index], defaultValue);
                 public Vector4I asVector(int index, Vector4I defaultValue = new Vector4I()) => Configuration.asVector(this[index], defaultValue);
             }
-
 
             public class Handler
             {
@@ -303,10 +301,12 @@ namespace IngameScript
                 }
             }
 
-
-            static bool processConfig(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler)
+            public static bool Process(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler)
             {
+                errorHandler = errorHandler != null ? errorHandler : (key, value, options) => false;
+
                 // convert to line list
+                Dictionary<string, string> variables = new Dictionary<string, string>();
                 List<string> lines = config.Trim().Split('\n').ToList();
                 foreach (var line in lines)
                 {
@@ -320,36 +320,31 @@ namespace IngameScript
                     {
                         string key = segments[0].Trim().ToLower();
                         string value = segments.Count >= 2 ? segments[1].Trim() : "";
-                        List<string> options = segments.Count > 2 ? segments.GetRange(2, segments.Count - 2) : new List<string>();
+                        //List<string> options = segments.Count > 2 ? segments.GetRange(2, segments.Count - 2) : new List<string>();
 
-                        if (key.Length <= 0)
-                            continue;
+                        if (key.Length > 0)
+                        {
+                            if (key[0] == '$')
+                                variables[$"$({key.Substring(1)})"] = value;
+                            else
+                            {
+                                value = variables.ContainsKey(value) ? variables[value] : value;
+                                List<string> options = new List<string>();
+                                for (int c = 2; c < segments.Count; ++c)
+                                    options.Add(variables.ContainsKey(segments[c]) ? variables[segments[c]] : segments[c]);
 
-                        if (!handler[key](key, value, new Options(options)))
-                            return errorHandler(key, value, options);
+                                if (!handler[key](key, value, new Options(options)))
+                                    return errorHandler(key, value, options);
+                            }
+                        }
                     }
                 }
 
                 return true;
             }
 
-
-            public static bool Process(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler = null)
-            {
-                return processConfig(handler, config, errorHandler != null ? errorHandler : (key, value, options) =>
-                {
-                    return false;
-                });
-            }
-
-
             public static bool Process(Handler handler, IMyTerminalBlock block, Func<string, string, List<string>, bool> errorHandler = null)
-            {
-                return processConfig(handler, block.CustomData, errorHandler != null ? errorHandler : (key, value, options) =>
-                {
-                    return false;
-                });
-            }
+                => Process(handler, block.CustomData, errorHandler);
         }
     }
 }
