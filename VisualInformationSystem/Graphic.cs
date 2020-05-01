@@ -803,7 +803,7 @@ namespace IngameScript
             protected class Icon
             {
                 public delegate void Render(AddSpriteDelegate addSprite, RenderTarget rt, string name,
-                    Vector2 position, Vector2 size, float rotation, Color color);
+                    Vector2 position, Vector2 size, float thickness, float rotation, Color color);
 
                 public static Render getIcon(string name)
                 {
@@ -814,22 +814,55 @@ namespace IngameScript
                     switch(name)
                     {
                         case "VIS_Icon_Storage":
-                            return renderStorageIcon;
+                            return renderIconStorage;
                         case "VIS_Icon_Delimiter":
-                            return renderDelimiter;
+                            return renderIconDelimiter;
+                        case "VIS_Icon_Border":
+                            return renderIconBorder;
                     }
 
                     return null;
                 }
 
                 static void renderSEIcon(AddSpriteDelegate addSprite, RenderTarget rt, string name,
-                    Vector2 position, Vector2 size, float rotation, Color color)
+                    Vector2 position, Vector2 size, float thickness, float rotation, Color color)
                 {
                     addSprite(new MySprite(SpriteType.TEXTURE, name, position + rt.DisplayOffset, size, color, rotation: rotation));
                 }
 
-                static void renderDelimiter(AddSpriteDelegate addSprite, RenderTarget rt, string name,
-                    Vector2 position, Vector2 size, float rotation, Color color)
+                static void renderIconBorder(AddSpriteDelegate addSprite, RenderTarget rt, string name,
+                    Vector2 position, Vector2 size, float thickness, float rotation, Color color)
+                {
+                    Vector2 halfSize = size * 0.5f;
+                    float halfThickness = thickness * 0.5f;
+
+                    // top
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
+                        new Vector2(position.X, position.Y - halfSize.Y + halfThickness) + rt.DisplayOffset,
+                        new Vector2(size.X, thickness),
+                        color, rotation:rotation));
+
+                    // bottom
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
+                        new Vector2(position.X, position.Y + halfSize.Y - halfThickness) + rt.DisplayOffset,
+                        new Vector2(size.X, thickness),
+                        color, rotation:rotation));
+
+                    // left
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
+                        new Vector2(position.X - halfSize.X + halfThickness, position.Y) + rt.DisplayOffset,
+                        new Vector2(thickness, size.Y),
+                        color, rotation: rotation));
+
+                    // right
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
+                        new Vector2(position.X + halfSize.X - halfThickness, position.Y) + rt.DisplayOffset,
+                        new Vector2(thickness, size.Y),
+                        color, rotation: rotation));
+                }
+
+                static void renderIconDelimiter(AddSpriteDelegate addSprite, RenderTarget rt, string name,
+                    Vector2 position, Vector2 size, float thickness, float rotation, Color color)
                 {
                     Vector2 rtPosition = position + rt.DisplayOffset;
 
@@ -845,8 +878,8 @@ namespace IngameScript
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameCircle, posEndRight, new Vector2(size.Y, size.Y), color));
                 }
 
-                static void renderStorageIcon(AddSpriteDelegate addSprite, RenderTarget rt, string name,
-                    Vector2 center, Vector2 size, float rotation, Color color)
+                static void renderIconStorage(AddSpriteDelegate addSprite, RenderTarget rt, string name,
+                    Vector2 center, Vector2 size, float thickness, float rotation, Color color)
                 {
                     //size.Y = size.X;
                     Vector2 offset = new Vector2(0f, 0f);

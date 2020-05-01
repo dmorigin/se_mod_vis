@@ -36,6 +36,7 @@ namespace IngameScript
             public static Graphic.ValueType PositionType = ValueType;
             public static Vector2 Size = new Vector2(1f, 1f);
             public static Graphic.ValueType SizeType = ValueType;
+            public static float Thickness = 0.01f;
 
             public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);

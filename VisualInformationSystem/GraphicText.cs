@@ -231,7 +231,6 @@ namespace IngameScript
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                //if (DataAccessor != null && !VisibleOperator(DataAccessor.indicator(), VisibleThreshold))
                 if (DataAccessor != null && !isVisible(DataAccessor.indicator()))
                     return;
 

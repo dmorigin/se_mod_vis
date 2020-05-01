@@ -99,7 +99,7 @@ namespace IngameScript
                     thickness_, renderData_.ratio, Gradient, colorLerp_, Template.BackgroundColor);
 
                 if (icon_ != null)
-                    icon_(addSprite, rt, iconName_, renderData_.position, renderData_.iconSize, 0f, renderData_.iconColor);
+                    icon_(addSprite, rt, iconName_, renderData_.position, renderData_.iconSize, 1f, 0f, renderData_.iconColor);
             }
             #endregion // Rendering
 

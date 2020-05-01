@@ -52,6 +52,8 @@ namespace IngameScript
                 gfx.icon_ = icon_;
                 gfx.blink_ = blink_;
                 gfx.rotation_ = rotation_;
+                gfx.thickness_ = thickness_;
+                gfx.thicknessSizeType_ = thicknessSizeType_;
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
@@ -71,17 +73,20 @@ namespace IngameScript
                 bool visible = true;
                 if (DataAccessor != null)
                 {
-                    visible = isVisible(DataAccessor.indicator());//VisibleOperator(DataAccessor.indicator(), VisibleThreshold);
+                    visible = isVisible(DataAccessor.indicator());
                     getGradientColorLerp((float)DataAccessor.indicator(), Gradient, out color);
                 }
 
                 if (!visible || (!toggleShow_ && blink_))
                     return;
 
-                Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
 
-                icon_(addSprite, rt, iconName_, position, size, rotation_, color);
+                icon_(addSprite, rt, iconName_,
+                    PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position,
+                    size,
+                    thicknessSizeType_ == ValueType.Relative ? thickness_ * size.X : thickness_,
+                    rotation_, color);
             }
 
             #region Configuration
@@ -91,12 +96,13 @@ namespace IngameScript
                 config.add("icon", configIcon);
                 config.add("blink", configBlink);
                 config.add("rotation", configRotation);
+                config.add("thickness", configThickness);
 
                 return config;
             }
 
             string iconName_ = "";
-            Icon.Render icon_ = (addSprite, rt, name, position, size, rotation, color) => { };
+            Icon.Render icon_ = (addSprite, rt, name, position, size, thickness, rotation, color) => { };
             bool configIcon(string key, string value, Configuration.Options options)
             {
                 iconName_ = value;
@@ -121,6 +127,16 @@ namespace IngameScript
             {
                 // 360° == 2*pi
                 rotation_ = (float)((Configuration.asFloat(value, 0f) / 180f) * Math.PI);
+                return true;
+            }
+
+            float thickness_ = Default.Thickness;
+            ValueType thicknessSizeType_ = Default.SizeType;
+            bool configThickness(string key, string value, Configuration.Options options)
+            {
+                thickness_ = Configuration.asFloat(value, Default.Thickness);
+                if (options.Count > 0)
+                    toValueType(options[0], out thicknessSizeType_, Default.SizeType);
                 return true;
             }
             #endregion // Configuration

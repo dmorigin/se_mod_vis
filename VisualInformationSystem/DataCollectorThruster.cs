@@ -93,8 +93,16 @@ namespace IngameScript
 
                 if (constructionStage_ == 0)
                 {
+                    if (ReferenceGrid == null)
+                    {
+                        constructionStage_ = 1;
+                        return true;
+                    }
+
                     // search for ship controller
                     referenceControllerName_ = Options[cfgIndex];
+                    referenceController_ = null;
+
                     App.GridTerminalSystem.GetBlocksOfType<IMyShipController>(null, (scblock) =>
                     {
                         IMyShipController controller = scblock as IMyShipController;
@@ -103,7 +111,9 @@ namespace IngameScript
                             if (!controller.ControlThrusters)
                                 return false;
 
-                            if (controller.CustomName == referenceControllerName_)
+                            if (referenceController_ == null)
+                                referenceController_ = controller;
+                            else if (controller.CustomName == referenceControllerName_)
                                 referenceController_ = controller;
                             else if (controller.IsMainCockpit)
                                 referenceController_ = controller;

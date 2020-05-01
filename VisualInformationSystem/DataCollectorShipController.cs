@@ -62,9 +62,15 @@ namespace IngameScript
                     blocksOn_ += isOn(controller) ? 1 : 0;
                     blocksFunctional_ += controller.IsFunctional ? 1 : 0;
 
-                    if (controller.CanControlShip && controller.CanControlShip)
+                    if (controller.CanControlShip && controller.IsUnderControl)
                         referenceController_ = controller;
+
+                    if (controller.IsMainCockpit)
+                        mainController_ = controller;
                 }
+
+                if (mainController_ != null)
+                    referenceController_ = mainController_;
 
                 speedMax_ = Default.MaxShipSpeed; // ToDo: Find a more generic way to support speed mods
                 speedCurrent_ = (float)referenceController_.GetShipSpeed();
@@ -80,6 +86,7 @@ namespace IngameScript
                 massRatio_ = clamp(massInventory_ / (massShip_ * 1.5f)); // ToDo: find a more accurate way
 
                 //var velocities = referenceController_.GetShipVelocities();
+                //referenceController_.DampenersOverride 
 
                 UpdateFinished = true;
             }
