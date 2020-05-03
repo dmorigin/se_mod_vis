@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorGasTank : DataCollector<IMyGasTank>
+        public class DataCollectorGasTank : DataCollectorBase<IMyGasTank>
         {
             public DataCollectorGasTank(string name, string typeId, Configuration.Options options, string connector)
                 : base(name, "MyObjectBuilder_OxygenTank", options, connector)

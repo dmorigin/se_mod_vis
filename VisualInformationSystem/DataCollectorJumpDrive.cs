@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorJumpDrive: DataCollector<IMyJumpDrive>
+        public class DataCollectorJumpDrive: DataCollectorBase<IMyJumpDrive>
         {
             public DataCollectorJumpDrive(Configuration.Options options, string connector)
                 : base("jumpdrive", "", options, connector)

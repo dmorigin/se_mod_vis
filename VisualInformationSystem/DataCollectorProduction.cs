@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorProduction<BlockType> : DataCollector<BlockType> where BlockType: class
+        public class DataCollectorProduction<BlockType> : DataCollectorBase<BlockType> where BlockType: class
         {
             public DataCollectorProduction(string collectorTypeName, string typeId, Unit unit, Configuration.Options options, string connector)
                 : base(collectorTypeName, typeId, options, connector)

@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorProperty : DataCollector<IMyTerminalBlock>
+        public class DataCollectorProperty : DataCollectorBase<IMyTerminalBlock>
         {
             public DataCollectorProperty(string collectorTypeName, string typeId, Configuration.Options options, string connector)
                 : base(collectorTypeName, typeId, options, connector)

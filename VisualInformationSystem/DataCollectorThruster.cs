@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorThruster : DataCollector<IMyThrust>
+        public class DataCollectorThruster : DataCollectorBase<IMyThrust>
         {
             public DataCollectorThruster(Configuration.Options options, string connector)
                 : base("thruster", "", options, connector)
@@ -202,8 +202,7 @@ namespace IngameScript
                     blocksFunctional_ += thruster.IsFunctional ? 1 : 0;
                 }
 
-                if (updateIndex >= Blocks.Count)
-                    UpdateFinished = true;
+                UpdateFinished = updateIndex >= Blocks.Count;
             }
 
             public override void finalizeUpdate()

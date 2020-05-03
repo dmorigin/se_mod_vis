@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorLandingGear : DataCollector<IMyLandingGear>
+        public class DataCollectorLandingGear : DataCollectorBase<IMyLandingGear>
         {
             public DataCollectorLandingGear(Configuration.Options options, string connector)
                 : base("landinggear", "", options, connector)

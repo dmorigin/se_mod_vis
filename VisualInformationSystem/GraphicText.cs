@@ -152,11 +152,13 @@ namespace IngameScript
                 public Vector2 position;
                 public float lineHeight;
                 public List<string> lines;
+
+                public bool visible;
             }
 
             RenderData renderData_ = new RenderData();
 
-            string getText(string text)
+            string processTextLine(string text)
             {
                 string line = text
                     .Replace("%time_hhmmss%", DateTime.Now.ToString("HH:mm:ss"))
@@ -186,7 +188,7 @@ namespace IngameScript
 
                 Func<string, string> calcMaxSize = (text) =>
                 {
-                    string line = getText(text);
+                    string line = processTextLine(text);
                     Vector2 lineSize = display.measureLineInPixels(line, Font, dynFontSize ? 1f : fontSize);
 
                     maxSize.X = Math.Max(maxSize.X, lineSize.X);
@@ -227,11 +229,13 @@ namespace IngameScript
                     renderData_.fontColor = DataAccessor != null ? getGradientColor((float)DataAccessor.indicator()) : Color;
                 else
                     renderData_.fontColor = FontColor;
+
+                renderData_.visible = DataAccessor != null ? isVisible(DataAccessor.indicator()) : true;
             }
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (DataAccessor != null && !isVisible(DataAccessor.indicator()))
+                if (!renderData_.visible)
                     return;
 
                 for (int c = 0; c < renderData_.lines.Count; c++)

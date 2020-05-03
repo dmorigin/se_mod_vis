@@ -41,6 +41,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="DataCollectorAirVent.cs" />
+    <Compile Include="DataCollectorBase.cs" />
     <Compile Include="DataCollectorConnector.cs" />
     <Compile Include="DataCollectorLandingGear.cs" />
     <Compile Include="DataCollectorPiston.cs" />

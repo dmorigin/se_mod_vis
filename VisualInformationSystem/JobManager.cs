@@ -28,7 +28,6 @@ namespace IngameScript
             {
             }
 
-
             static int nextJobId_ = 1;
             public int NextJobID
             {
@@ -62,12 +61,11 @@ namespace IngameScript
                         return true;
                     }
                     else
-                        log(Console.LogType.Error, $"Job with id {job.JobId} already registered");
+                        log(Console.LogType.Error, $"Job '{job.JobId}' already registered");
                 }
 
                 return false;
             }
-
 
             public bool unregisterTimedJob(JobTimed job)
             {
@@ -77,12 +75,10 @@ namespace IngameScript
                 return timedJobs_.Remove(job);
             }
 
-
             public bool unregisterTimedJob(int id)
             {
                 return unregisterTimedJob(getTimedJob(id));
             }
-
 
             public JobTimed getTimedJob(int id)
             {
@@ -90,6 +86,20 @@ namespace IngameScript
                 {
                     if (job.JobId == id)
                         return job;
+                }
+
+                return null;
+            }
+
+            public JobTimed getTimedJob(string name)
+            {
+                foreach(var job in timedJobs_)
+                {
+                    if (job.Name == name)
+                    {
+                        log(Console.LogType.Debug, $"Job {name} found");
+                        return job;
+                    }
                 }
 
                 return null;

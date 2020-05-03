@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorPiston : DataCollector<IMyPistonBase>
+        public class DataCollectorPiston : DataCollectorBase<IMyPistonBase>
         {
             public DataCollectorPiston(Configuration.Options options, string connector)
                 : base("piston", "", options, connector)

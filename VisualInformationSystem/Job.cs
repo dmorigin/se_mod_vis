@@ -23,7 +23,8 @@ namespace IngameScript
     {
         public class Job : RuntimeObject
         {
-            public Job()
+            public Job(string name = "")
+                : base(name)
             {
                 JobManager = App.Manager.JobManager;
                 JobId = JobManager.NextJobID;

@@ -24,6 +24,7 @@ namespace IngameScript
         public class Display : JobTimed
         {
             public Display(string groupId)
+                : base($"Display:{groupId}")
             {
                 GroupId = groupId;
                 PanelConnector = null;

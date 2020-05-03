@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorConnector : DataCollector<IMyShipConnector>
+        public class DataCollectorConnector : DataCollectorBase<IMyShipConnector>
         {
             public DataCollectorConnector(Configuration.Options options, string connector)
                 : base("connector", "", options, connector)
@@ -31,7 +31,7 @@ namespace IngameScript
             protected override void update()
             {
                 connected_ = 0;
-                disconnected_ = 0;
+                unconnected_ = 0;
                 connectable_ = 0;
 
                 foreach(var connector in Blocks)
@@ -40,7 +40,7 @@ namespace IngameScript
                     blocksFunctional_ += connector.IsFunctional ? 1 : 0;
 
                     connected_ += connector.Status == MyShipConnectorStatus.Connected ? 1 : 0;
-                    disconnected_ += connector.Status == MyShipConnectorStatus.Unconnected ? 1 : 0;
+                    unconnected_ += connector.Status == MyShipConnectorStatus.Unconnected ? 1 : 0;
                     connectable_ += connector.Status == MyShipConnectorStatus.Connectable ? 1 : 0;
                 }
 
@@ -48,22 +48,30 @@ namespace IngameScript
             }
 
             int connected_ = 0;
-            int disconnected_ = 0;
+            int unconnected_ = 0;
             int connectable_ = 0;
 
             public override string getVariable(string data)
             {
                 return base.getVariable(data)
                     .Replace("%connected%", connected_.ToString())
-                    .Replace("%disconnected%", disconnected_.ToString())
+                    .Replace("%disconnected%", unconnected_.ToString())
                     .Replace("%connectable%", connectable_.ToString());
             }
 
             #region Data Accessor
             public override DataAccessor getDataAccessor(string name)
             {
-                if (name.ToLower() == "status")
-                    return new Status(this);
+                switch(name.ToLower())
+                {
+                    case "status":
+                        return new Status(this);
+                    case "connected":
+                        return new Connected(this);
+                    case "unconnected":
+                        return new Unconnected(this);
+                }
+
                 return base.getDataAccessor(name);
             }
 
@@ -89,6 +97,68 @@ namespace IngameScript
                         ListContainer item = new ListContainer();
                         item.name = connector.CustomName;
                         item.indicator = connector.Status == MyShipConnectorStatus.Connected ? 1 : (connector.Status == MyShipConnectorStatus.Connectable ? 0.5 : 0);
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(item.indicator);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+
+            class Connected : DataAccessor
+            {
+                DataCollectorConnector dc_;
+                public Connected(DataCollectorConnector dc)
+                {
+                    dc_ = dc;
+                }
+
+                public override double indicator() => (dc_.connected_ / (float)dc_.Blocks.Count);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.connected_);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (var connector in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = connector.CustomName;
+                        item.indicator = connector.Status == MyShipConnectorStatus.Connected ? 1 : 0;
+                        item.min = new VISUnitType(0);
+                        item.max = new VISUnitType(1);
+                        item.value = new VISUnitType(item.indicator);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+
+            class Unconnected : DataAccessor
+            {
+                DataCollectorConnector dc_;
+                public Unconnected(DataCollectorConnector dc)
+                {
+                    dc_ = dc;
+                }
+
+                public override double indicator() => (dc_.unconnected_ / (float)dc_.Blocks.Count);
+                public override VISUnitType min() => new VISUnitType(0);
+                public override VISUnitType max() => new VISUnitType(dc_.Blocks.Count);
+                public override VISUnitType value() => new VISUnitType(dc_.connected_);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (var connector in dc_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = connector.CustomName;
+                        item.indicator = connector.Status == MyShipConnectorStatus.Unconnected ? 1 : 0;
                         item.min = new VISUnitType(0);
                         item.max = new VISUnitType(1);
                         item.value = new VISUnitType(item.indicator);

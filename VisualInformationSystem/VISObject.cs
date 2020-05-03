@@ -31,7 +31,7 @@ namespace IngameScript
                 Constructed = false;
 
                 if (name == string.Empty)
-                    Name = $"ModObject_{Id}";
+                    Name = $"VISObject_{Id}";
                 else
                     Name = name;
             }

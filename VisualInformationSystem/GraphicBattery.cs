@@ -234,7 +234,7 @@ namespace IngameScript
                         drawSingleBattery(position, renderData_.scale,
                             battery.CurrentStoredPower / battery.MaxStoredPower,
                             (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput),
-                            DataCollector<IMyBatteryBlock>.isOn(battery),
+                            DataCollectorBase<IMyBatteryBlock>.isOn(battery),
                             battery.ChargeMode, addSprite);
                     }
                 }

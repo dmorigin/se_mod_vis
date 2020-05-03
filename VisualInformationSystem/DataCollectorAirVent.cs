@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorAirVent : DataCollector<IMyAirVent>
+        public class DataCollectorAirVent : DataCollectorBase<IMyAirVent>
         {
             public DataCollectorAirVent(Configuration.Options options, string connector)
                 : base("airvent", "", options, connector)

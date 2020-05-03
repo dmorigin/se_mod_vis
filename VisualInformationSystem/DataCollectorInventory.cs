@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorInventory : DataCollector<IMyTerminalBlock>
+        public class DataCollectorInventory : DataCollectorBase<IMyTerminalBlock>
         {
             public DataCollectorInventory(Configuration.Options options, string connector)
                 : base("inventory", "", options, connector)
@@ -77,9 +77,6 @@ namespace IngameScript
             {
                 if (constructStage_ == 0)
                 {
-                    if (ConnectorName != "" && Connector == null)
-                        log(Console.LogType.Error, $"Connector \"{ConnectorName}\" not found");
-
                     if (ReferenceGrid != null)
                     {
                         if (BlockName != "")
@@ -90,7 +87,11 @@ namespace IngameScript
                         constructStage_ = 1;
                     }
                     else
+                    {
+                        if (ConnectorName == "")
+                            log(Console.LogType.Error, $"No reference block");
                         Constructed = true;
+                    }
                 }
                 else if (constructStage_ == 1)
                 {
@@ -183,7 +184,6 @@ namespace IngameScript
                 currentItems_ = 0;
                 invIndex_ = 0;
                 items_.Clear();
-                UpdateFinished = false;
             }
 
             public override void finalizeUpdate()
@@ -236,10 +236,7 @@ namespace IngameScript
                 }
 
                 if (invIndex_ >= inventories_.Count)
-                {
                     base.update();
-                    UpdateFinished = true;
-                }
             }
             #endregion // Update Part
 

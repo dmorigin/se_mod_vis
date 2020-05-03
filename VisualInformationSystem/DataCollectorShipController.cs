@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorShipController : DataCollector<IMyShipController>
+        public class DataCollectorShipController : DataCollectorBase<IMyShipController>
         {
             public DataCollectorShipController(Configuration.Options options, string connector)
                 : base("shipcontroller", "", options, connector)

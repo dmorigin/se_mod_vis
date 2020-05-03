@@ -23,19 +23,26 @@ namespace IngameScript
     {
         public class JobTimed : Job
         {
-            TimeSpan interval_ = Default.Refresh;
+            public JobTimed(string name)
+                : base(name)
+            {
+                Interval = Default.Refresh;
+                NextExecute = new TimeSpan(0);
+            }
+
+            //TimeSpan interval_ = Default.Refresh;
             public virtual TimeSpan Interval
             {
-                get { return interval_; }
-                set { interval_ = value; }
+                get;// { return interval_; }
+                set;// { interval_ = value; }
             }
 
 
-            TimeSpan nextExecute_ = new TimeSpan(0);
+            //TimeSpan nextExecute_ = new TimeSpan(0);
             public TimeSpan NextExecute
             {
-                get { return nextExecute_; }
-                set { nextExecute_ = value; }
+                get;// { return nextExecute_; }
+                set;// { nextExecute_ = value; }
             }
         }
     }

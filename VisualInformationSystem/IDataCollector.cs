@@ -31,8 +31,6 @@ namespace IngameScript
 
             bool UpdateFinished { get; }
             string CollectorTypeName { get; }
-            string BlockName { get; }
-            bool IsGroup { get; }
             Configuration.Options Options { get; }
             string TypeID { get; }
             TimeSpan MaxUpdateInterval { get; set; }

@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class DataCollectorPowerProducer<T> : DataCollector<T> where T: class
+        public class DataCollectorPowerProducer<T> : DataCollectorBase<T> where T: class
         {
             public DataCollectorPowerProducer(string collectorTypeName, string typeId, Configuration.Options options, string connector)
                 : base(collectorTypeName, typeId, options, connector)
