@@ -29,7 +29,7 @@ namespace IngameScript
             }
 
             List<Display> displays_ = new List<Display>();
-            static int genericDisplayGroupId_ = 0;
+            static int genericGroupId_ = 0;
 
             public Display createDisplay(string groupId)
             {
@@ -37,7 +37,7 @@ namespace IngameScript
 
                 if (groupId == Default.EmptyDisplayGroupID)
                 {
-                    groupId = $"genericDisplayGroup_{++genericDisplayGroupId_}";
+                    groupId = $"genericGroup_{++genericGroupId_}";
                     display = new Display(groupId);
                 }
                 else if ((display = getDisplayGroup(groupId)) == null)

@@ -34,7 +34,7 @@ namespace IngameScript
 
                 TypeID = typeId;
                 CollectorTypeName = collectorTypeName;
-                ReferenceGrid = App.Me;
+                ReferenceGrid = connector != "" ? null : App.Me;
                 ConnectorName = connector;
 
                 MaxUpdateInterval = Default.DCRefresh;
@@ -160,6 +160,7 @@ namespace IngameScript
             class UpdateJob : Job
             {
                 public UpdateJob(DataCollector dc)
+                    : base($"Update[{dc.CollectorTypeName}]")
                 {
                     dc_ = dc;
                 }
@@ -201,6 +202,7 @@ namespace IngameScript
             class ReconstructJob : Job
             {
                 public ReconstructJob(DataCollector dc)
+                    : base($"Reconstruct[{dc.CollectorTypeName}]")
                 {
                     dc_ = dc;
                 }
@@ -237,7 +239,6 @@ namespace IngameScript
                 List<DataCollector> dcs_ = new List<DataCollector>();
                 bool connected_ = false;
                 string connectorName_ = "";
-                IMyShipConnector connector_ = null;
 
                 public WatchConnector(string connectorName, DataCollector dc)
                     : base(JobName(connectorName))
@@ -252,36 +253,26 @@ namespace IngameScript
 
                 public override void tick(TimeSpan delta)
                 {
-                    if (connector_ == null)
-                        connector_ = App.GridTerminalSystem.GetBlockWithName(connectorName_) as IMyShipConnector;
-
-                    try
+                    var connector = App.GridTerminalSystem.GetBlockWithName(connectorName_) as IMyShipConnector;
+                    if (connector != null)
                     {
-                        if (connector_ != null)
-                        {
-                            bool connected = connector_.Status == MyShipConnectorStatus.Connected;
-                            var otherConnector = connected ? connector_.OtherConnector : null;
-                            var reconstruct = connected_ != connected;
+                        bool connected = connector.Status == MyShipConnectorStatus.Connected;
+                        var otherConnector = connected ? connector.OtherConnector : null;
+                        var reconstruct = connected_ != connected;
 
-                            foreach (var dc in dcs_)
+                        foreach (var dc in dcs_)
+                        {
+                            if (dc.Constructed)
                             {
-                                if (dc.Constructed)
-                                {
-                                    if (reconstruct)
-                                        dc.ReconstructOnConnector = true;
-                                    dc.ReferenceGrid = otherConnector;
-                                }
+                                if (reconstruct)
+                                    dc.ReconstructOnConnector = true;
+                                dc.ReferenceGrid = otherConnector;
                             }
+                        }
 
-                            connected_ = connected;
-                        }
-                        else
-                        {
-                            foreach (var dc in dcs_)
-                                dc.ReferenceGrid = null;
-                        }
+                        connected_ = connected;
                     }
-                    catch (Exception)
+                    else
                     {
                         foreach (var dc in dcs_)
                             dc.ReferenceGrid = null;

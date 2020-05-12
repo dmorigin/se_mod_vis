@@ -34,18 +34,29 @@ namespace IngameScript
                 get { return ++nextJobId_; }
             }
 
+            //public struct JobstatisticInfo
+            //{
+            //    public int id;
+            //    public string name;
+            //    public int count;
+            //}
+
             int jobCountLastUpdate_ = 0;
             int queuedJobCountFinished_ = 0;
             int queuedJobCountExecutes_ = 0;
+            //List<JobstatisticInfo> jobsExecuted_ = new List<JobstatisticInfo>();
             public void getStatistic(ref int jobCountLastUpdate, ref int queuedJobCountFinished, ref int queuedJobCountExecutes)
+                //ref List<JobstatisticInfo> jobInfo)
             {
                 jobCountLastUpdate = jobCountLastUpdate_;
                 queuedJobCountFinished = queuedJobCountFinished_;
                 queuedJobCountExecutes = queuedJobCountExecutes_;
+                //jobInfo = jobsExecuted_.GetRange(0, jobsExecuted_.Count);
 
                 jobCountLastUpdate_ = 0;
                 queuedJobCountFinished_ = 0;
                 queuedJobCountExecutes_ = 0;
+                //jobsExecuted_.Clear();
             }
 
             #region Timed Jobs
@@ -152,6 +163,7 @@ namespace IngameScript
             #endregion // Queued Jobs
 
             bool toggleRun_ = false;
+            //JobstatisticInfo jobInfo_ = new JobstatisticInfo();
             public override void tick(TimeSpan delta)
             {
                 if ((toggleRun_ = !toggleRun_) == true)
@@ -164,6 +176,7 @@ namespace IngameScript
                             curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
                             curQueuedJobLastExecute_ = Manager.Timer.Ticks;
                             queuedJobCountExecutes_++;
+                            //jobInfo_.count++;
 
                             if (curQueuedJob_.JobFinished)
                             {
@@ -171,6 +184,9 @@ namespace IngameScript
                                 curQueuedJob_.LastExecute = Manager.Timer.Ticks;
                                 queuedJobCountFinished_++;
                                 curQueuedJob_ = null;
+
+                                //statistic
+                                //jobsExecuted_.Add(jobInfo_);
                             }
                         }
                         else if (queuedJobs_.Count > 0)
@@ -179,6 +195,11 @@ namespace IngameScript
                             queuedJobs_.RemoveFirst();
                             curQueuedJob_.prepareJob();
                             curQueuedJobLastExecute_ = Manager.Timer.Ticks;
+
+                            // statistic
+                            //jobInfo_.id = curQueuedJob_.JobId;
+                            //jobInfo_.name = curQueuedJob_.Name;
+                            //jobInfo_.count = 0;
                         }
                     }
                     catch(Exception exp)

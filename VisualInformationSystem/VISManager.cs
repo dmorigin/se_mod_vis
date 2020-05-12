@@ -116,6 +116,7 @@ namespace IngameScript
                     add("rtfixsize", configRTFixSize);
                     add("maxspeed", configMaxSpeed);
                     add("itemamount", configMaxAmountItem);
+                    add("recointerval", configSetRecInterval);
                 }
 
                 public string vDisplayNameTag_ = Default.DisplayNameTag;
@@ -198,6 +199,12 @@ namespace IngameScript
 
                     manager_.log(Console.LogType.Error, $"Invalid item type \"{value}\"");
                     return false;
+                }
+
+                bool configSetRecInterval(string key, string value, Configuration.Options options)
+                {
+                    Default.ReconstructInterval = TimeSpan.FromSeconds(Configuration.asFloat(value, Default.ReconstructIntervalInSec));
+                    return true;
                 }
             }
             #endregion // Configuration

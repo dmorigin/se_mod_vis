@@ -67,10 +67,13 @@ namespace IngameScript
                 return new Vector2(width * fontSize, Default.CharHeight * fontSize);
             }
 
+            bool renderProcessStarted_ = false;
             public override void tick(TimeSpan delta)
             {
-                if (Template != null)
+                if (Template != null && !renderProcessStarted_)
                 {
+                    renderProcessStarted_ = true;
+
                     // queue gather jobs
                     foreach (var graphic in Template.getGraphics())
                     {
@@ -143,11 +146,17 @@ namespace IngameScript
             class RenderJob : Job
             {
                 public RenderJob(Display display)
+                    : base($"Render[{display.Name}]")
                 {
                     display_ = display;
                 }
 
                 Display display_ = null;
+
+                public override void finalizeJob()
+                {
+                    display_.renderProcessStarted_ = false;
+                }
 
                 public override void tick(TimeSpan delta)
                 {

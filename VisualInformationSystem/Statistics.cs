@@ -79,7 +79,8 @@ namespace IngameScript
                     int jobQueuedExec = 0;
                     int jobQueued = 0;
                     int jobTimed = 0;
-                    vis.JobManager.getStatistic(ref jobTimed, ref jobQueued, ref jobQueuedExec);
+                    //List<JobManager.JobstatisticInfo> jobInfo = new List<JobManager.JobstatisticInfo>();
+                    vis.JobManager.getStatistic(ref jobTimed, ref jobQueued, ref jobQueuedExec);//, ref jobInfo);
 
                     // print statistic
                     sb_.Clear();
@@ -93,6 +94,10 @@ namespace IngameScript
                     sb_.AppendLine($"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}");
                     sb_.AppendLine($"Job (Timed): {jobTimed}");
                     sb_.AppendLine($"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}");
+
+                    //sb_.AppendLine($"\nJobs executed:");
+                    //foreach (var job in jobInfo)
+                    //    sb_.AppendLine($"{job.name}/{job.id}:{job.count}");
 
                     if (exception_ != "")
                         sb_.Append($"\nException:\n{exception_}\n");
