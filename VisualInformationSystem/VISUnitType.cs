@@ -32,7 +32,8 @@ namespace IngameScript
             Gravity,
             Speed,
             Meter,
-            Newton
+            Newton,
+            Accel
         }
 
         public enum Multiplier
@@ -143,6 +144,8 @@ namespace IngameScript
                         return "m";
                     case Unit.Newton:
                         return "N";
+                    case Unit.Accel:
+                        return "m/s²";
                 }
 
                 return "";

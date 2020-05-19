@@ -267,13 +267,31 @@ namespace IngameScript
 
             public override string getVariable(string data)
             {
+                // calculate acceleration
+                // F = m * a
+                // F => Newton
+                // m => Mass in kg
+                // a => Accel in m/s²
+                Func<float, float> calcAccel = (thrust) =>
+                {
+                    if (referenceController_ != null)
+                    {
+                        var mass = referenceController_.CalculateShipMass();
+                        return thrust / mass.TotalMass;
+                    }
+
+                    return 0f;
+                };
+
                 return base.getVariable(data)
                     .Replace("%currentthrust%", new VISUnitType(thrustCurrent_, unit: Unit.Newton).pack())
                     .Replace("%maxthrust%", new VISUnitType(thrustMax_, unit: Unit.Newton).pack())
                     .Replace("%thrustrate%", new VISUnitType(thrustRate_, unit: Unit.Percent).pack())
                     .Replace("%currentoverride%", new VISUnitType(overrideCurrent_, unit: Unit.Newton).pack())
                     .Replace("%maxoverride%", new VISUnitType(overrideMax_, unit: Unit.Newton).pack())
-                    .Replace("%overriderate%", new VISUnitType(overrideRate_, unit: Unit.Percent).pack());
+                    .Replace("%overriderate%", new VISUnitType(overrideRate_, unit: Unit.Percent).pack())
+                    .Replace("%curraccel%", new VISUnitType(calcAccel(thrustCurrent_), unit:Unit.Accel).pack())
+                    .Replace("%maxaccel%", new VISUnitType(calcAccel(thrustMax_), unit: Unit.Accel).pack());
             }
 
             #region Accessors
