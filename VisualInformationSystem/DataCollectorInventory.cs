@@ -23,8 +23,8 @@ namespace IngameScript
     {
         public class DataCollectorInventory : DataCollectorBase<IMyTerminalBlock>
         {
-            public DataCollectorInventory(Configuration.Options options, string connector)
-                : base("inventory", "", options, connector)
+            public DataCollectorInventory(Configuration.Options options, string typeId, string connector)
+                : base("inventory", typeId, options, connector)
             {
                 AcceptBlock = (block) =>
                 {

@@ -66,7 +66,10 @@ namespace IngameScript
                         dataCollector = new DataCollectorGasTank("oxygentank", "Oxygen", options, connector);
                         break;
                     case "inventory":
-                        dataCollector = new DataCollectorInventory(options, connector);
+                        dataCollector = new DataCollectorInventory(options, "", connector);
+                        break;
+                    case "cargo":
+                        dataCollector = new DataCollectorInventory(options, $"{Default.MyObjectBuilder}_CargoContainer", connector);
                         break;
                     case "battery":
                         dataCollector = new DataCollectorBattery(options, connector);
@@ -75,7 +78,7 @@ namespace IngameScript
                         dataCollector = new DataCollectorPowerProducer<IMySolarPanel>("solar", "", options, connector);
                         break;
                     case "windturbine":
-                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("windturbine", "MyObjectBuilder_WindTurbine", options, connector);
+                        dataCollector = new DataCollectorPowerProducer<IMyPowerProducer>("windturbine", $"{Default.MyObjectBuilder}_WindTurbine", options, connector);
                         break;
                     case "reactor":
                         dataCollector = new DataCollectorReactor(options, connector);
