@@ -24,12 +24,13 @@ namespace IngameScript
         public class DisplayProvider : VISObject
         {
             IMyTextSurfaceProvider surfaceProvider_ = null;
+            string config_ = "";
 
-
-            public DisplayProvider(string name, IMyTextSurfaceProvider provider)
+            public DisplayProvider(string name, IMyTextSurfaceProvider provider, string config = "")
                 : base($"Provider_{name}")
             {
                 surfaceProvider_ = provider;
+                config_ = config;
             }
 
 
@@ -45,7 +46,7 @@ namespace IngameScript
                 if (block != null)
                 {
                     ConfigHandler config = new ConfigHandler(this);
-                    if (Configuration.Process(config, block, (key, value, options) =>
+                    if (Configuration.Process(config, config_ != "" ? config_ : block.CustomData, Default.ShareCustomData, (key, value, options) =>
                     {
                         log(Console.LogType.Error, $"Invalid display provider config: {key}, {value}");
                         return false;

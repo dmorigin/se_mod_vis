@@ -117,6 +117,12 @@ namespace IngameScript
                     add("maxspeed", configMaxSpeed);
                     add("itemamount", configMaxAmountItem);
                     add("recointerval", configSetRecInterval);
+                    add("shareconfig", configShareConfig);
+
+                    remove("*");
+                    add("blockconfig", configBlockStart);
+                    add("blockend", configBlockEnd);
+                    add("*", configCaptureRaw);
                 }
 
                 public string vDisplayNameTag_ = Default.DisplayNameTag;
@@ -206,6 +212,63 @@ namespace IngameScript
                     Default.ReconstructInterval = TimeSpan.FromSeconds(Configuration.asFloat(value, Default.ReconstructIntervalInSec));
                     return true;
                 }
+
+                bool captureRaw_ = false;
+                StringBuilder rawConfig_ = new StringBuilder();
+                IMyTerminalBlock currentBlock_ = null;
+                bool configBlockStart(string key, string value, Configuration.Options options)
+                {
+                    if (currentBlock_ != null)
+                        return false;
+
+                    // search block
+                    App.GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(null, (block) =>
+                    {
+                        if (block.IsSameConstructAs(App.Me) &&
+                            block is IMyTextSurfaceProvider &&
+                            block.CustomName == value)
+                        {
+                            captureRaw_ = true;
+                            currentBlock_ = block;
+                        }
+                        return false;
+                    });
+
+                    return currentBlock_ != null;
+                }
+
+                bool configBlockEnd(string key, string value, Configuration.Options options)
+                {
+                    if (currentBlock_ != null)
+                    {
+                        manager_.displayProviders_.Add(new DisplayProvider(
+                            currentBlock_.CustomName,
+                            currentBlock_ as IMyTextSurfaceProvider,
+                            rawConfig_.ToString()));
+                    }
+
+                    captureRaw_ = false;
+                    rawConfig_.Clear();
+                    currentBlock_ = null;
+                    return true;
+                }
+
+                bool configCaptureRaw(string key, string value, Configuration.Options options)
+                {
+                    if (captureRaw_)
+                    {
+                        rawConfig_.AppendLine($"{key}:{value}:{options}");
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                bool configShareConfig(string key, string value, Configuration.Options options)
+                {
+                    Default.ShareCustomData = Configuration.asBoolean(value, Default.ShareCustomData);
+                    return true;
+                }
             }
             #endregion // Configuration
 
@@ -275,7 +338,7 @@ namespace IngameScript
 
                     // read configuration
                     bool readConfigFailed = false;
-                    Configuration.Process(config_, App.Me, (key, value, options) =>
+                    Configuration.Process(config_, App.Me, false, (key, value, options) =>
                     {
                         log(Console.LogType.Error, $"Read config: \"{key}\", \"{value}\"");
                         readConfigFailed = true;
@@ -301,13 +364,7 @@ namespace IngameScript
 
                         IMyTextSurfaceProvider provider = block as IMyTextSurfaceProvider;
                         if (provider != null)
-                        {
-                            // create display provider
-                            DisplayProvider displayProvider = new DisplayProvider(block.CustomName, provider);
-
-                            // add to list
-                            displayProviders_.Add(displayProvider);
-                        }
+                            displayProviders_.Add(new DisplayProvider(block.CustomName, provider));
 
                         return false;
                     });

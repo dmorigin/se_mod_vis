@@ -53,6 +53,7 @@ namespace IngameScript
             public static float MaxShipSpeed = 100.0f;
 
             public static string DisplayNameTag = "[VIS]";
+            public static bool ShareCustomData = false;
             public static Vector2I DisplayCoordinate = new Vector2I(0, 0);
             public static int DisplayID = 0;
             public static string EmptyDisplayGroupID = "";

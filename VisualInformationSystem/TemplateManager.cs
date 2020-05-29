@@ -46,7 +46,7 @@ namespace IngameScript
                 if (template != null)
                 {
                     Configuration.Handler handler = template.getConfigHandler();
-                    if (!Configuration.Process(handler, config, (key, value, options) =>
+                    if (!Configuration.Process(handler, config, false, (key, value, options) =>
                     {
                         log(Console.LogType.Error, $"Read config: \"{key}\", \"{value}\"");
                         return false;

@@ -203,13 +203,11 @@ namespace IngameScript
                     options_ = options;
                 }
 
-
                 public Options(Options other)
                 {
                     options_ = new List<string>();
                     options_.AddList(other.options_);
                 }
-
 
                 public Options clone()
                 {
@@ -218,10 +216,8 @@ namespace IngameScript
                     return new Options(data);
                 }
 
-
                 public bool equals(Options other) => options_.SequenceEqual(other.options_);
                 public int Count => options_.Count;
-
 
                 public string this[int index]
                 {
@@ -233,6 +229,13 @@ namespace IngameScript
                     }
                 }
 
+                public override string ToString()
+                {
+                    string output = "";
+                    for (int c = 0; c < options_.Count; ++c)
+                        output += options_[c] + (c < (options_.Count - 1) ? ":" : "");
+                    return output;
+                }
 
                 public bool asBoolean(int index, bool defaultValue = true) => Configuration.asBoolean(this[index], defaultValue);
                 public int asInteger(int index, int defaultValue = 0) => Configuration.asInteger(this[index], defaultValue);
@@ -301,9 +304,11 @@ namespace IngameScript
                 }
             }
 
-            public static bool Process(Handler handler, string config, Func<string, string, List<string>, bool> errorHandler)
+            public static bool Process(Handler handler, string config, bool shareCD = false, 
+                Func<string, string, List<string>, bool> errorHandler = null)
             {
                 errorHandler = errorHandler != null ? errorHandler : (key, value, options) => false;
+                bool startConfig = !shareCD;
 
                 // convert to line list
                 Dictionary<string, string> variables = new Dictionary<string, string>();
@@ -311,30 +316,44 @@ namespace IngameScript
                 foreach (var line in lines)
                 {
                     string trim = line.Trim();
-                    if (trim.Length == 0 || trim[0] == '#')
+                    if (trim.Length == 0 || trim[0] == '#' || trim.StartsWith("//"))
                         continue;
 
-                    // split in segments
-                    List<string> segments = trim.Split(':').ToList();
-                    if (segments.Count > 0)
+                    if (shareCD)
                     {
-                        string key = segments[0].Trim().ToLower();
-                        string value = segments.Count >= 2 ? segments[1].Trim() : "";
-                        //List<string> options = segments.Count > 2 ? segments.GetRange(2, segments.Count - 2) : new List<string>();
-
-                        if (key.Length > 0)
+                        if (!startConfig && trim == "---//VIS")
                         {
-                            if (key[0] == '$')
-                                variables[$"$({key.Substring(1)})"] = value;
-                            else
-                            {
-                                value = variables.ContainsKey(value) ? variables[value] : value;
-                                List<string> options = new List<string>();
-                                for (int c = 2; c < segments.Count; ++c)
-                                    options.Add(variables.ContainsKey(segments[c]) ? variables[segments[c]] : segments[c]);
+                            startConfig = true;
+                            continue;
+                        } // config start with next line
 
-                                if (!handler[key](key, value, new Options(options)))
-                                    return errorHandler(key, value, options);
+                        if (startConfig && trim == "---")
+                            break; // config end with this line
+                    }
+
+                    if (startConfig)
+                    {
+                        // split in segments
+                        List<string> segments = trim.Split(':').ToList();
+                        if (segments.Count > 0)
+                        {
+                            string key = segments[0].Trim().ToLower();
+                            string value = segments.Count >= 2 ? segments[1].Trim() : "";
+
+                            if (key.Length > 0)
+                            {
+                                if (key[0] == '$')
+                                    variables[$"$({key.Substring(1)})"] = value;
+                                else
+                                {
+                                    value = variables.ContainsKey(value) ? variables[value] : value;
+                                    List<string> options = new List<string>();
+                                    for (int c = 2; c < segments.Count; ++c)
+                                        options.Add(variables.ContainsKey(segments[c]) ? variables[segments[c]] : segments[c]);
+
+                                    if (!handler[key](key, value, new Options(options)))
+                                        return errorHandler(key, value, options);
+                                }
                             }
                         }
                     }
@@ -343,8 +362,8 @@ namespace IngameScript
                 return true;
             }
 
-            public static bool Process(Handler handler, IMyTerminalBlock block, Func<string, string, List<string>, bool> errorHandler = null)
-                => Process(handler, block.CustomData, errorHandler);
+            public static bool Process(Handler handler, IMyTerminalBlock block, bool shareCD, Func<string, string, List<string>, bool> errorHandler = null)
+                => Process(handler, block.CustomData, shareCD, errorHandler);
         }
     }
 }
