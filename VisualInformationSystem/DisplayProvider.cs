@@ -46,7 +46,8 @@ namespace IngameScript
                 if (block != null)
                 {
                     ConfigHandler config = new ConfigHandler(this);
-                    if (Configuration.Process(config, config_ != "" ? config_ : block.CustomData, Default.ShareCustomData, (key, value, options) =>
+                    if (Configuration.Process(config, config_ != "" ? config_ : block.CustomData, 
+                        config_ != "" ? false : Default.ShareCustomData, (key, value, options) =>
                     {
                         log(Console.LogType.Error, $"Invalid display provider config: {key}, {value}");
                         return false;
