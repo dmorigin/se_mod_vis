@@ -57,7 +57,6 @@
     <Compile Include="DataCollectorThruster.cs" />
     <Compile Include="Default.cs" />
     <Compile Include="Display.cs" />
-    <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayProvider.cs" />
     <Compile Include="DataCollector.cs" />
     <Compile Include="DataCollectorBattery.cs" />
