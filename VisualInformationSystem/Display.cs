@@ -233,6 +233,7 @@ namespace IngameScript
                 return getRenderTarget(Default.DisplayCoordinate);
             }
 
+            bool drawEmpty_ = false;
             public void render()
             {
                 foreach (var graphic in Template.getGraphics())
@@ -244,6 +245,11 @@ namespace IngameScript
 
                     using (var frame = rt.getRenderFrame())
                     {
+                        // Workaround to fix the MP Sprite issue
+                        if (drawEmpty_)
+                            frame.Add(new MySprite());
+                        drawEmpty_ = !drawEmpty_;
+
                         rt.clearDrawArea(sprite => frame.Add(sprite));
 
                         foreach (var graphic in Template.getGraphics())

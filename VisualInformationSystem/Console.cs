@@ -129,7 +129,7 @@ namespace IngameScript
                 newMesssages_ = true;
             }
 
-
+            bool drawEmpty_ = false;
             public void flush()
             {
                 if (renderTarget_ != null && newMesssages_ == true)
@@ -140,6 +140,11 @@ namespace IngameScript
 
                     using (MySpriteDrawFrame frame = renderTarget_.getRenderFrame())
                     {
+                        // Workaround to fix the MP Sprite issue
+                        if (drawEmpty_)
+                            frame.Add(new MySprite());
+                        drawEmpty_ = !drawEmpty_;
+
                         // background
                         renderTarget_.clearDrawArea(sprite => frame.Add(sprite));
 
