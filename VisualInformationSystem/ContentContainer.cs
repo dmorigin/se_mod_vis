@@ -126,9 +126,9 @@ namespace IngameScript
 
             public class Settings : Configuration.Handler
             {
-                public Settings(ContentContainer template)
+                public Settings(ContentContainer container)
                 {
-                    tpl_ = template;
+                    container_ = container;
 
                     // fill up handler
                     //add("usetemplate", configUseTemplate);
@@ -139,7 +139,7 @@ namespace IngameScript
                     add("graphic", configGraphic);
                 }
 
-                ContentContainer tpl_ = null;
+                ContentContainer container_ = null;
 
                 #region Handler
                 /*bool configUseTemplate(string key, string value, Configuration.Options options)
@@ -162,21 +162,21 @@ namespace IngameScript
                 bool configRefresh(string key, string value, Configuration.Options options)
                 {
                     float seconds = Configuration.asFloat(value, Default.RefreshInSec);
-                    tpl_.Refresh = TimeSpan.FromSeconds(seconds);
+                    container_.Refresh = TimeSpan.FromSeconds(seconds);
                     return true;
                 }
 
                 bool configBackgroundColor(string key, string value, Configuration.Options options)
                 {
-                    tpl_.BackgroundColor = Configuration.asColor(value, Default.BackgroundColor);
+                    container_.BackgroundColor = Configuration.asColor(value, Default.BackgroundColor);
                     return true;
                 }
 
                 bool configFont(string key, string value, Configuration.Options options)
                 {
-                    tpl_.Font = value != string.Empty ? value : Default.Font;
-                    tpl_.FontSize = options.asFloat(0, Default.FontSize);
-                    tpl_.FontColor = options.asColor(1, Default.FontColor);
+                    container_.Font = value != string.Empty ? value : Default.Font;
+                    container_.FontSize = options.asFloat(0, Default.FontSize);
+                    container_.FontColor = options.asColor(1, Default.FontColor);
                     return true;
                 }
 
@@ -187,15 +187,15 @@ namespace IngameScript
                     {
                         case "center":
                         case "c":
-                            tpl_.TextAlignment = TextAlignment.CENTER;
+                            container_.TextAlignment = TextAlignment.CENTER;
                             break;
                         case "left":
                         case "l":
-                            tpl_.TextAlignment = TextAlignment.LEFT;
+                            container_.TextAlignment = TextAlignment.LEFT;
                             break;
                         case "right":
                         case "r":
-                            tpl_.TextAlignment = TextAlignment.RIGHT;
+                            container_.TextAlignment = TextAlignment.RIGHT;
                             break;
                         default:
                             return false;
@@ -211,28 +211,28 @@ namespace IngameScript
                     switch (value.ToLower())
                     {
                         case "text":
-                            graphic = new GraphicText(tpl_, options);
+                            graphic = new GraphicText(container_, options);
                             break;
                         case "battery":
-                            graphic = new GraphicBattery(tpl_, options);
+                            graphic = new GraphicBattery(container_, options);
                             break;
                         case "list":
-                            graphic = new GraphicList(tpl_, options);
+                            graphic = new GraphicList(container_, options);
                             break;
                         case "bar":
-                            graphic = new GraphicBar(tpl_, options);
+                            graphic = new GraphicBar(container_, options);
                             break;
                         case "icon":
-                            graphic = new GraphicIcon(tpl_, options);
+                            graphic = new GraphicIcon(container_, options);
                             break;
                         case "slider":
-                            graphic = new GraphicSlider(tpl_, options);
+                            graphic = new GraphicSlider(container_, options);
                             break;
                         case "test":
-                            graphic = new GraphicTest(tpl_, options);
+                            graphic = new GraphicTest(container_, options);
                             break;
                         case "curvedbar":
-                            graphic = new GraphicCurvedBar(tpl_, options);
+                            graphic = new GraphicCurvedBar(container_, options);
                             break;
                     }
 
@@ -241,14 +241,14 @@ namespace IngameScript
                         if (graphic.construct())
                         {
                             setSubHandler(graphic.getConfigHandler());
-                            tpl_.graphics_.Add(graphic);
+                            container_.graphics_.Add(graphic);
                             return true;
                         }
                         else
-                            tpl_.log(Console.LogType.Error, $"Failed to construct graphic:{value}");
+                            container_.log(Console.LogType.Error, $"Failed to construct graphic:{value}");
                     }
                     else
-                        tpl_.log(Console.LogType.Error, $"Invalid graphic type:{value}");
+                        container_.log(Console.LogType.Error, $"Invalid graphic type:{value}");
                     return false;
                 }
                 #endregion // Handler
