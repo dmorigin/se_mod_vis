@@ -21,13 +21,13 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class Template : VISObject
+        public class ContentContainer : VISObject
         {
-            public Template(TemplateManager templateManager, string name)
-                : base($"Template_{name}")
+            public ContentContainer(/*TemplateManager templateManager,*/ string name)
+                : base($"ContentContainer_{name}")
             {
-                TemplateManager = templateManager;
-                TemplateName = name;
+                //TemplateManager = templateManager;
+                //TemplateName = name;
 
                 // setup defaults
                 Refresh = Default.Refresh;
@@ -43,7 +43,7 @@ namespace IngameScript
                 return new Settings(this);
             }
 
-            public virtual void merge(Template template)
+            /*public virtual void merge(ContentContainer template)
             {
                 Refresh = template.Refresh;
                 BackgroundColor = template.BackgroundColor;
@@ -54,20 +54,20 @@ namespace IngameScript
 
                 foreach (var gfx in template.graphics_)
                     graphics_.Add(gfx.clone());
-            }
+            }*/
 
             #region Properties
-            public TemplateManager TemplateManager
+            /*public TemplateManager TemplateManager
             {
                 get;
                 private set;
-            }
+            }*/
 
-            public string TemplateName
+            /*public string TemplateName
             {
                 get;
                 set;
-            }
+            }*/
 
             public TimeSpan Refresh
             {
@@ -126,12 +126,12 @@ namespace IngameScript
 
             public class Settings : Configuration.Handler
             {
-                public Settings(Template template)
+                public Settings(ContentContainer template)
                 {
                     tpl_ = template;
 
                     // fill up handler
-                    add("usetemplate", configUseTemplate);
+                    //add("usetemplate", configUseTemplate);
                     add("refresh", configRefresh);
                     add("bgcolor", configBackgroundColor);
                     add("font", configFont);
@@ -139,14 +139,14 @@ namespace IngameScript
                     add("graphic", configGraphic);
                 }
 
-                Template tpl_ = null;
+                ContentContainer tpl_ = null;
 
                 #region Handler
-                bool configUseTemplate(string key, string value, Configuration.Options options)
+                /*bool configUseTemplate(string key, string value, Configuration.Options options)
                 {
                     if (value != string.Empty)
                     {
-                        Template template = tpl_.TemplateManager.loadTemplate(value);
+                        ContentContainer template = tpl_.TemplateManager.loadTemplate(value);
                         if (template == null)
                         {
                             tpl_.log(Console.LogType.Error, $"Invalid template name:{value}");
@@ -157,7 +157,7 @@ namespace IngameScript
                         return true;
                     }
                     return false;
-                }
+                }*/
 
                 bool configRefresh(string key, string value, Configuration.Options options)
                 {

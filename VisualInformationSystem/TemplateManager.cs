@@ -21,7 +21,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class TemplateManager : VISObject
+        /*public class TemplateManager : VISObject
         {
             public TemplateManager()
                 : base("TemplateManager")
@@ -38,11 +38,11 @@ namespace IngameScript
                 return base.construct();
             }
 
-            List<Template> templates_ = new List<Template>();
+            List<ContentContainer> templates_ = new List<ContentContainer>();
 
-            public Template createDefaultTemplate(string name, string config)
+            public ContentContainer createDefaultTemplate(string name, string config)
             {
-                Template template = createTemplate($"Default_{name}");
+                ContentContainer template = createTemplate($"Default_{name}");
                 if (template != null)
                 {
                     Configuration.Handler handler = template.getConfigHandler();
@@ -63,7 +63,7 @@ namespace IngameScript
                 return null;
             }
 
-            public Template createTemplate(string name)
+            public ContentContainer createTemplate(string name)
             {
                 if (name == string.Empty)
                 {
@@ -71,7 +71,7 @@ namespace IngameScript
                     return null;
                 }
 
-                Template template = new Template(this, name);
+                ContentContainer template = new ContentContainer(this, name);
                 if (template.construct())
                     return template;
 
@@ -79,13 +79,13 @@ namespace IngameScript
                 return null;
             }
 
-            public Template loadTemplate(string name)
+            public ContentContainer loadTemplate(string name)
             {
                 var tpl = templates_.Find(x => x.TemplateName == name);
                 return tpl != null ? tpl : null;
             }
 
-            public bool saveTemplate(Template template)
+            public bool saveTemplate(ContentContainer template)
             {
                 if (loadTemplate(template.TemplateName) == null)
                 {
@@ -96,6 +96,6 @@ namespace IngameScript
 
                 return false;
             }
-        }
+        }*/
     }
 }

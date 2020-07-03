@@ -23,12 +23,12 @@ namespace IngameScript
     {
         public class GraphicCurvedBar : Graphic
         {
-            public GraphicCurvedBar(Template template, Configuration.Options options)
+            public GraphicCurvedBar(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicCurvedBar gfx = new GraphicCurvedBar(Template, Options);
 
@@ -59,7 +59,7 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
             protected override bool supportCheck(string name) => name != "battery";
 

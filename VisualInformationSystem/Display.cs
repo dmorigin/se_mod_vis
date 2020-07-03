@@ -29,6 +29,7 @@ namespace IngameScript
                 GroupId = groupId;
                 PanelConnector = null;
                 RenderingRetry = Default.ExceptionRetry;
+                ContentContainer = null;
             }
 
             public override bool construct()
@@ -70,12 +71,12 @@ namespace IngameScript
             bool renderProcessStarted_ = false;
             public override void tick(TimeSpan delta)
             {
-                if (Template != null && !renderProcessStarted_)
+                if (ContentContainer != null && !renderProcessStarted_)
                 {
                     renderProcessStarted_ = true;
 
                     // queue gather jobs
-                    foreach (var graphic in Template.getGraphics())
+                    foreach (var graphic in ContentContainer.getGraphics())
                     {
                         if (graphic.DataCollector != null)
                             graphic.DataCollector.queueJob();
@@ -90,8 +91,8 @@ namespace IngameScript
             {
                 get
                 {
-                    if (Template != null)
-                        return Template.Refresh;
+                    if (ContentContainer != null)
+                        return ContentContainer.Refresh;
                     return base.Interval;
                 }
 
@@ -104,7 +105,7 @@ namespace IngameScript
                 private set;
             }
 
-            public Template Template
+            public ContentContainer ContentContainer
             {
                 get;
                 set;
@@ -236,12 +237,12 @@ namespace IngameScript
             bool drawEmpty_ = false;
             public void render()
             {
-                foreach (var graphic in Template.getGraphics())
+                foreach (var graphic in ContentContainer.getGraphics())
                     graphic.prepareRendering(this);
 
                 foreach (var rt in renderTargets_)
                 {
-                    rt.BackgroundColor = Template.BackgroundColor;
+                    rt.BackgroundColor = ContentContainer.BackgroundColor;
 
                     using (var frame = rt.getRenderFrame())
                     {
@@ -252,7 +253,7 @@ namespace IngameScript
 
                         rt.clearDrawArea(sprite => frame.Add(sprite));
 
-                        foreach (var graphic in Template.getGraphics())
+                        foreach (var graphic in ContentContainer.getGraphics())
                             graphic.getSprite(this, rt, sprite => frame.Add(sprite));
                     }
                 }

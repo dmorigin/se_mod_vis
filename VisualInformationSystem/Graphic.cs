@@ -24,7 +24,7 @@ namespace IngameScript
         public abstract class Graphic : VISObject
         {
             static int GraphicIDCounter = 0;
-            public Graphic(Template template, Configuration.Options options)
+            public Graphic(ContentContainer template, Configuration.Options options)
                 : base($"GraphicObject:{GraphicIDCounter++}")
             {
                 Options = options;
@@ -54,7 +54,7 @@ namespace IngameScript
                 return true;
             }
 
-            public abstract Graphic clone();
+            //public abstract Graphic clone();
             protected abstract bool supportCheck(string name);
 
             #region Configuration
@@ -326,7 +326,7 @@ namespace IngameScript
             }
 
             #region Properties
-            public Template Template
+            public ContentContainer Template
             {
                 get;
                 protected set;

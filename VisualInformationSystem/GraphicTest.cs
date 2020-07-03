@@ -23,12 +23,12 @@ namespace IngameScript
     {
         public class GraphicTest : Graphic
         {
-            public GraphicTest(Template template, Configuration.Options options)
+            public GraphicTest(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicTest gfx = new GraphicTest(Template, Options);
 
@@ -50,7 +50,7 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
             protected override bool supportCheck(string name) => false;
 

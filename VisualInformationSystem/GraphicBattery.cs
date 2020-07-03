@@ -23,19 +23,14 @@ namespace IngameScript
     {
         public class GraphicBattery : Graphic
         {
-            public GraphicBattery(Template template, Configuration.Options options)
+            public GraphicBattery(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
-            protected override bool supportCheck(string name)
-            {
-                if (name == "battery")
-                    return true;
-                return false;
-            }
+            protected override bool supportCheck(string name) => name == "battery";
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicBattery gfx = new GraphicBattery(Template, Options);
 
@@ -70,7 +65,7 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
             #region Configuration
             int cols_ = 0;

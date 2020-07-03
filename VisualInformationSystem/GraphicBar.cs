@@ -23,13 +23,13 @@ namespace IngameScript
     {
         public class GraphicBar : Graphic
         {
-            public GraphicBar(Template template, Configuration.Options options)
+            public GraphicBar(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
                 renderStyledBar_ = renderSimpleBar;
             }
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicBar gfx = new GraphicBar(Template, Options);
 
@@ -62,12 +62,9 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
-            protected override bool supportCheck(string name)
-            {
-                return true;
-            }
+            protected override bool supportCheck(string name) => true;
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {

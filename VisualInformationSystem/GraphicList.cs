@@ -23,7 +23,7 @@ namespace IngameScript
     {
         public class GraphicList : Graphic
         {
-            public GraphicList(Template template, Configuration.Options options)
+            public GraphicList(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
                 VisibleOperatorA = greater;
@@ -35,7 +35,7 @@ namespace IngameScript
                 return name != "shipcontroller";
             }
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicList gfx = new GraphicList(Template, Options);
 
@@ -79,7 +79,7 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
             #region Rendering
             struct RenderData

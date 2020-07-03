@@ -90,7 +90,7 @@
     <Compile Include="RenderTargetID.cs" />
     <Compile Include="RuntimeObject.cs" />
     <Compile Include="Statistics.cs" />
-    <Compile Include="Template.cs" />
+    <Compile Include="ContentContainer.cs" />
     <Compile Include="TemplateManager.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="VISUnitType.cs" />

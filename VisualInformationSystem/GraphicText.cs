@@ -23,13 +23,13 @@ namespace IngameScript
     {
         public class GraphicText : Graphic
         {
-            public GraphicText(Template template, Configuration.Options options)
+            public GraphicText(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicText gfx = new GraphicText(Template, Options);
 
@@ -59,7 +59,7 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
             bool useDefaultFont_ = true;
             bool sizeIsSet = false;

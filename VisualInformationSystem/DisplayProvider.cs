@@ -75,10 +75,18 @@ namespace IngameScript
                     provider_ = provider;
 
                     add("display", configDisplay);
+                    add("screen", configScreen);
                 }
 
 
                 bool configDisplay(string key, string value, Configuration.Options options)
+                {
+                    provider_.log(Console.LogType.Error, "Config display is depricated. Use 'screen' instead!");
+                    return configScreen(key, value, options);
+                }
+
+
+                bool configScreen(string key, string value, Configuration.Options options)
                 {
                     // set surface index
                     int displayId = Configuration.asInteger(value, Default.DisplayID);
@@ -122,15 +130,17 @@ namespace IngameScript
                             display.PanelConnector = new Display.PanelConnectorObj(lcdPanel);
 
                         // setup template
-                        Template template = provider_.Manager.TemplateManager.createTemplate(display.GroupId);
+                        /*ContentContainer template = provider_.Manager.TemplateManager.createTemplate(display.GroupId);
                         if (template == null)
                         {
                             provider_.log(Console.LogType.Error, "Failed to create template config handler");
                             return false;
-                        }
+                        }*/
 
-                        setSubHandler(template.getConfigHandler());
-                        display.Template = template;
+                        // create content container
+                        ContentContainer container = new ContentContainer(display.GroupId);
+                        setSubHandler(container.getConfigHandler());
+                        display.ContentContainer = container;
                     }
 
                     return true;

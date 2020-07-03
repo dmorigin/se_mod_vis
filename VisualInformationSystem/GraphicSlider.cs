@@ -23,17 +23,17 @@ namespace IngameScript
     {
         public class GraphicSlider : Graphic
         {
-            public GraphicSlider(Template template, Configuration.Options options)
+            public GraphicSlider(ContentContainer template, Configuration.Options options)
                 : base(template, options)
             {
             }
 
-            public override bool construct()
+            /*public override bool construct()
             {
                 return base.construct();
-            }
+            }*/
 
-            public override Graphic clone()
+            /*public override Graphic clone()
             {
                 GraphicSlider gfx = new GraphicSlider(Template, Options);
 
@@ -59,12 +59,9 @@ namespace IngameScript
 
                 Manager.JobManager.queueJob(gfx.getConstructionJob());
                 return gfx;
-            }
+            }*/
 
-            protected override bool supportCheck(string name)
-            {
-                return true;
-            }
+            protected override bool supportCheck(string name) => true;
 
             public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {

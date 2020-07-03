@@ -32,7 +32,7 @@ namespace IngameScript
                 Timer = new Timer();
                 CollectorManager = new DataCollectorManager();
                 JobManager = new JobManager();
-                TemplateManager = new TemplateManager();
+                //TemplateManager = new TemplateManager();
             }
 
 
@@ -47,7 +47,7 @@ namespace IngameScript
 
                 Console.construct();
                 CollectorManager.construct();
-                TemplateManager.construct();
+                //TemplateManager.construct();
 
                 // construct job manager
                 if (JobManager.construct())
@@ -67,11 +67,11 @@ namespace IngameScript
                 private set;
             }
 
-            public TemplateManager TemplateManager
+            /*public TemplateManager TemplateManager
             {
                 get;
                 private set;
-            }
+            }*/
 
             public DataCollectorManager CollectorManager
             {
@@ -111,7 +111,7 @@ namespace IngameScript
 
                     // setup configuration
                     add("displaytag", configDisplayNameTag);
-                    add("template", configTemplate);
+                    //add("template", configTemplate);
                     add("console", configConsole);
                     add("rtfixsize", configRTFixSize);
                     add("maxspeed", configMaxSpeed);
@@ -135,12 +135,12 @@ namespace IngameScript
                     return true;
                 }
 
-                bool configTemplate(string key, string value, Configuration.Options options)
+                /*bool configTemplate(string key, string value, Configuration.Options options)
                 {
                     // create new template
                     manager_.log(Console.LogType.Error, "The template configuration isnt' fully implemented yet");
                     return false;
-                }
+                }*/
 
                 bool configConsole(string key, string value, Configuration.Options options)
                 {
