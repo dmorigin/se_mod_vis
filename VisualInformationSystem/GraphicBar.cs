@@ -66,7 +66,7 @@ namespace IngameScript
 
             protected override bool supportCheck(string name) => true;
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 if (DataAccessor == null || !isVisible(DataAccessor.indicator()))
                     return;

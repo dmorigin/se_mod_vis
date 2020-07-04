@@ -54,7 +54,7 @@ namespace IngameScript
 
             protected override bool supportCheck(string name) => false;
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 // render info text
                 string text = "Size=" + rt.Size.X.ToString("0000.00") + ";" + rt.Size.Y.ToString("0000.00");

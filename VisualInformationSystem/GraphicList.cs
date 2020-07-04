@@ -203,7 +203,7 @@ namespace IngameScript
                     addGradientColor(0.0f, Template.FontColor);
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 Vector2 iconPosition = renderData_.iconPosition;
                 Vector2 barPosition = renderData_.barPosition;

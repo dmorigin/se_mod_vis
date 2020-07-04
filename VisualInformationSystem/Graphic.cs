@@ -463,16 +463,17 @@ namespace IngameScript
             #endregion // Properties
 
             public delegate void AddSpriteDelegate(MySprite sprite);
-            public abstract void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite);
+            public abstract void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite);
             public virtual void prepareRendering(Display display)
             {
             }
 
+            #region Render Helper
+            #region Render Bars
             public delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
                 float rotation, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
                 float borderSize, Color borderColor, Color backgroundColor);
 
-            #region Render Helper
             protected static void renderTextLine(Display display, RenderTarget rt, AddSpriteDelegate addSprite, 
                 string font, float fontSize, Vector2 position, Color fontColor, string textLine, TextAlignment alignment)
             {
@@ -799,6 +800,7 @@ namespace IngameScript
                     }
                 }
             }
+            #endregion // Render Bars
 
             protected class Icon
             {

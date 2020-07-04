@@ -90,7 +90,7 @@ namespace IngameScript
                     renderData_.iconColor = getGradientColor(renderData_.ratio);
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 if (!isVisible(DataAccessor.indicator()))
                     return;

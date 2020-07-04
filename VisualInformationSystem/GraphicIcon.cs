@@ -67,7 +67,7 @@ namespace IngameScript
                 toggleShow_ = !toggleShow_;
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 Color color = Color;
                 bool visible = true;

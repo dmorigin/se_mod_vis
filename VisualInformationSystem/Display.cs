@@ -254,7 +254,7 @@ namespace IngameScript
                         rt.clearDrawArea(sprite => frame.Add(sprite));
 
                         foreach (var graphic in ContentContainer.getGraphics())
-                            graphic.getSprite(this, rt, sprite => frame.Add(sprite));
+                            graphic.render(this, rt, sprite => frame.Add(sprite));
                     }
                 }
             }

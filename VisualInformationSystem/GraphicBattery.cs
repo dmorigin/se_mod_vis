@@ -208,7 +208,7 @@ namespace IngameScript
                 }
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 float positionX = renderData_.renderPosition.X + rt.DisplayOffset.X - (renderData_.renderSize.X * 0.5f) + (renderData_.size.X * 0.5f);
                 float positionY = renderData_.renderPosition.Y + rt.DisplayOffset.Y - (renderData_.renderSize.Y * 0.5f) + (renderData_.size.Y * 0.5f);

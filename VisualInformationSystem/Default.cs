@@ -32,16 +32,20 @@ namespace IngameScript
 
             public static Color Color = Color.White;
             public static Color BackgroundColor = new Color(0, 88, 151);
+            public static Color GfxBackgroundColor = new Color(0, 0, 0, 0);
             public static Vector2 Position = new Vector2(0.5f, 0.5f);
             public static Graphic.ValueType PositionType = ValueType;
             public static Vector2 Size = new Vector2(1f, 1f);
             public static Graphic.ValueType SizeType = ValueType;
             public static float Thickness = 0.01f;
+            public static float BorderSize = 0f;
+            public static float BorderSpacing = 0.01f;
+            public static Color BorderColor = new Color(179, 237, 255);
 
             public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
-            public static Color BarBorderColor = new Color(179, 237, 255);
-            public static float BarBorderSize = 0f;
+            public static Color BarBorderColor = BorderColor;
+            public static float BarBorderSize = BorderSize;
             public static float BarTileSpace = 0.04f;
             public static Graphic.ValueType BarTileSpaceType = ValueType;
             public static int BarTileCount = 10;

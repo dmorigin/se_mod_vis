@@ -233,7 +233,7 @@ namespace IngameScript
                 renderData_.visible = DataAccessor != null ? isVisible(DataAccessor.indicator()) : true;
             }
 
-            public override void getSprite(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 if (!renderData_.visible)
                     return;
