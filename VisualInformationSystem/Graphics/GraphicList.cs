@@ -82,75 +82,80 @@ namespace IngameScript
             }*/
 
             #region Rendering
-            struct RenderData
+            class RenderDataList : RenderDataBase
             {
-                public int lines;
-                public float lineHeight;
-                public float fontSize;
+                public int Lines;
+                public float LineHeight;
+                public float FontSize;
 
-                public Vector2 iconPosition;
-                public Vector2 iconSize;
+                public Vector2 IconPosition;
+                public Vector2 IconSize;
 
-                public Vector2 barPosition;
-                public Vector2 barSize;
-                public int barTiles;
-                public float barTileSpacing;
+                public Vector2 BarPosition;
+                public Vector2 BarSize;
+                public int BarTiles;
+                public float BarTileSpacing;
 
-                public float textLeftPositionX;
-                public float textRightPositionX;
-                public float textPositionY;
+                public float TextLeftPositionX;
+                public float TextRightPositionX;
+                public float TextPositionY;
 
-                public List<DataAccessor.ListContainer> container;
+                public List<DataAccessor.ListContainer> Container;
             }
 
-            RenderData renderData_ = new RenderData();
+            //RenderDataList renderData = new RenderDataList();
+            protected override RenderDataBase createRenderDataObj() => new RenderDataList();
 
             public override void prepareRendering(Display display)
             {
-                Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
-                Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                base.prepareRendering(display);
+                RenderDataList renderData = RenderData as RenderDataList;
+                //Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                //Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                Vector2 size = RenderData.InnerSize;
+                Vector2 position = RenderData.Position;
 
                 float fontHeight = textShow_ == true ? Default.CharHeight * Template.FontSize : 0f;
                 float barThickness = barThicknessType_ == ValueType.Relative ? barThickness_ * fontHeight : barThickness_;
 
-                renderData_.lineHeight = fontHeight + spacing_;
+                renderData.LineHeight = fontHeight + spacing_;
                 if (barShow_)
                 {
-                    renderData_.barSize = new Vector2(size.X, barThickness);
-                    renderData_.lineHeight += barEmbedded_ ? 0f : renderData_.barSize.Y;
+                    renderData.BarSize = new Vector2(size.X, barThickness);
+                    renderData.LineHeight += barEmbedded_ ? 0f : renderData.BarSize.Y;
                 }
                 else
-                    renderData_.barSize = new Vector2();
+                    renderData.BarSize = new Vector2();
 
                 if (lines_ > 0)
                 {
-                    float scale = (size.Y / lines_) / renderData_.lineHeight;
+                    float scale = (size.Y / lines_) / renderData.LineHeight;
 
                     fontHeight *= scale;
-                    renderData_.barSize.Y *= scale;
-                    renderData_.lineHeight *= scale;
-                    renderData_.lines = lines_;
-                    renderData_.fontSize = Template.FontSize * scale;
+                    renderData.BarSize.Y *= scale;
+                    renderData.LineHeight *= scale;
+                    renderData.Lines = lines_;
+                    renderData.FontSize = Template.FontSize * scale;
                 }
                 else
                 {
-                    renderData_.lines = (int)(size.Y / renderData_.lineHeight);
-                    renderData_.fontSize = Template.FontSize;
+                    renderData.Lines = (int)(size.Y / renderData.LineHeight);
+                    renderData.FontSize = Template.FontSize;
                 }
 
                 if (iconShow_ && (!textShow_ || barEmbedded_))
-                    renderData_.barSize.X -= renderData_.barSize.Y;
+                    renderData.BarSize.X -= renderData.BarSize.Y;
 
                 // calculate bar tiles
                 if (barShow_)
                 {
-                    renderData_.barTiles = (int)((renderData_.barSize.X / renderData_.barSize.Y) * 2f);
-                    renderData_.barTileSpacing = renderData_.barSize.X * 0.01f;
+                    renderData.BarTiles = (int)((renderData.BarSize.X / renderData.BarSize.Y) * 2f);
+                    renderData.BarTileSpacing = renderData.BarSize.X * 0.01f;
                 }
 
                 // calculate Y position
-                renderData_.textPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
-                renderData_.barPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.barSize.Y * 0.5f) + (barEmbedded_ ? 0f : fontHeight);
+                renderData.TextPositionY = position.Y - (size.Y * 0.5f) + (fontHeight * 0.5f);
+                renderData.BarPosition.Y = position.Y - (size.Y * 0.5f) + (renderData.BarSize.Y * 0.5f) + (barEmbedded_ ? 0f : fontHeight);
 
                 // icon
                 if (iconShow_)
@@ -158,29 +163,29 @@ namespace IngameScript
                     // adjust bar size if no text
                     if (textShow_ == false)
                     {
-                        renderData_.barSize.X -= renderData_.barSize.Y;
-                        renderData_.iconSize = new Vector2(renderData_.barSize.Y, renderData_.barSize.Y);
+                        renderData.BarSize.X -= renderData.BarSize.Y;
+                        renderData.IconSize = new Vector2(renderData.BarSize.Y, renderData.BarSize.Y);
                     }
                     else
-                        renderData_.iconSize = new Vector2(fontHeight, fontHeight);
+                        renderData.IconSize = new Vector2(fontHeight, fontHeight);
 
-                    renderData_.iconPosition.Y = position.Y - (size.Y * 0.5f) + (renderData_.iconSize.Y * 0.5f);
+                    renderData.IconPosition.Y = position.Y - (size.Y * 0.5f) + (renderData.IconSize.Y * 0.5f);
                 }
 
                 // calculate X position
-                renderData_.iconPosition.X = position.X - (size.X * 0.5f) + (renderData_.iconSize.X * 0.5f);
-                renderData_.barPosition.X = position.X - (size.X * 0.5f) + (renderData_.barSize.X * 0.5f) + (barEmbedded_ ? renderData_.iconSize.X : 0f);
-                renderData_.textLeftPositionX = position.X - (size.X * 0.5f) + renderData_.iconSize.X;
-                renderData_.textRightPositionX = position.X + (size.X * 0.5f);
-                renderData_.barSize = new Vector2(renderData_.barSize.Y, renderData_.barSize.X);
+                renderData.IconPosition.X = position.X - (size.X * 0.5f) + (renderData.IconSize.X * 0.5f);
+                renderData.BarPosition.X = position.X - (size.X * 0.5f) + (renderData.BarSize.X * 0.5f) + (barEmbedded_ ? renderData.IconSize.X : 0f);
+                renderData.TextLeftPositionX = position.X - (size.X * 0.5f) + renderData.IconSize.X;
+                renderData.TextRightPositionX = position.X + (size.X * 0.5f);
+                renderData.BarSize = new Vector2(renderData.BarSize.Y, renderData.BarSize.X);
 
                 // filter list
-                DataAccessor.list(out renderData_.container, (item) => isVisible(item.indicator));
+                DataAccessor.list(out renderData.Container, (item) => isVisible(item.indicator));
 
                 // auto scroll
                 if (autoScroll_ == true)
                 {
-                    if (renderData_.lines >= renderData_.container.Count)
+                    if (renderData.Lines >= renderData.Container.Count)
                         autoScrollLine_ = 0;
                     else
                     {
@@ -191,9 +196,9 @@ namespace IngameScript
                             autoScrollLine_ = 0;
                             autoScrollInc_ *= -1;
                         }
-                        else if (autoScrollLine_ > (renderData_.container.Count - renderData_.lines))
+                        else if (autoScrollLine_ > (renderData.Container.Count - renderData.Lines))
                         {
-                            autoScrollLine_ = renderData_.container.Count - renderData_.lines;
+                            autoScrollLine_ = renderData.Container.Count - renderData.Lines;
                             autoScrollInc_ *= -1;
                         }
                     }
@@ -205,47 +210,49 @@ namespace IngameScript
 
             public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                Vector2 iconPosition = renderData_.iconPosition;
-                Vector2 barPosition = renderData_.barPosition;
-                float textPositionY = renderData_.textPositionY;
+                base.render(display, rt, addSprite);
+                RenderDataList renderData = RenderData as RenderDataList;
+                Vector2 iconPosition = renderData.IconPosition;
+                Vector2 barPosition = renderData.BarPosition;
+                float textPositionY = renderData.TextPositionY;
 
                 // render name
-                for (int l = autoScrollLine_; l < (renderData_.lines + autoScrollLine_) && l < renderData_.container.Count; l++)
+                for (int l = autoScrollLine_; l < (renderData.Lines + autoScrollLine_) && l < renderData.Container.Count; l++)
                 {
-                    var entry = renderData_.container[l];
+                    var entry = renderData.Container[l];
 
                     // draw icon
                     if (iconShow_)
                     {
                         string iconType = $"{entry.type.TypeId}/{entry.type.SubtypeId}";
                         if (RenderTarget.spriteExist(iconType))
-                            addSprite(new MySprite(SpriteType.TEXTURE, iconType, iconPosition + rt.DisplayOffset, renderData_.iconSize, Color.White));
-                        iconPosition.Y += renderData_.lineHeight;
+                            addSprite(new MySprite(SpriteType.TEXTURE, iconType, iconPosition + rt.DisplayOffset, renderData.IconSize, Color.White));
+                        iconPosition.Y += renderData.LineHeight;
                     }
 
                     // draw bar
                     if (barShow_)
                     {
-                        barRenderMethod_(addSprite, rt, barPosition, renderData_.barSize, (float)Math.PI * 0.5f, false, renderData_.barTiles, 
-                            renderData_.barTileSpacing, IconNameSquareSimple, (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
-                        barPosition.Y += renderData_.lineHeight;
+                        barRenderMethod_(addSprite, rt, barPosition, renderData.BarSize, (float)Math.PI * 0.5f, false, renderData.BarTiles, 
+                            renderData.BarTileSpacing, IconNameSquareSimple, (float)entry.indicator, Gradient, 0f, Default.BarBorderColor, barBackground_);
+                        barPosition.Y += renderData.LineHeight;
                     }
 
                     // draw text
                     if (textShow_)
                     {
-                        renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize, 
-                            new Vector2(renderData_.textLeftPositionX, textPositionY), 
+                        renderTextLine(display, rt, addSprite, Template.Font, renderData.FontSize, 
+                            new Vector2(renderData.TextLeftPositionX, textPositionY), 
                             getGradientColor((float)entry.indicator), entry.name, TextAlignment.LEFT);
 
                         if (textStyle_ != TextStyle.OnlyName)
                         {
-                            renderTextLine(display, rt, addSprite, Template.Font, renderData_.fontSize,
-                                new Vector2(renderData_.textRightPositionX, textPositionY),
+                            renderTextLine(display, rt, addSprite, Template.Font, renderData.FontSize,
+                                new Vector2(renderData.TextRightPositionX, textPositionY),
                                 getGradientColor((float)entry.indicator), getRightText(entry), TextAlignment.RIGHT);
                         }
 
-                        textPositionY += renderData_.lineHeight;
+                        textPositionY += renderData.LineHeight;
                     }
                 }
             }

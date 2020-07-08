@@ -273,6 +273,7 @@ namespace IngameScript
             #endregion // Configuration
 
             #region Application State System
+            #region mdk preserve
             public enum State
             {
                 Init,
@@ -281,8 +282,9 @@ namespace IngameScript
                 Stopped,
                 Error
             }
+            #endregion // mdk preserve
 
-            public string stateToString(State state)
+            /*public string stateToString(State state)
             {
                 switch (state)
                 {
@@ -299,7 +301,7 @@ namespace IngameScript
                 }
 
                 return "";
-            }
+            }*/
 
             public UpdateFrequency UpdateFrequency
             {

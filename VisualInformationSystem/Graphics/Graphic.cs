@@ -30,6 +30,7 @@ namespace IngameScript
                 Options = options;
                 Template = template;
                 DataAccessorName = "";
+                RenderData = createRenderDataObj();
 
                 // defaults
                 MaxDCUpdateInterval = Default.DCRefresh;
@@ -42,6 +43,15 @@ namespace IngameScript
                 VisibleThresholdB = -1.0;
                 VisibleOperatorB = val_true;
                 VisibleCondition = cond_and;
+
+                RenderData.BackgroundColor = new Color(0, 0, 0, 0);
+                RenderData.BackgroundIconName = IconNameSquareSimple;
+                RenderData.BackgroundRotation = 0f;
+
+                RenderData.BorderColor = new Color(0, 0, 0, 0);
+                RenderData.BorderSize = 0f;
+                RenderData.BorderSpacing = 0f;
+                RenderData.BorderName = "Simple";
             }
 
             public override bool construct()
@@ -68,6 +78,8 @@ namespace IngameScript
                     add("size", configSize);
                     add("color", configColor);
                     add("gradient", configGradient);
+                    add("border", configBorder);
+                    add("background", configBackground);
                     add("check", configCheck);
                     add("checkremote", configCheckRemote);
                     add("dcrefresh", configDCRefresh);
@@ -223,6 +235,60 @@ namespace IngameScript
                         graphic_.VisibleThresholdB = options.asFloat(3, 0f);
                     }
 
+                    return true;
+                }
+
+                bool configBackground(string key, string value, Configuration.Options options)
+                {
+                    // background:color:icon:rotation:thickness:type
+
+                    graphic_.RenderData.BackgroundColor = Configuration.asColor(value, Default.GfxBackgroundColor);
+
+                    if (options.Count > 0)
+                    {
+                        graphic_.RenderData.BackgroundIconName = options[0];
+                        graphic_.RenderData.BackgroundIcon = Icon.getIcon(options[0]);
+                        if (graphic_.RenderData.BackgroundIcon == null)
+                        {
+                            graphic_.log(Console.LogType.Error, $"Invalid background icon '{options[0]}'");
+                            return false;
+                        }
+
+                        graphic_.RenderData.BackgroundRotation = (options.asFloat(1, 0f) / 180f) * (float)Math.PI;
+
+                        graphic_.BackgroundThickness = options.asFloat(2, 0f);
+                        ValueType vt;
+                        if (!toValueType(options[3], out vt, Default.ValueType))
+                            return false;
+
+                        graphic_.BackgroundThicknessType = vt;
+                    }
+
+                    return true;
+                }
+
+                bool configBorder(string key, string value, Configuration.Options options)
+                {
+                    // border:style:size:spacing:type:color
+
+                    //string prefix = "VIS_Icon_Border";
+                    graphic_.RenderData.BorderIcon = Icon.getIcon($"VIS_Icon_Border{value}");
+                    if (graphic_.RenderData.BorderIcon == null)
+                    {
+                        graphic_.log(Console.LogType.Error, $"Invalid border icon '{value}'");
+                        return false;
+                    }
+                    graphic_.RenderData.BorderName = value;
+
+                    graphic_.BorderSize = options.asFloat(0, Default.BorderSize);
+                    graphic_.BorderSpacing = options.asFloat(1, Default.BorderSpacing);
+
+                    ValueType vt;
+                    if (!toValueType(options[2], out vt, Default.ValueType))
+                        return false;
+                    graphic_.BorderSizeType = vt;
+
+                    graphic_.RenderData.BorderColor = options.asColor(3, Default.BorderColor);
                     return true;
                 }
             }
@@ -460,21 +526,108 @@ namespace IngameScript
                     colorGradient_ = colorGradient_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
                 }
             }
-            #endregion // Properties
 
-            public delegate void AddSpriteDelegate(MySprite sprite);
-            public abstract void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite);
-            public virtual void prepareRendering(Display display)
+            public float BorderSize
             {
+                get;
+                set;
             }
 
-            #region Render Helper
-            #region Render Bars
-            public delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
-                float rotation, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
-                float borderSize, Color borderColor, Color backgroundColor);
+            public float BorderSpacing
+            {
+                get;
+                set;
+            }
 
-            protected static void renderTextLine(Display display, RenderTarget rt, AddSpriteDelegate addSprite, 
+            public ValueType BorderSizeType
+            {
+                get;
+                set;
+            }
+
+            public float BackgroundThickness
+            {
+                get;
+                set;
+            }
+
+            public ValueType BackgroundThicknessType
+            {
+                get;
+                set;
+            }
+            #endregion // Properties
+
+            #region Rendering
+            public delegate void AddSpriteDelegate(MySprite sprite);
+
+            protected class RenderDataBase
+            {
+                // render area
+                public Vector2 Position;
+                public Vector2 OuterSize;
+                public Vector2 InnerSize;
+
+                // border
+                public Color BorderColor;
+                public float BorderSize;
+                public float BorderRotation;
+                public float BorderSpacing;
+                public string BorderName;
+                public Icon.Render BorderIcon;
+
+                // background
+                public Vector2 BackgroundSize;
+                public Color BackgroundColor;
+                public string BackgroundIconName;
+                public Icon.Render BackgroundIcon;
+                public float BackgroundRotation;
+                public float BackgroundThickness;
+            }
+
+            protected RenderDataBase RenderData
+            {
+                get;
+                set;
+            }
+
+            protected virtual RenderDataBase createRenderDataObj() => new RenderDataBase();
+
+            public virtual void prepareRendering(Display display)
+            {
+                RenderData.Position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                RenderData.OuterSize = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+
+                var min = RenderData.OuterSize.X < RenderData.OuterSize.Y ? RenderData.OuterSize.X : RenderData.OuterSize.Y;
+
+                // calculate border
+                RenderData.BorderSize = BorderSizeType == ValueType.Relative ? BorderSize * min : BorderSize;
+                RenderData.BorderSpacing = BorderSizeType == ValueType.Relative ? BorderSpacing * min : BorderSpacing;
+
+                // calculate background
+                RenderData.BackgroundSize = RenderData.OuterSize - (2 * RenderData.BorderSize);
+                RenderData.BackgroundThickness = BackgroundThicknessType == ValueType.Relative ? BackgroundThickness * min : BackgroundThickness;
+
+                // calculate inner size
+                RenderData.InnerSize = RenderData.BackgroundSize - (2 * RenderData.BorderSpacing);
+            }
+
+            public virtual void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
+            {
+                // Render Background
+                if (RenderData.BackgroundColor.A > 0)
+                    RenderData.BackgroundIcon(addSprite, rt, RenderData.BackgroundIconName, RenderData.Position, RenderData.OuterSize,
+                        RenderData.BackgroundThickness, RenderData.BackgroundRotation, RenderData.BackgroundColor);
+
+                // Render border
+                if (RenderData.BorderSize > 0)
+                    RenderData.BorderIcon(addSprite, rt, RenderData.BorderName, RenderData.Position, RenderData.OuterSize,
+                        RenderData.BorderSize, RenderData.BorderRotation, RenderData.BorderColor);
+            }
+            #endregion // Rendering
+
+            #region Render Helper
+            protected static void renderTextLine(Display display, RenderTarget rt, AddSpriteDelegate addSprite,
                 string font, float fontSize, Vector2 position, Color fontColor, string textLine, TextAlignment alignment)
             {
                 // fix font position
@@ -483,6 +636,11 @@ namespace IngameScript
                 sprite.Position = position + offset;
                 addSprite(sprite);
             }
+
+            #region Render Bars
+            public delegate void RenderStyledBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
+                float rotation, bool doubleSided, int tiles, float tileSpace, string tileName, float ratio, Dictionary<float, Color> gradient,
+                float borderSize, Color borderColor, Color backgroundColor);
 
             protected static void renderEllipseBar(AddSpriteDelegate addSprite, RenderTarget rt, Vector2 position, Vector2 size,
                 float degreeStart, float degreeEnd, float blockThickness, float ratio,
@@ -539,12 +697,12 @@ namespace IngameScript
             {
                 Vector2 innerSize = size - (borderSize * 2f);
                 Vector2 rtPosition = position + rt.DisplayOffset;
-
+                /*
                 if (borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, size, borderColor, rotation: rotation));
                 if (backgroundColor.A > 0 || borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, innerSize, backgroundColor, rotation: rotation));
-
+                */
                 Vector2 barSize;
                 Vector2 barPosition;
 
@@ -572,12 +730,12 @@ namespace IngameScript
             {
                 Vector2 innerSize = size - (borderSize * 2f);
                 Vector2 rtPosition = position + rt.DisplayOffset;
-
+                /*
                 if (borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, size, borderColor, rotation: rotation));
                 if (backgroundColor.A > 0 || borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, innerSize, backgroundColor, rotation: rotation));
-
+                */
                 float startRatio = ratio;
                 float innerSizeOffset = 0f;
                 if (doubleSided)
@@ -625,12 +783,12 @@ namespace IngameScript
             {
                 Vector2 innerSize = size - (borderSize * 2f);
                 Vector2 rtPosition = position + rt.DisplayOffset;
-
+                /*
                 if (borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, size, borderColor, rotation: rotation));
                 if (backgroundColor.A > 0 || borderSize > 0f)
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, rtPosition, innerSize, backgroundColor, rotation: rotation));
-
+                */
                 if (doubleSided) innerSize.Y *= 0.5f;
                 Vector2 tileSize = new Vector2(innerSize.X - (borderSize > 0f ? tileSpace * 2f : 0f),
                     (innerSize.Y - (tileSpace * (tiles + (borderSize > 0f ? 1 : 0)))) / tiles);
@@ -815,12 +973,11 @@ namespace IngameScript
                     // custom icon
                     switch(name)
                     {
-                        case "VIS_Icon_Storage":
-                            return renderIconStorage;
                         case "VIS_Icon_Delimiter":
                             return renderIconDelimiter;
                         case "VIS_Icon_Border":
-                            return renderIconBorder;
+                        case "VIS_Icon_BorderSimple":
+                            return renderIconBorderSimple;
                     }
 
                     return null;
@@ -832,33 +989,42 @@ namespace IngameScript
                     addSprite(new MySprite(SpriteType.TEXTURE, name, position + rt.DisplayOffset, size, color, rotation: rotation));
                 }
 
-                static void renderIconBorder(AddSpriteDelegate addSprite, RenderTarget rt, string name,
+                static void renderIconBorderSimple(AddSpriteDelegate addSprite, RenderTarget rt, string name,
                     Vector2 position, Vector2 size, float thickness, float rotation, Color color)
                 {
+                    Vector2 rtPosition = position + rt.DisplayOffset;
                     Vector2 halfSize = size * 0.5f;
                     float halfThickness = thickness * 0.5f;
 
                     // top
+                    Vector2 pos = new Vector2(0f, -halfSize.Y + halfThickness);
+                    pos.Rotate(rotation);
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
-                        new Vector2(position.X, position.Y - halfSize.Y + halfThickness) + rt.DisplayOffset,
+                        pos + rtPosition,
                         new Vector2(size.X, thickness),
                         color, rotation:rotation));
 
                     // bottom
+                    pos = new Vector2(0f, halfSize.Y - halfThickness);
+                    pos.Rotate(rotation);
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
-                        new Vector2(position.X, position.Y + halfSize.Y - halfThickness) + rt.DisplayOffset,
+                        pos + rtPosition,
                         new Vector2(size.X, thickness),
                         color, rotation:rotation));
 
                     // left
+                    pos = new Vector2(-halfSize.X + halfThickness, 0f);
+                    pos.Rotate(rotation);
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
-                        new Vector2(position.X - halfSize.X + halfThickness, position.Y) + rt.DisplayOffset,
+                        pos + rtPosition,
                         new Vector2(thickness, size.Y),
                         color, rotation: rotation));
 
                     // right
+                    pos = new Vector2(halfSize.X - halfThickness, 0f);
+                    pos.Rotate(rotation);
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
-                        new Vector2(position.X + halfSize.X - halfThickness, position.Y) + rt.DisplayOffset,
+                        pos + rtPosition,
                         new Vector2(thickness, size.Y),
                         color, rotation: rotation));
                 }
@@ -871,71 +1037,13 @@ namespace IngameScript
                     Vector2 posBar = new Vector2(rtPosition.X + size.Y * 0.5f, rtPosition.Y);
                     addSprite(new MySprite(SpriteType.TEXTURE, IconNameSquareSimple, posBar, new Vector2(size.X - size.Y, size.Y), color, rotation:rotation));
 
-                    Vector2 posEndLeft = new Vector2(rtPosition.X - size.X * 0.5f + size.Y * 0.5f, rtPosition.Y);
+                    Vector2 posEndLeft = new Vector2(-size.X * 0.5f + size.Y * 0.5f, 0f);
                     posEndLeft.Rotate(rotation);
-                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameCircle, posEndLeft, new Vector2(size.Y, size.Y), color));
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameCircle, posEndLeft + rtPosition, new Vector2(size.Y, size.Y), color));
 
-                    Vector2 posEndRight = new Vector2(rtPosition.X + size.X * 0.5f - size.Y * 0.5f, rtPosition.Y);
+                    Vector2 posEndRight = new Vector2(size.X * 0.5f - size.Y * 0.5f, 0f);
                     posEndRight.Rotate(rotation);
-                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameCircle, posEndRight, new Vector2(size.Y, size.Y), color));
-                }
-
-                static void renderIconStorage(AddSpriteDelegate addSprite, RenderTarget rt, string name,
-                    Vector2 center, Vector2 size, float thickness, float rotation, Color color)
-                {
-                    //size.Y = size.X;
-                    Vector2 offset = new Vector2(0f, 0f);
-                    Vector2 linesize = size;
-                    linesize.X = size.X * 0.05f;
-                    linesize.Y = size.Y * 0.5f;
-
-                    MySprite sprite;
-                    sprite = new MySprite(SpriteType.TEXTURE, IconNameSquareSimple,
-                        size: linesize,
-                        color: color
-                        );
-                    offset.Y = linesize.Y / 2f;
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = offset.X + linesize.Y * (float)Math.Cos(Math.PI / 6);
-                    offset.Y = offset.Y - linesize.Y * (float)Math.Sin(Math.PI / 6);
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = offset.X - linesize.Y * 2f * (float)Math.Cos(Math.PI / 6);
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
-                    offset.Y = linesize.Y * 3f / 2f * (float)Math.Sin(Math.PI / 6);
-                    sprite.RotationOrScale = (float)Math.PI / 3f;
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.Y = offset.Y - linesize.Y * 2f * (float)Math.Sin(Math.PI / 6);
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = -linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
-                    offset.Y = offset.Y - linesize.Y / 2f;
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = -linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
-                    offset.Y = linesize.Y * 3f / 2f * (float)Math.Sin(Math.PI / 6);
-                    sprite.RotationOrScale = -(float)Math.PI / 3f;
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.Y = offset.Y - linesize.Y * 2f * (float)Math.Sin(Math.PI / 6);
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
-
-                    offset.X = linesize.Y / 2f * (float)Math.Cos(Math.PI / 6);
-                    offset.Y = offset.Y - linesize.Y / 2f;
-                    sprite.Position = center + offset;
-                    addSprite(sprite);
+                    addSprite(new MySprite(SpriteType.TEXTURE, IconNameCircle, posEndRight + rtPosition, new Vector2(size.Y, size.Y), color));
                 }
             }
             #endregion // Render Helper

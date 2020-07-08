@@ -28,6 +28,8 @@ namespace IngameScript
             {
             }
 
+            protected override bool supportCheck(string name) => true;
+
 
             /*public override Graphic clone()
             {
@@ -138,25 +140,20 @@ namespace IngameScript
             public override ConfigHandler getConfigHandler() => new Config(this);
             #endregion // Configuration
 
-            protected override bool supportCheck(string name)
-            {
-                return true;
-            }
-
             #region Rendering
-            struct RenderData
+            class RenderDataText : RenderDataBase
             {
-                public float fontSize;
-                public Color fontColor;
+                public float FontSize;
+                public Color FontColor;
 
-                public Vector2 position;
-                public float lineHeight;
-                public List<string> lines;
+                public Vector2 TextPosition;
+                public float LineHeight;
+                public List<string> Lines;
 
-                public bool visible;
+                public bool Visible;
             }
 
-            RenderData renderData_ = new RenderData();
+            protected override RenderDataBase createRenderDataObj() => new RenderDataText();
 
             string processTextLine(string text)
             {
@@ -182,8 +179,9 @@ namespace IngameScript
             {
                 float fontSize = FontSize;
                 bool dynFontSize = fontSize == 0f || (useDefaultFont_ && sizeIsSet);
+                RenderDataText renderData = RenderData as RenderDataText;
 
-                renderData_.lines = new List<string>();
+                renderData.Lines = new List<string>();
                 Vector2 maxSize = new Vector2(0f, 0f);
 
                 Func<string, string> calcMaxSize = (text) =>
@@ -204,45 +202,52 @@ namespace IngameScript
                     {
                         string[] lines = display.Text.Split('\n');
                         foreach (string line in lines)
-                            renderData_.lines.Add(calcMaxSize(line));
+                            renderData.Lines.Add(calcMaxSize(line));
                     }
                     else
-                        renderData_.lines.Add(calcMaxSize(text));
+                        renderData.Lines.Add(calcMaxSize(text));
                 }
                 
                 if (dynFontSize)
                 {
-                    Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
-                    renderData_.fontSize = Math.Min(size.X / maxSize.X, size.Y / (maxSize.Y * renderData_.lines.Count));
-                    renderData_.lineHeight = maxSize.Y * renderData_.fontSize;
+                    //Vector2 size = SizeType == Graphic.ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                    base.prepareRendering(display);
+                    renderData.FontSize = Math.Min(renderData.InnerSize.X / maxSize.X, renderData.InnerSize.Y / (maxSize.Y * renderData.Lines.Count));
+                    renderData.LineHeight = maxSize.Y * renderData.FontSize;
                 }
                 else
                 {
-                    renderData_.fontSize = fontSize;
-                    renderData_.lineHeight = maxSize.Y;
+                    Size = maxSize;
+                    SizeType = ValueType.Absolute;
+                    base.prepareRendering(display);
+                    var min = Math.Min(renderData.InnerSize.X / maxSize.X, renderData.InnerSize.Y / (maxSize.Y * renderData.Lines.Count));
+                    renderData.FontSize = fontSize * min;
+                    renderData.LineHeight = maxSize.Y * min;
                 }
 
-                Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                renderData_.position = new Vector2(position.X, position.Y - ((renderData_.lineHeight * (renderData_.lines.Count - 1)) * 0.5f));
+                //Vector2 position = PositionType == Graphic.ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                renderData.TextPosition = new Vector2(renderData.Position.X,
+                    renderData.Position.Y - ((renderData.LineHeight * (renderData.Lines.Count - 1)) * 0.5f));
 
                 if (Gradient.Count > 0)
-                    renderData_.fontColor = DataAccessor != null ? getGradientColor((float)DataAccessor.indicator()) : Color;
+                    renderData.FontColor = DataAccessor != null ? getGradientColor((float)DataAccessor.indicator()) : Color;
                 else
-                    renderData_.fontColor = FontColor;
+                    renderData.FontColor = FontColor;
 
-                renderData_.visible = DataAccessor != null ? isVisible(DataAccessor.indicator()) : true;
+                renderData.Visible = DataAccessor != null ? isVisible(DataAccessor.indicator()) : true;
             }
 
             public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                if (!renderData_.visible)
+                RenderDataText renderData = RenderData as RenderDataText;
+                if (!renderData.Visible)
                     return;
 
-                for (int c = 0; c < renderData_.lines.Count; c++)
+                for (int c = 0; c < renderData.Lines.Count; c++)
                 {
-                    Graphic.renderTextLine(display, rt, addSprite, Font, renderData_.fontSize, 
-                        new Vector2(renderData_.position.X, renderData_.position.Y + (c * renderData_.lineHeight)), 
-                        renderData_.fontColor, renderData_.lines[c], TextAlignment);
+                    renderTextLine(display, rt, addSprite, Font, renderData.FontSize, 
+                        new Vector2(renderData.TextPosition.X, renderData.TextPosition.Y + (c * renderData.LineHeight)), 
+                        renderData.FontColor, renderData.Lines[c], TextAlignment);
                 }
             }
             #endregion // Rendering

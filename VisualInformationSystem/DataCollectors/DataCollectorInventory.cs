@@ -46,11 +46,11 @@ namespace IngameScript
                 {
                     IMyInventory inventory = block.GetInventory(i);
 
-                    if (itemTypes_.Count > 0)
+                    if (itemTypeFilter_.Count > 0)
                     {
                         List<MyItemType> acceptedItems = new List<MyItemType>();
                         inventory.GetAcceptedItems(acceptedItems);
-                        foreach (ItemType item in itemTypes_)
+                        foreach (ItemType item in itemTypeFilter_)
                         {
                             if (acceptedItems.Exists(x => item.type.Equals(x)))
                             {
@@ -103,8 +103,8 @@ namespace IngameScript
 
                         if (int.TryParse(itemTypeName, out amount))
                         {
-                            if (itemTypes_.Count > 0)
-                                itemTypes_[itemTypes_.Count - 1].amount = amount;
+                            if (itemTypeFilter_.Count > 0)
+                                itemTypeFilter_[itemTypeFilter_.Count - 1].amount = amount;
                             else
                                 defaultMaxAmountItems_ = amount;
                         }
@@ -121,7 +121,7 @@ namespace IngameScript
                             }
 
                             long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key == itemType).Value;
-                            itemTypes_.Add(new ItemType(itemType, defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_));
+                            itemTypeFilter_.Add(new ItemType(itemType, defaultAmount > 0 ? defaultAmount : defaultMaxAmountItems_));
                         }
                     }
 
@@ -129,7 +129,7 @@ namespace IngameScript
                 }
                 else if (constructStage_ == 2)
                 {
-                    itemTypes_.Sort((a, b) => a.type.Group && !b.type.Group ? 1 : (!a.type.Group && b.type.Group ? -1 : 0));
+                    itemTypeFilter_.Sort((a, b) => a.type.Group && !b.type.Group ? 1 : (!a.type.Group && b.type.Group ? -1 : 0));
 
                     for (; constructIndex_ < constructBlocks_.Count && 
                         App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
@@ -145,8 +145,8 @@ namespace IngameScript
                     if (inventories_.Count == 0)
                         log(Console.LogType.Warning, $"No blocks found {Name}[{BlockName}{(IsGroup ? ":group" : "")}]");
 
-                    if (itemTypes_.Count > 0)
-                        foreach (var it in itemTypes_)
+                    if (itemTypeFilter_.Count > 0)
+                        foreach (var it in itemTypeFilter_)
                             maxItems_ += it.amount;
                     else
                     {
@@ -164,7 +164,7 @@ namespace IngameScript
             {
                 maxItems_ = 0;
                 maxVolume_ = 0.0;
-                itemTypes_.Clear();
+                itemTypeFilter_.Clear();
                 inventories_.Clear();
                 constructStage_ = 0;
                 constructIndex_ = 0;
@@ -205,8 +205,8 @@ namespace IngameScript
 
                     inventory.GetAcceptedItems(null, (itemType) =>
                     {
-                        int itemTypeIndex = itemTypes_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
-                        if (itemTypes_.Count > 0 && itemTypeIndex < 0)
+                        int itemTypeIndex = itemTypeFilter_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
+                        if (itemTypeFilter_.Count > 0 && itemTypeIndex < 0)
                             return false;
 
                         var amount = inventory.GetItemAmount(itemType);
@@ -220,7 +220,7 @@ namespace IngameScript
                             item.type = itemType;
 
                             if (itemTypeIndex >= 0)
-                                item.maxAmount = itemTypes_[itemTypeIndex].amount;
+                                item.maxAmount = itemTypeFilter_[itemTypeIndex].amount;
                             else
                             {
                                 long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key.Equals(item.type)).Value;
@@ -252,7 +252,7 @@ namespace IngameScript
                 public long amount;
             }
 
-            List<ItemType> itemTypes_ = new List<ItemType>();
+            List<ItemType> itemTypeFilter_ = new List<ItemType>();
             List<IMyInventory> inventories_ = new List<IMyInventory>();
             double currentVolume_ = 0;
             double maxVolume_ = 0;
@@ -271,7 +271,7 @@ namespace IngameScript
                     .Replace("%currentvolume%", new VISUnitType(currentVolume_, unit: Unit.Liter).pack())
                     .Replace("%volumeratio%", new VISUnitType(volumeRatio_, unit: Unit.Percent))
                     .Replace("%inventories%", inventories_.Count.ToString())
-                    .Replace("%itemtypes%", itemTypes_.Count.ToString());
+                    .Replace("%itemtypes%", itemTypeFilter_.Count.ToString());
             }
 
             long defaultMaxAmountItems_ = Default.MaxAmountItems;

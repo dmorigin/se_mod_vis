@@ -71,12 +71,14 @@ namespace IngameScript
                 if (Gradient.Count == 0)
                     addGradientColor(0f, Default.BarColor);
 
-                Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
-                Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                //Vector2 position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                //Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+
+                base.render(display, rt, addSprite);
 
                 // draw slider
-                renderSlider(addSprite, rt, position, size, DataAccessor.min() < 0.0, (float)DataAccessor.indicator(),
-                    Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
+                renderSlider(addSprite, rt, RenderData.Position, RenderData.InnerSize, DataAccessor.min() < 0.0,
+                    (float)DataAccessor.indicator(), Gradient, sliderOrientation_, sliderWidth_, sliderColor_);
             }
 
             #region Configuration

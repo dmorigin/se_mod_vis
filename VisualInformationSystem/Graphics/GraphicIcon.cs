@@ -64,6 +64,7 @@ namespace IngameScript
             bool toggleShow_ = true; // render data only
             public override void prepareRendering(Display display)
             {
+                base.prepareRendering(display);
                 toggleShow_ = !toggleShow_;
             }
 
@@ -80,12 +81,14 @@ namespace IngameScript
                 if (!visible || (!toggleShow_ && blink_))
                     return;
 
-                Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                //Vector2 size = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                base.render(display, rt, addSprite);
 
                 icon_(addSprite, rt, iconName_,
-                    PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position,
-                    size,
-                    thicknessSizeType_ == ValueType.Relative ? thickness_ * size.X : thickness_,
+                    //PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position,
+                    RenderData.Position,
+                    RenderData.InnerSize,
+                    thicknessSizeType_ == ValueType.Relative ? thickness_ * RenderData.InnerSize.X : thickness_,
                     rotation_, color);
             }
 

@@ -86,7 +86,7 @@ namespace IngameScript
                     sb_.Clear();
                     sb_.AppendLine($"Visual Information System ({Program.VERSION})\n=============================");
                     sb_.AppendLine($"Running: {getRunSymbol()}");
-                    sb_.AppendLine($"VIS State: {app.Manager.stateToString(vis.CurrentState)}");
+                    sb_.AppendLine($"VIS State: {vis.CurrentState}");
                     sb_.AppendLine($"Data Collectors: {app.Manager.CollectorManager.Created}/{app.Manager.CollectorManager.Requested}");
                     sb_.AppendLine($"Time: {ticks_}");
                     sb_.AppendLine($"Ticks: {ticksSinceLastUpdate_}");

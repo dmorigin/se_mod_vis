@@ -64,7 +64,7 @@ namespace IngameScript
             protected override bool supportCheck(string name) => name != "battery";
 
             #region Rendering
-            struct RenderData
+            struct RenderDataCurved
             {
                 public Vector2 position;
                 public Vector2 size;
@@ -73,7 +73,7 @@ namespace IngameScript
                 public Vector2 iconSize;
                 public Color iconColor;
             }
-            RenderData renderData_ = new RenderData();
+            RenderDataCurved renderData_ = new RenderDataCurved();
 
             public override void prepareRendering(Display display)
             {
@@ -95,7 +95,7 @@ namespace IngameScript
                 if (!isVisible(DataAccessor.indicator()))
                     return;
 
-                Graphic.renderEllipseBar(addSprite, rt, renderData_.position, renderData_.size, minDegree_, maxDegree_, 
+                renderEllipseBar(addSprite, rt, renderData_.position, renderData_.size, minDegree_, maxDegree_, 
                     thickness_, renderData_.ratio, Gradient, colorLerp_, Template.BackgroundColor);
 
                 if (icon_ != null)

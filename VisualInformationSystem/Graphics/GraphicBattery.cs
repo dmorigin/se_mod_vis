@@ -141,36 +141,41 @@ namespace IngameScript
             #endregion // Configuration
 
             #region Rendering
-            struct RenderData
+            class RenderDataBattery : RenderDataBase
             {
-                public int rows;
-                public int cols;
+                public int Rows;
+                public int Cols;
 
-                public float scale;
-                public Vector2 size;
+                public float Scale;
+                public Vector2 Size;
 
-                public Vector2 renderPosition;
-                public Vector2 renderSize;
+                //public Vector2 renderPosition;
+                //public Vector2 renderSize;
 
-                public List<IMyBatteryBlock> batteries;
+                public List<IMyBatteryBlock> Batteries;
             }
 
-            RenderData renderData_ = new RenderData();
+            protected override RenderDataBase createRenderDataObj() => new RenderDataBattery();
+
+            //RenderData renderData_ = new RenderData();
             Vector2 batterySize_ = new Vector2(60f, 120f);
             int capacitySegments_ = 6;
 
             public override void prepareRendering(Display display)
             {
+                base.prepareRendering(display);
+
+                RenderDataBattery renderData = RenderData as RenderDataBattery;
                 DataCollectorBattery dcBattery = DataCollector as DataCollectorBattery;
                 if (dcBattery == null)
                 {
-                    renderData_.batteries = new List<IMyBatteryBlock>();
+                    renderData.Batteries = new List<IMyBatteryBlock>();
                     return;
                 }
 
-                renderData_.batteries = dcBattery.Batteries;
-                renderData_.renderSize = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
-                renderData_.renderPosition = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
+                renderData.Batteries = dcBattery.Batteries;
+                //renderData.renderSize = SizeType == ValueType.Relative ? Size * display.RenderArea.Size : Size;
+                //renderData.renderPosition = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
 
                 // calculate rows and cols size
                 Vector2 batterySize = batterySize_ + margin_;
@@ -178,55 +183,59 @@ namespace IngameScript
                 // full automatic
                 if (rows_ <= 0 && cols_ <= 0)
                 {
-                    for (int curCols = renderData_.batteries.Count; curCols > 0; curCols--)
+                    for (int curCols = renderData.Batteries.Count; curCols > 0; curCols--)
                     {
                         // padding == 2pixel
-                        int curRows = (int)Math.Ceiling((double)renderData_.batteries.Count / curCols);
-                        Vector2 curSize = new Vector2(renderData_.renderSize.X / curCols, renderData_.renderSize.Y / curRows);
+                        int curRows = (int)Math.Ceiling((double)renderData.Batteries.Count / curCols);
+                        Vector2 curSize = new Vector2(renderData.InnerSize.X / curCols, renderData.InnerSize.Y / curRows);
                         float curScale = Math.Min(curSize.X / batterySize.X, curSize.Y / batterySize.Y);
 
-                        if (curScale < renderData_.scale)
+                        if (curScale < renderData.Scale)
                             break;
 
-                        renderData_.scale = curScale;
-                        renderData_.size = curSize;
-                        renderData_.rows = curRows;
-                        renderData_.cols = curCols;
+                        renderData.Scale = curScale;
+                        renderData.Size = curSize;
+                        renderData.Rows = curRows;
+                        renderData.Cols = curCols;
                     }
                 }
                 else
                 {
                     // calculate rows
                     if (rows_ <= 0)
-                        renderData_.rows = (int)Math.Ceiling((double)renderData_.batteries.Count / cols_);
+                        renderData.Rows = (int)Math.Ceiling((double)renderData.Batteries.Count / cols_);
                     // calculate cols
                     else if (cols_ <= 0)
-                        renderData_.cols = (int)Math.Ceiling((double)renderData_.batteries.Count / rows_);
+                        renderData.Cols = (int)Math.Ceiling((double)renderData.Batteries.Count / rows_);
 
-                    renderData_.size = new Vector2(renderData_.renderSize.X / renderData_.cols, renderData_.renderSize.Y / renderData_.rows);
-                    renderData_.scale = Math.Min(renderData_.size.X / batterySize.X, renderData_.size.Y / batterySize.Y);
+                    renderData.Size = new Vector2(renderData.InnerSize.X / renderData.Cols, renderData.InnerSize.Y / renderData.Rows);
+                    renderData.Scale = Math.Min(renderData.Size.X / batterySize.X, renderData.Size.Y / batterySize.Y);
                 }
             }
 
             public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
-                float positionX = renderData_.renderPosition.X + rt.DisplayOffset.X - (renderData_.renderSize.X * 0.5f) + (renderData_.size.X * 0.5f);
-                float positionY = renderData_.renderPosition.Y + rt.DisplayOffset.Y - (renderData_.renderSize.Y * 0.5f) + (renderData_.size.Y * 0.5f);
-                float offsetX = renderData_.size.X;
-                float offsetY = renderData_.size.Y;
+                base.render(display, rt, addSprite);
+
+                RenderDataBattery renderData = RenderData as RenderDataBattery;
+
+                float positionX = renderData.Position.X + rt.DisplayOffset.X - (renderData.InnerSize.X * 0.5f) + (renderData.Size.X * 0.5f);
+                float positionY = renderData.Position.Y + rt.DisplayOffset.Y - (renderData.InnerSize.Y * 0.5f) + (renderData.Size.Y * 0.5f);
+                float offsetX = renderData.Size.X;
+                float offsetY = renderData.Size.Y;
 
                 // draw batteries
-                for (int r = 0; r < renderData_.rows; r++)
+                for (int r = 0; r < renderData.Rows; r++)
                 {
-                    for (int c = 0; c < renderData_.cols; c++)
+                    for (int c = 0; c < renderData.Cols; c++)
                     {
-                        int index = (renderData_.cols * r) + c;
-                        if (index >= renderData_.batteries.Count)
+                        int index = (renderData.Cols * r) + c;
+                        if (index >= renderData.Batteries.Count)
                             break;
 
-                        IMyBatteryBlock battery = renderData_.batteries[index];
+                        IMyBatteryBlock battery = renderData.Batteries[index];
                         Vector2 position = new Vector2(positionX + (offsetX * c), positionY + (offsetY * r));
-                        drawSingleBattery(position, renderData_.scale,
+                        drawSingleBattery(position, renderData.Scale,
                             battery.CurrentStoredPower / battery.MaxStoredPower,
                             (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput),
                             DataCollectorBase<IMyBatteryBlock>.isOn(battery),
