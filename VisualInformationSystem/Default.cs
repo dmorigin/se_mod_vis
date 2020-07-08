@@ -73,7 +73,7 @@ namespace IngameScript
             public static TimeSpan WatchConnectorInterval = TimeSpan.FromSeconds(2.0);//TimeSpan.FromSeconds(1.0);
             public static float DCRefreshInSec = 5.0f;
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
-            public static int MaxInstructionCount = 7000;
+            public static int MaxInstructionCount = 9000;//7000;
             public static int ExceptionRetry = 3;
 
             public static long MaxAmountItems = 1000;

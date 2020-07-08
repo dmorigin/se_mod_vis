@@ -38,7 +38,115 @@ namespace IngameScript
             List<IMyTerminalBlock> constructBlocks_ = new List<IMyTerminalBlock>();
             int constructIndex_ = 0;
 
-            void addInventoryBlock(IMyTerminalBlock block)
+            class CheckInventoryBlock
+            {
+                DataCollectorInventory dc_ = null;
+                IMyTerminalBlock block_ = null;
+
+                public CheckInventoryBlock(DataCollectorInventory dc, IMyTerminalBlock block)
+                {
+                    dc_ = dc;
+                    block_ = block;
+                    Check = checkBlock;
+                }
+
+                public Func<bool> Check
+                {
+                    get;
+                    private set;
+                }
+
+                bool addBlock = false;
+                int inventoryIndex_ = 0;
+                bool checkBlock()
+                {
+                    if (inventoryIndex_ < block_.InventoryCount)
+                    {
+                        var inventory = block_.GetInventory(inventoryIndex_);
+                        acceptedItems_.Clear();
+                        acceptedItemIndex_ = 0;
+                        inventory.GetAcceptedItems(null, (itemType) =>
+                        {
+                            int index = dc_.itemTypeFilter_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
+                            ItemType item = new ItemType();
+                            item.type = itemType;
+
+                            if (index >= 0)
+                            {
+                                item.amount = dc_.itemTypeFilter_[index].amount;
+                                acceptedItems_.Add(item);
+                            }
+                            else if (dc_.itemTypeFilter_.Count == 0)
+                            {
+                                long defaultAmount = Default.AmountItems.FirstOrDefault(pair => pair.Key.Equals(item.type)).Value;
+                                item.amount = defaultAmount > 0 ? defaultAmount : dc_.defaultMaxAmountItems_;
+                                acceptedItems_.Add(item);
+                            }
+
+                            return false;
+                        });
+
+                        if (acceptedItems_.Count > 0)
+                        {
+                            dc_.inventories_.Add(inventory);
+                            dc_.maxVolume_ += (double)inventory.MaxVolume;
+                            addBlock = true;
+                        }
+
+                        Check = checkInventory;
+                        return false;
+                    }
+
+                    if (addBlock)
+                        dc_.Blocks.Add(block_);
+                    return true;
+                }
+
+                struct ItemType
+                {
+                    public MyItemType type;
+                    public long amount;
+                }
+
+                List<ItemType> acceptedItems_ = new List<ItemType>();
+                int acceptedItemIndex_ = 0;
+                bool checkInventory()
+                {
+                    dc_.log(Console.LogType.Debug, $"construct::stage:2 - checkInventory:{dc_.constructIndex_}/{inventoryIndex_}/{acceptedItemIndex_}/{acceptedItems_.Count}");
+                    dc_.App.Manager.Console.flush();
+
+                    for (; acceptedItemIndex_ < acceptedItems_.Count &&
+                        dc_.App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount;
+                        ++acceptedItemIndex_)
+                    {
+                        var itemType = acceptedItems_[acceptedItemIndex_];
+
+                        // check item exists
+                        int index = dc_.items_.FindIndex((item) => item.type.Equals(itemType.type));
+                        var amount = block_.GetInventory(inventoryIndex_).GetItemAmount(itemType.type);
+
+                        if (index >= 0)
+                            dc_.items_[index].currentAmount += (long)amount;
+                        else
+                        {
+                            InventoryItem invItem = new InventoryItem();
+                            invItem.type = itemType.type;
+                            invItem.maxAmount = itemType.amount;
+                            invItem.currentAmount = (long)amount;
+                            dc_.items_.Add(invItem);
+                        }
+                    }
+
+                    if (acceptedItemIndex_ >= acceptedItems_.Count)
+                    {
+                        Check = checkBlock;
+                        inventoryIndex_++;
+                    }
+                    return false;
+                }
+            }
+
+            /*void addInventoryBlock(IMyTerminalBlock block)
             {
                 bool addBlock = false;
 
@@ -71,8 +179,10 @@ namespace IngameScript
 
                 if (addBlock == true)
                     Blocks.Add(block);
-            }
+            }*/
 
+            bool runStage_ = false;
+            CheckInventoryBlock blockScanner_ = null;
             public override bool construct()
             {
                 if (constructStage_ == 0)
@@ -84,6 +194,8 @@ namespace IngameScript
                         else if (!getBlocks(AcceptBlock, TypeID))
                             return false;
 
+                        log(Console.LogType.Debug, $"Blocks found:{constructBlocks_.Count}");
+                        App.Manager.Console.flush();
                         constructStage_ = 1;
                     }
                     else
@@ -129,12 +241,31 @@ namespace IngameScript
                 }
                 else if (constructStage_ == 2)
                 {
-                    itemTypeFilter_.Sort((a, b) => a.type.Group && !b.type.Group ? 1 : (!a.type.Group && b.type.Group ? -1 : 0));
+                    if (!runStage_)
+                    {
+                        itemTypeFilter_.Sort((a, b) => a.type.Group && !b.type.Group ? 1 : (!a.type.Group && b.type.Group ? -1 : 0));
+                        runStage_ = true;
+                    }
 
-                    for (; constructIndex_ < constructBlocks_.Count && 
-                        App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
-                        constructIndex_++)
-                        addInventoryBlock(constructBlocks_[constructIndex_]);
+                    //log(Console.LogType.Debug, "construct::stage:2 - update");
+                    //App.Manager.Console.flush();
+
+                    //for (; constructIndex_ < constructBlocks_.Count && 
+                    //    App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount; 
+                    //    constructIndex_++)
+                    while (constructIndex_ < constructBlocks_.Count &&
+                        App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount)
+                    {
+                        if (blockScanner_ == null)
+                            blockScanner_ = new CheckInventoryBlock(this, constructBlocks_[constructIndex_]);
+
+                        if(blockScanner_.Check())
+                        {
+                            blockScanner_ = null;
+                            constructIndex_++;
+                        }
+                    }
+                        //addInventoryBlock(constructBlocks_[constructIndex_]);
 
                     if (constructIndex_ >= constructBlocks_.Count)
                         constructStage_ = 3;
@@ -169,6 +300,7 @@ namespace IngameScript
                 constructStage_ = 0;
                 constructIndex_ = 0;
                 constructBlocks_.Clear();
+                items_.Clear();
                 return base.reconstruct();
             }
             #endregion // Construction Part
@@ -183,7 +315,10 @@ namespace IngameScript
                 currentVolume_ = 0.0;
                 currentItems_ = 0;
                 invIndex_ = 0;
-                items_.Clear();
+
+                //items_.Clear();
+                foreach (var item in items_)
+                    item.currentAmount = 0;
             }
 
             public override void finalizeUpdate()
@@ -203,6 +338,14 @@ namespace IngameScript
                     IMyInventory inventory = inventories_[invIndex_];
                     currentVolume_ += (double)inventory.CurrentVolume;
 
+                    foreach(var item in items_)
+                    {
+                        var amount = inventory.GetItemAmount(item.type);
+                        item.currentAmount += (long)amount;
+                        currentItems_ += (long)amount;
+                    }
+
+                    /*
                     inventory.GetAcceptedItems(null, (itemType) =>
                     {
                         int itemTypeIndex = itemTypeFilter_.FindIndex(x => VISItemType.compareItemTypes(x.type, itemType));
@@ -232,7 +375,7 @@ namespace IngameScript
 
                         currentItems_ += (long)amount;
                         return false;
-                    });
+                    });*/
                 }
 
                 if (invIndex_ >= inventories_.Count)
