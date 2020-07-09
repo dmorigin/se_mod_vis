@@ -39,7 +39,7 @@ namespace IngameScript
             public static Graphic.ValueType SizeType = ValueType;
             public static float Thickness = 0.01f;
             public static float BorderSize = 0f;
-            public static float BorderSpacing = 0.01f;
+            public static float BorderSpacing = 0.0f;
             public static Color BorderColor = new Color(179, 237, 255);
 
             public static Color BarColor = new Color(179, 237, 255);
