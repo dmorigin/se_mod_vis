@@ -112,8 +112,8 @@ namespace IngameScript
                 int acceptedItemIndex_ = 0;
                 bool checkInventory()
                 {
-                    dc_.log(Console.LogType.Debug, $"construct::stage:2 - checkInventory:{dc_.constructIndex_}/{inventoryIndex_}/{acceptedItemIndex_}/{acceptedItems_.Count}");
-                    dc_.App.Manager.Console.flush();
+                    //dc_.log(Console.LogType.Debug, $"construct::stage:2 - checkInventory:{dc_.constructIndex_}/{inventoryIndex_}/{acceptedItemIndex_}/{acceptedItems_.Count}");
+                    //dc_.App.Manager.Console.flush();
 
                     for (; acceptedItemIndex_ < acceptedItems_.Count &&
                         dc_.App.Runtime.CurrentInstructionCount < Default.MaxInstructionCount;
@@ -274,7 +274,7 @@ namespace IngameScript
                 {
                     constructBlocks_.Clear();
                     if (inventories_.Count == 0)
-                        log(Console.LogType.Warning, $"No blocks found {Name}[{BlockName}{(IsGroup ? ":group" : "")}]");
+                        log(Console.LogType.Warning, $"No inventories found {Name}[{BlockName}{(IsGroup ? ":group" : "")}]");
 
                     if (itemTypeFilter_.Count > 0)
                         foreach (var it in itemTypeFilter_)
