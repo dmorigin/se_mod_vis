@@ -248,7 +248,7 @@ namespace IngameScript
                 (orientation == Base6Directions.Direction.Forward && ((thrusterDirection_ & ThrusterDirection.Break) != 0)) ||
                 (orientation == Base6Directions.Direction.Backward && ((thrusterDirection_ & ThrusterDirection.Accelerate) != 0));
 
-            static string typePattern_ = @"^Type: [\w\s]*(?<type>Ion|Atmospheric|Hydrogen)[\w\s]*$";
+            static string typePattern_ = @"^Type:.*[\w\s]*(?<type>Ion|Atmospheric|Hydrogen)[\w\s]*$";
             bool sameThrusterType(string info)
             {
                 var regex = new System.Text.RegularExpressions.Regex(typePattern_, System.Text.RegularExpressions.RegexOptions.Multiline);

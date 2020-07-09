@@ -194,8 +194,8 @@ namespace IngameScript
                         else if (!getBlocks(AcceptBlock, TypeID))
                             return false;
 
-                        log(Console.LogType.Debug, $"Blocks found:{constructBlocks_.Count}");
-                        App.Manager.Console.flush();
+                        //log(Console.LogType.Debug, $"Blocks found:{constructBlocks_.Count}");
+                        //App.Manager.Console.flush();
                         constructStage_ = 1;
                     }
                     else
