@@ -81,7 +81,7 @@ namespace IngameScript
                 renderData_.position = PositionType == ValueType.Relative ? Position * display.RenderArea.Size : Position;
                 renderData_.ratio = (float)DataAccessor.indicator();
 
-                renderData_.iconSize = renderData_.size * 0.45f;
+                renderData_.iconSize = renderData_.size * 0.40f;
                 if (iconUseColor_)
                     renderData_.iconColor = iconColor_;
                 else if (colorLerp_)
