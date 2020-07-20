@@ -113,8 +113,10 @@ namespace IngameScript
                     add("displaytag", configDisplayNameTag);
                     //add("template", configTemplate);
                     add("console", configConsole);
+                    add("updatefrequency", configSetUpdateFrequency);
                     add("rtfixsize", configRTFixSize);
-                    add("maxspeed", configMaxSpeed);
+                    add("maxspeed", configMaxShipSpeed);
+                    add("maxshipspeed", configMaxShipSpeed);
                     add("itemamount", configMaxAmountItem);
                     add("recointerval", configSetRecInterval);
                     add("shareconfig", configShareConfig);
@@ -154,6 +156,25 @@ namespace IngameScript
                     return false;
                 }
 
+                bool configSetUpdateFrequency(string key, string value, Configuration.Options options)
+                {
+                    switch (value.ToLower())
+                    {
+                        case "fast":
+                            Default.UpdateFrequency = UpdateFrequency.Update1;
+                            break;
+                        case "normal":
+                            Default.UpdateFrequency = UpdateFrequency.Update10;
+                            break;
+                        case "slow":
+                            Default.UpdateFrequency = UpdateFrequency.Update100;
+                            break;
+                        default:
+                            return false;
+                    }
+                    return true;
+                }
+
                 bool configRTFixSize(string key, string value, Configuration.Options options)
                 {
                     int index = options.asInteger(0, 0);
@@ -174,8 +195,10 @@ namespace IngameScript
                     return true;
                 }
 
-                bool configMaxSpeed(string key, string value, Configuration.Options options)
+                bool configMaxShipSpeed(string key, string value, Configuration.Options options)
                 {
+                    if (key == "maxspeed")
+                        manager_.log(Console.LogType.Error, "Setting 'maxspeed' is deprecated. Use 'maxshipspeed' instead!");
                     Default.MaxShipSpeed = Configuration.asFloat(value, Default.MaxShipSpeed);
                     return true;
                 }
@@ -403,7 +426,7 @@ namespace IngameScript
                     if (--waitAfterInit_ == 0)
                     {
                         log(Console.LogType.Info, "VIS Manager initiated");
-                        UpdateFrequency = UpdateFrequency.Update1;
+                        UpdateFrequency = Default.UpdateFrequency;
                         switchState(State.Run);
                     }
                 }

@@ -264,13 +264,14 @@ namespace IngameScript
             static List<Display> displays_ = new List<Display>();
             static int genericDisplayGroupId_ = 0;
 
-            public static Display createDisplay(string groupId)
+            public static Display createDisplay(string groupId, int screenId, string customName)
             {
                 Display display;
 
                 if (groupId == Default.EmptyDisplayGroupID)
                 {
-                    groupId = $"genericDisplayGroup_{++genericDisplayGroupId_}";
+                    var groupName = customName == "" ? "genericDisplayGroup" : customName;
+                    groupId = $"{groupName}/{screenId}_{++genericDisplayGroupId_}";
                     display = new Display(groupId);
                 }
                 else if ((display = getDisplayGroup(groupId)) != null)

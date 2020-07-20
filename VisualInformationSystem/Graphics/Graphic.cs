@@ -49,7 +49,7 @@ namespace IngameScript
                 RenderData.BackgroundRotation = 0f;
 
                 RenderData.BorderColor = new Color(0, 0, 0, 0);
-                RenderData.BorderSize = 0f;
+                RenderData.BorderThickness = 0f;
                 RenderData.BorderSpacing = 0f;
                 RenderData.BorderName = "Simple";
             }
@@ -246,7 +246,7 @@ namespace IngameScript
 
                     if (options.Count > 0)
                     {
-                        graphic_.RenderData.BackgroundIconName = options[0];
+                        graphic_.RenderData.BackgroundIconName = options[0] == "" ? IconNameSquareSimple : options[0];
                         graphic_.RenderData.BackgroundIcon = Icon.getIcon(options[0]);
                         if (graphic_.RenderData.BackgroundIcon == null)
                         {
@@ -254,7 +254,7 @@ namespace IngameScript
                             return false;
                         }
 
-                        graphic_.RenderData.BackgroundRotation = (options.asFloat(1, 0f) / 180f) * (float)Math.PI;
+                        graphic_.BackgroundRotation = (options.asFloat(1, 0f) / 180f) * (float)Math.PI;
 
                         graphic_.BackgroundThickness = options.asFloat(2, 0f);
                         ValueType vt;
@@ -556,6 +556,12 @@ namespace IngameScript
                 get;
                 set;
             }
+
+            public float BackgroundRotation
+            {
+                get;
+                set;
+            }
             #endregion // Properties
 
             #region Rendering
@@ -570,7 +576,7 @@ namespace IngameScript
 
                 // border
                 public Color BorderColor;
-                public float BorderSize;
+                public float BorderThickness;
                 public float BorderRotation;
                 public float BorderSpacing;
                 public string BorderName;
@@ -601,12 +607,13 @@ namespace IngameScript
                 var min = RenderData.OuterSize.X < RenderData.OuterSize.Y ? RenderData.OuterSize.X : RenderData.OuterSize.Y;
 
                 // calculate border
-                RenderData.BorderSize = BorderSizeType == ValueType.Relative ? BorderSize * min : BorderSize;
+                RenderData.BorderThickness = BorderSizeType == ValueType.Relative ? BorderSize * min : BorderSize;
                 RenderData.BorderSpacing = BorderSizeType == ValueType.Relative ? BorderSpacing * min : BorderSpacing;
 
                 // calculate background
-                RenderData.BackgroundSize = RenderData.OuterSize - (2 * RenderData.BorderSize);
+                RenderData.BackgroundSize = RenderData.OuterSize - (2 * RenderData.BorderThickness);
                 RenderData.BackgroundThickness = BackgroundThicknessType == ValueType.Relative ? BackgroundThickness * min : BackgroundThickness;
+                RenderData.BackgroundRotation = BackgroundRotation;
 
                 // calculate inner size
                 RenderData.InnerSize = RenderData.BackgroundSize - (2 * RenderData.BorderSpacing);
@@ -615,14 +622,14 @@ namespace IngameScript
             public virtual void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)
             {
                 // Render Background
-                if (RenderData.BackgroundColor.A > 0)
-                    RenderData.BackgroundIcon(addSprite, rt, RenderData.BackgroundIconName, RenderData.Position, RenderData.OuterSize,
+                if (RenderData.BackgroundColor.A > 0 && RenderData.BackgroundIcon != null)
+                    RenderData.BackgroundIcon(addSprite, rt, RenderData.BackgroundIconName, RenderData.Position, RenderData.BackgroundSize,
                         RenderData.BackgroundThickness, RenderData.BackgroundRotation, RenderData.BackgroundColor);
 
                 // Render border
-                if (RenderData.BorderSize > 0)
+                if (RenderData.BorderThickness > 0 && RenderData.BorderIcon != null)
                     RenderData.BorderIcon(addSprite, rt, RenderData.BorderName, RenderData.Position, RenderData.OuterSize,
-                        RenderData.BorderSize, RenderData.BorderRotation, RenderData.BorderColor);
+                        RenderData.BorderThickness, RenderData.BorderRotation, RenderData.BorderColor);
             }
             #endregion // Rendering
 

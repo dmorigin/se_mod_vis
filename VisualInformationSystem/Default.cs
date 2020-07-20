@@ -30,6 +30,17 @@ namespace IngameScript
             public static string StringFormat = "#0.00#";
             public static Graphic.ValueType ValueType = Graphic.ValueType.Relative;
 
+            public static float RefreshInSec = 5.0f;
+            public static TimeSpan Refresh = TimeSpan.FromSeconds(RefreshInSec);
+            public static float ReconstructIntervalInSec = 30f;
+            public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(ReconstructIntervalInSec);
+            public static TimeSpan WatchConnectorInterval = TimeSpan.FromSeconds(2.0);//TimeSpan.FromSeconds(1.0);
+            public static float DCRefreshInSec = 5.0f;
+            public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
+            public static int MaxInstructionCount = 9000;//7000;
+            public static UpdateFrequency UpdateFrequency = UpdateFrequency.Update10;
+            public static int ExceptionRetry = 3;
+
             public static Color Color = Color.White;
             public static Color BackgroundColor = new Color(0, 88, 151);
             public static Color GfxBackgroundColor = new Color(0, 0, 0, 0);
@@ -45,7 +56,7 @@ namespace IngameScript
             public static Color BarColor = new Color(179, 237, 255);
             public static Color BarBackgroundColor = new Color(179, 237, 255, 50);
             public static Color BarBorderColor = BorderColor;
-            public static float BarBorderSize = BorderSize;
+            //public static float BarBorderSize = BorderSize;
             public static float BarTileSpace = 0.04f;
             public static Graphic.ValueType BarTileSpaceType = ValueType;
             public static int BarTileCount = 10;
@@ -65,16 +76,6 @@ namespace IngameScript
             public static string Component = $"{MyObjectBuilder}_Component";
 
             public static Dictionary<RenderTargetID, RectangleF> RenderTargetFixSize = new Dictionary<RenderTargetID, RectangleF>();
-
-            public static float RefreshInSec = 5.0f;
-            public static TimeSpan Refresh = TimeSpan.FromSeconds(RefreshInSec);
-            public static float ReconstructIntervalInSec = 30f;
-            public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(ReconstructIntervalInSec);
-            public static TimeSpan WatchConnectorInterval = TimeSpan.FromSeconds(2.0);//TimeSpan.FromSeconds(1.0);
-            public static float DCRefreshInSec = 5.0f;
-            public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
-            public static int MaxInstructionCount = 9000;//7000;
-            public static int ExceptionRetry = 3;
 
             public static long MaxAmountItems = 1000;
             public static Dictionary<VISItemType, long> AmountItems = new Dictionary<VISItemType, long>()

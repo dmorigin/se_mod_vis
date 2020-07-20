@@ -25,6 +25,7 @@ namespace IngameScript
         {
             IMyTextSurfaceProvider surfaceProvider_ = null;
             string config_ = "";
+            string customName_ = "";
 
             public DisplayProvider(string name, IMyTextSurfaceProvider provider, string config = "")
                 : base($"Provider_{name}")
@@ -45,6 +46,7 @@ namespace IngameScript
                 IMyTerminalBlock block = surfaceProvider_ as IMyTerminalBlock;
                 if (block != null)
                 {
+                    customName_ = block.CustomName.Trim().Replace(" ", "");
                     ConfigHandler config = new ConfigHandler(this);
                     if (Configuration.Process(config, config_ != "" ? config_ : block.CustomData, 
                         config_ != "" ? false : Default.ShareCustomData, (key, value, options) =>
@@ -89,7 +91,7 @@ namespace IngameScript
                 bool configScreen(string key, string value, Configuration.Options options)
                 {
                     // set surface index
-                    int displayId = Configuration.asInteger(value, Default.DisplayID);
+                    int screenId = Configuration.asInteger(value, Default.DisplayID);
                     string groupId = Default.EmptyDisplayGroupID;
                     Vector2I coordinate = Default.DisplayCoordinate;
 
@@ -103,19 +105,19 @@ namespace IngameScript
                         coordinate = options.asVector(1, Default.DisplayCoordinate);
                     }
 
-                    if (displayId < 0 || displayId >= provider_.surfaceProvider_.SurfaceCount)
+                    if (screenId < 0 || screenId >= provider_.surfaceProvider_.SurfaceCount)
                     {
-                        provider_.log(Console.LogType.Error, $"Invalid display id: {displayId}");
+                        provider_.log(Console.LogType.Error, $"Invalid display id: {screenId}");
                         return false;
                     }
 
-                    Display display = Display.createDisplay(groupId);
+                    Display display = Display.createDisplay(groupId, screenId, provider_.customName_);
                     if (display == null)
                         return false;
 
                     // create render target to display
-                    RenderTargetID RTID = RenderTargetID.fromSurfaceProvider(provider_.surfaceProvider_, displayId);
-                    if (!display.addRenderTarget(provider_.surfaceProvider_.GetSurface(displayId), RTID, coordinate))
+                    RenderTargetID RTID = RenderTargetID.fromSurfaceProvider(provider_.surfaceProvider_, screenId);
+                    if (!display.addRenderTarget(provider_.surfaceProvider_.GetSurface(screenId), RTID, coordinate))
                     {
                         provider_.log(Console.LogType.Error, $"Render target exists: {groupId}:{coordinate}");
                         return false;

@@ -217,7 +217,7 @@ namespace IngameScript
                 }
                 else
                 {
-                    Size = maxSize;
+                    Size = new Vector2(maxSize.X, maxSize.Y * renderData.Lines.Count);
                     SizeType = ValueType.Absolute;
                     base.prepareRendering(display);
                     var min = Math.Min(renderData.InnerSize.X / maxSize.X, renderData.InnerSize.Y / (maxSize.Y * renderData.Lines.Count));

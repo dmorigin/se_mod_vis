@@ -162,11 +162,12 @@ namespace IngameScript
             }
             #endregion // Queued Jobs
 
-            bool toggleRun_ = false;
+            bool runQueuedJob_ = false;
             //JobstatisticInfo jobInfo_ = new JobstatisticInfo();
             public override void tick(TimeSpan delta)
             {
-                if ((toggleRun_ = !toggleRun_) == true)
+                //if ((toggleRun_ = !toggleRun_) == true)
+                if (runQueuedJob_ == true)
                 {
                     try
                     {
@@ -184,6 +185,7 @@ namespace IngameScript
                                 curQueuedJob_.LastExecute = Manager.Timer.Ticks;
                                 queuedJobCountFinished_++;
                                 curQueuedJob_ = null;
+                                runQueuedJob_ = false;
 
                                 //statistic
                                 //jobsExecuted_.Add(jobInfo_);
@@ -201,12 +203,16 @@ namespace IngameScript
                             //jobInfo_.name = curQueuedJob_.Name;
                             //jobInfo_.count = 0;
                         }
+                        else
+                            runQueuedJob_ = false;
                     }
                     catch(Exception exp)
                     {
                         if (!curQueuedJob_.handleException())
                             throw exp;
                         curQueuedJob_ = null;
+                        runQueuedJob_ = false;
+                        App.statistics_.registerException(exp);
                     }
                 }
                 else
@@ -220,6 +226,8 @@ namespace IngameScript
                         timedJob.NextExecute = timedJob.LastExecute + timedJob.Interval;
                         jobCountLastUpdate_++;
                     }
+
+                    runQueuedJob_ = true;
                 }
             }
         }
