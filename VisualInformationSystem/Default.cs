@@ -32,7 +32,7 @@ namespace IngameScript
 
             public static float RefreshInSec = 5.0f;
             public static TimeSpan Refresh = TimeSpan.FromSeconds(RefreshInSec);
-            public static float ReconstructIntervalInSec = 30f;
+            public static float ReconstructIntervalInSec = 60f;
             public static TimeSpan ReconstructInterval = TimeSpan.FromSeconds(ReconstructIntervalInSec);
             public static TimeSpan WatchConnectorInterval = TimeSpan.FromSeconds(2.0);//TimeSpan.FromSeconds(1.0);
             public static float DCRefreshInSec = 5.0f;
