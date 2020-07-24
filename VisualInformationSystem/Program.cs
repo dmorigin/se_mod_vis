@@ -22,7 +22,7 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        const string VERSION = "0.71e";
+        const string VERSION = "0.71f";
 
         const string IconNameSquareSimple = "SquareSimple";
         const string IconNameCircle = "Circle";

@@ -162,57 +162,60 @@ namespace IngameScript
             }
             #endregion // Queued Jobs
 
-            bool runQueuedJob_ = false;
+            //bool runQueuedJob_ = false;
             //JobstatisticInfo jobInfo_ = new JobstatisticInfo();
             public override void tick(TimeSpan delta)
             {
                 //if ((toggleRun_ = !toggleRun_) == true)
-                if (runQueuedJob_ == true)
+                if (queuedJobs_.Count > 0)
                 {
-                    try
+                    while (App.Runtime.CurrentInstructionCount <= Default.MaxInstructionCount && queuedJobs_.Count > 0)
                     {
-                        // process queued jobs
-                        if (curQueuedJob_ != null)
+                        try
                         {
-                            curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
-                            curQueuedJobLastExecute_ = Manager.Timer.Ticks;
-                            queuedJobCountExecutes_++;
-                            //jobInfo_.count++;
-
-                            if (curQueuedJob_.JobFinished)
+                            // process queued jobs
+                            if (curQueuedJob_ != null)
                             {
-                                curQueuedJob_.finalizeJob();
-                                curQueuedJob_.LastExecute = Manager.Timer.Ticks;
-                                queuedJobCountFinished_++;
-                                curQueuedJob_ = null;
-                                runQueuedJob_ = false;
+                                curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
+                                curQueuedJobLastExecute_ = Manager.Timer.Ticks;
+                                queuedJobCountExecutes_++;
+                                //jobInfo_.count++;
 
-                                //statistic
-                                //jobsExecuted_.Add(jobInfo_);
+                                if (curQueuedJob_.JobFinished)
+                                {
+                                    curQueuedJob_.finalizeJob();
+                                    curQueuedJob_.LastExecute = Manager.Timer.Ticks;
+                                    queuedJobCountFinished_++;
+                                    curQueuedJob_ = null;
+                                    //runQueuedJob_ = false;
+
+                                    //statistic
+                                    //jobsExecuted_.Add(jobInfo_);
+                                }
                             }
-                        }
-                        else if (queuedJobs_.Count > 0)
-                        {
-                            curQueuedJob_ = queuedJobs_.First.Value;
-                            queuedJobs_.RemoveFirst();
-                            curQueuedJob_.prepareJob();
-                            curQueuedJobLastExecute_ = Manager.Timer.Ticks;
+                            else if (queuedJobs_.Count > 0)
+                            {
+                                curQueuedJob_ = queuedJobs_.First.Value;
+                                queuedJobs_.RemoveFirst();
+                                curQueuedJob_.prepareJob();
+                                curQueuedJobLastExecute_ = Manager.Timer.Ticks;
 
-                            // statistic
-                            //jobInfo_.id = curQueuedJob_.JobId;
-                            //jobInfo_.name = curQueuedJob_.Name;
-                            //jobInfo_.count = 0;
+                                // statistic
+                                //jobInfo_.id = curQueuedJob_.JobId;
+                                //jobInfo_.name = curQueuedJob_.Name;
+                                //jobInfo_.count = 0;
+                            }
+                            //else
+                                //runQueuedJob_ = false;
                         }
-                        else
-                            runQueuedJob_ = false;
-                    }
-                    catch(Exception exp)
-                    {
-                        if (!curQueuedJob_.handleException())
-                            throw exp;
-                        curQueuedJob_ = null;
-                        runQueuedJob_ = false;
-                        App.statistics_.registerException(exp);
+                        catch (Exception exp)
+                        {
+                            if (!curQueuedJob_.handleException())
+                                throw exp;
+                            curQueuedJob_ = null;
+                            //runQueuedJob_ = false;
+                            App.statistics_.registerException(exp);
+                        }
                     }
                 }
                 else
@@ -227,7 +230,7 @@ namespace IngameScript
                         jobCountLastUpdate_++;
                     }
 
-                    runQueuedJob_ = true;
+                    //runQueuedJob_ = true;
                 }
             }
         }

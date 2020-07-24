@@ -38,7 +38,7 @@ namespace IngameScript
             public static float DCRefreshInSec = 5.0f;
             public static TimeSpan DCRefresh = TimeSpan.FromSeconds(DCRefreshInSec);
             public static int MaxInstructionCount = 9000;//7000;
-            public static UpdateFrequency UpdateFrequency = UpdateFrequency.Update10;
+            public static int UpdateFrequency = 5;
             public static int ExceptionRetry = 3;
 
             public static Color Color = Color.White;

@@ -161,16 +161,17 @@ namespace IngameScript
                     switch (value.ToLower())
                     {
                         case "fast":
-                            Default.UpdateFrequency = UpdateFrequency.Update1;
+                            Default.UpdateFrequency = 1;
                             break;
                         case "normal":
-                            Default.UpdateFrequency = UpdateFrequency.Update10;
+                            Default.UpdateFrequency = 10;
                             break;
                         case "slow":
-                            Default.UpdateFrequency = UpdateFrequency.Update100;
+                            Default.UpdateFrequency = 100;
                             break;
                         default:
-                            return false;
+                            Default.UpdateFrequency = Configuration.asInteger(value, Default.UpdateFrequency);
+                            break;
                     }
                     return true;
                 }
@@ -426,7 +427,7 @@ namespace IngameScript
                     if (--waitAfterInit_ == 0)
                     {
                         log(Console.LogType.Info, "VIS Manager initiated");
-                        UpdateFrequency = Default.UpdateFrequency;
+                        UpdateFrequency = UpdateFrequency.Update1;
                         switchState(State.Run);
                     }
                 }
@@ -437,8 +438,13 @@ namespace IngameScript
                 }
             }
 
+            int ticks_ = Default.UpdateFrequency;
             void handleRunState()
             {
+                if (--ticks_ > 0)
+                    return;
+                ticks_ = Default.UpdateFrequency;
+
                 // process job manager
                 JobManager.tick(Timer.Delta);
             }
