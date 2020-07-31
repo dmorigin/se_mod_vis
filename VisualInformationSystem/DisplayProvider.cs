@@ -131,14 +131,6 @@ namespace IngameScript
                         if (lcdPanel != null)
                             display.PanelConnector = new Display.PanelConnectorObj(lcdPanel);
 
-                        // setup template
-                        /*ContentContainer template = provider_.Manager.TemplateManager.createTemplate(display.GroupId);
-                        if (template == null)
-                        {
-                            provider_.log(Console.LogType.Error, "Failed to create template config handler");
-                            return false;
-                        }*/
-
                         // create content container
                         ContentContainer container = new ContentContainer(display.GroupId);
                         setSubHandler(container.getConfigHandler());

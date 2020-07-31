@@ -34,30 +34,23 @@ namespace IngameScript
                 get { return ++nextJobId_; }
             }
 
-            //public struct JobstatisticInfo
-            //{
-            //    public int id;
-            //    public string name;
-            //    public int count;
-            //}
+            public override bool construct()
+            {
+                App.statistics_.FlushStatistic += (statistics, sb) => {
+                    sb.AppendLine($"Job (Timed): {jobCountLastUpdate_}");
+                    sb.AppendLine($"Job (Queue/Exec): {queuedJobCountExecutes_}/{queuedJobCountFinished_}");
+
+                    jobCountLastUpdate_ = 0;
+                    queuedJobCountFinished_ = 0;
+                    queuedJobCountExecutes_ = 0;
+                };
+
+                return base.construct();
+            }
 
             int jobCountLastUpdate_ = 0;
             int queuedJobCountFinished_ = 0;
             int queuedJobCountExecutes_ = 0;
-            //List<JobstatisticInfo> jobsExecuted_ = new List<JobstatisticInfo>();
-            public void getStatistic(ref int jobCountLastUpdate, ref int queuedJobCountFinished, ref int queuedJobCountExecutes)
-                //ref List<JobstatisticInfo> jobInfo)
-            {
-                jobCountLastUpdate = jobCountLastUpdate_;
-                queuedJobCountFinished = queuedJobCountFinished_;
-                queuedJobCountExecutes = queuedJobCountExecutes_;
-                //jobInfo = jobsExecuted_.GetRange(0, jobsExecuted_.Count);
-
-                jobCountLastUpdate_ = 0;
-                queuedJobCountFinished_ = 0;
-                queuedJobCountExecutes_ = 0;
-                //jobsExecuted_.Clear();
-            }
 
             #region Timed Jobs
             List<JobTimed> timedJobs_ = new List<JobTimed>();
@@ -145,7 +138,6 @@ namespace IngameScript
             #endregion // Timed Jobs
 
             #region Queued Jobs
-            //Queue<Job> queuedJobs_ = new Queue<Job>();
             LinkedList<Job> queuedJobs_ = new LinkedList<Job>();
             Job curQueuedJob_ = null;
             TimeSpan curQueuedJobLastExecute_ = new TimeSpan(0);
@@ -162,11 +154,8 @@ namespace IngameScript
             }
             #endregion // Queued Jobs
 
-            //bool runQueuedJob_ = false;
-            //JobstatisticInfo jobInfo_ = new JobstatisticInfo();
             public override void tick(TimeSpan delta)
             {
-                //if ((toggleRun_ = !toggleRun_) == true)
                 if (queuedJobs_.Count > 0)
                 {
                     while (App.Runtime.CurrentInstructionCount <= Default.MaxInstructionCount && queuedJobs_.Count > 0)
@@ -179,7 +168,6 @@ namespace IngameScript
                                 curQueuedJob_.tick(Manager.Timer.Ticks - curQueuedJobLastExecute_);
                                 curQueuedJobLastExecute_ = Manager.Timer.Ticks;
                                 queuedJobCountExecutes_++;
-                                //jobInfo_.count++;
 
                                 if (curQueuedJob_.JobFinished)
                                 {
@@ -187,10 +175,6 @@ namespace IngameScript
                                     curQueuedJob_.LastExecute = Manager.Timer.Ticks;
                                     queuedJobCountFinished_++;
                                     curQueuedJob_ = null;
-                                    //runQueuedJob_ = false;
-
-                                    //statistic
-                                    //jobsExecuted_.Add(jobInfo_);
                                 }
                             }
                             else if (queuedJobs_.Count > 0)
@@ -199,21 +183,13 @@ namespace IngameScript
                                 queuedJobs_.RemoveFirst();
                                 curQueuedJob_.prepareJob();
                                 curQueuedJobLastExecute_ = Manager.Timer.Ticks;
-
-                                // statistic
-                                //jobInfo_.id = curQueuedJob_.JobId;
-                                //jobInfo_.name = curQueuedJob_.Name;
-                                //jobInfo_.count = 0;
                             }
-                            //else
-                                //runQueuedJob_ = false;
                         }
                         catch (Exception exp)
                         {
                             if (!curQueuedJob_.handleException())
                                 throw exp;
                             curQueuedJob_ = null;
-                            //runQueuedJob_ = false;
                             App.statistics_.registerException(exp);
                         }
                     }
@@ -229,8 +205,6 @@ namespace IngameScript
                         timedJob.NextExecute = timedJob.LastExecute + timedJob.Interval;
                         jobCountLastUpdate_++;
                     }
-
-                    //runQueuedJob_ = true;
                 }
             }
         }

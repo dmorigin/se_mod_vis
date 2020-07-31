@@ -28,37 +28,6 @@ namespace IngameScript
             {
             }
 
-            /*public override Graphic clone()
-            {
-                GraphicIcon gfx = new GraphicIcon(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.iconName_ = iconName_;
-                gfx.icon_ = icon_;
-                gfx.blink_ = blink_;
-                gfx.rotation_ = rotation_;
-                gfx.thickness_ = thickness_;
-                gfx.thicknessSizeType_ = thicknessSizeType_;
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             protected override bool supportCheck(string name) => true;
 
             bool toggleShow_ = true; // render data only

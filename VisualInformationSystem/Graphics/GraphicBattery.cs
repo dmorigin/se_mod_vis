@@ -30,43 +30,6 @@ namespace IngameScript
 
             protected override bool supportCheck(string name) => name == "battery";
 
-            /*public override Graphic clone()
-            {
-                GraphicBattery gfx = new GraphicBattery(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.rows_ = rows_;
-                gfx.cols_ = cols_;
-                gfx.margin_ = margin_;
-
-                gfx.barColors_[0] = barColors_[0];
-                gfx.barColors_[1] = barColors_[1];
-
-                gfx.borderColors_[0] = borderColors_[0];
-                gfx.borderColors_[1] = borderColors_[1];
-                gfx.borderColors_[2] = borderColors_[2];
-                gfx.borderColors_[3] = borderColors_[3];
-                gfx.borderColors_[4] = borderColors_[4];
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             #region Configuration
             int cols_ = 0;
             bool configColumns(string key, string value, Configuration.Options options)

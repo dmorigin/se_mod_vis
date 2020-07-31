@@ -30,39 +30,6 @@ namespace IngameScript
 
             protected override bool supportCheck(string name) => true;
 
-
-            /*public override Graphic clone()
-            {
-                GraphicText gfx = new GraphicText(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.useDefaultFont_ = useDefaultFont_;
-                gfx.sizeIsSet = sizeIsSet;
-                gfx.useDefaultAlignment_ = useDefaultAlignment_;
-                gfx.font_ = font_;
-                gfx.fontSize_ = fontSize_;
-                gfx.alignment_ = alignment_;
-                gfx.text_.AddList(text_);
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             bool useDefaultFont_ = true;
             bool sizeIsSet = false;
             string font_ = Default.Font;

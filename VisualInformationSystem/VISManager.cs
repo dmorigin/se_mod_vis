@@ -32,7 +32,6 @@ namespace IngameScript
                 Timer = new Timer();
                 CollectorManager = new DataCollectorManager();
                 JobManager = new JobManager();
-                //TemplateManager = new TemplateManager();
             }
 
 
@@ -45,9 +44,14 @@ namespace IngameScript
                 stateHandlers_[State.Shutdown] = handleShutdownState;
                 stateHandlers_[State.Error] = handleErrorState;
 
+                App.statistics_.FlushStatistic += (statistics, sb) =>
+                {
+                    sb.AppendLine($"VIS State: {CurrentState}");
+                    sb.AppendLine($"Data Collectors: {CollectorManager.Created}/{CollectorManager.Requested}");
+                };
+
                 Console.construct();
                 CollectorManager.construct();
-                //TemplateManager.construct();
 
                 // construct job manager
                 if (JobManager.construct())
@@ -66,12 +70,6 @@ namespace IngameScript
                 get;
                 private set;
             }
-
-            /*public TemplateManager TemplateManager
-            {
-                get;
-                private set;
-            }*/
 
             public DataCollectorManager CollectorManager
             {
@@ -308,25 +306,6 @@ namespace IngameScript
             }
             #endregion // mdk preserve
 
-            /*public string stateToString(State state)
-            {
-                switch (state)
-                {
-                    case State.Run:
-                        return "Run";
-                    case State.Init:
-                        return "Init";
-                    case State.Shutdown:
-                        return "Shutdown";
-                    case State.Stopped:
-                        return "Stopped";
-                    case State.Error:
-                        return "Error";
-                }
-
-                return "";
-            }*/
-
             public UpdateFrequency UpdateFrequency
             {
                 get { return App.Runtime.UpdateFrequency; }
@@ -475,10 +454,6 @@ namespace IngameScript
             Dictionary<State, StateDelegate> stateHandlers_ = new Dictionary<State, StateDelegate>();
             bool reboot_ = true;
             #endregion // Application State System
-
-            public void onSave()
-            {
-            }
 
             public void onTick(string args, UpdateType updateSource)
             {

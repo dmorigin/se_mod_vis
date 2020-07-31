@@ -28,39 +28,6 @@ namespace IngameScript
             {
             }
 
-            /*public override bool construct()
-            {
-                return base.construct();
-            }*/
-
-            /*public override Graphic clone()
-            {
-                GraphicSlider gfx = new GraphicSlider(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.sliderColor_ = sliderColor_;
-                gfx.sliderOrientation_ = sliderOrientation_;
-                gfx.sliderWidth_ = sliderWidth_;
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             protected override bool supportCheck(string name) => true;
 
             public override void render(Display display, RenderTarget rt, AddSpriteDelegate addSprite)

@@ -64,7 +64,6 @@ namespace IngameScript
                 return true;
             }
 
-            //public abstract Graphic clone();
             protected abstract bool supportCheck(string name);
 
             #region Configuration

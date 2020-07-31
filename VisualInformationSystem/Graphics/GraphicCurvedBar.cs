@@ -28,39 +28,6 @@ namespace IngameScript
             {
             }
 
-            /*public override Graphic clone()
-            {
-                GraphicCurvedBar gfx = new GraphicCurvedBar(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.minDegree_ = minDegree_;
-                gfx.maxDegree_ = maxDegree_;
-                gfx.colorLerp_ = colorLerp_;
-                gfx.thickness_ = thickness_;
-                gfx.icon_ = icon_;
-                gfx.iconName_ = iconName_;
-                gfx.iconColor_ = iconColor_;
-                gfx.iconUseColor_ = iconUseColor_;
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             protected override bool supportCheck(string name) => name != "battery";
 
             #region Rendering

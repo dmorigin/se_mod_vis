@@ -22,17 +22,16 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        const string VERSION = "0.71f";
+        const string VERSION = "0.71g";
 
         const string IconNameSquareSimple = "SquareSimple";
         const string IconNameCircle = "Circle";
 
         static Program App = null;
-
-        VISManager manager_ = null;
         VISManager Manager
         {
-            get { return manager_; }
+            get;
+            set;
         }
 
         Statistics statistics_ = new Statistics();
@@ -50,9 +49,9 @@ namespace IngameScript
 
         public Program()
         {
-            Program.App = this;
-            manager_ = new VISManager();
-            if (manager_.construct())
+            App = this;
+            Manager = new VISManager();
+            if (Manager.construct())
                 Runtime.UpdateFrequency = UpdateFrequency.Update100;
             else
                 Runtime.UpdateFrequency = UpdateFrequency.None;
@@ -60,16 +59,12 @@ namespace IngameScript
 
         public void Save()
         {
-            if (manager_ != null)
-                manager_.onSave();
         }
 
         public void Main(string argument, UpdateType updateSource)
         {
-            if (manager_ != null)
-                manager_.onTick(argument, updateSource);
-
-            statistics_.tick(this, manager_);
+            Manager.onTick(argument, updateSource);
+            statistics_.tick(this);
         }
     }
 }

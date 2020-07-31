@@ -23,12 +23,9 @@ namespace IngameScript
     {
         public class ContentContainer : VISObject
         {
-            public ContentContainer(/*TemplateManager templateManager,*/ string name)
+            public ContentContainer(string name)
                 : base($"ContentContainer_{name}")
             {
-                //TemplateManager = templateManager;
-                //TemplateName = name;
-
                 // setup defaults
                 Refresh = Default.Refresh;
                 BackgroundColor = Default.BackgroundColor;
@@ -43,32 +40,7 @@ namespace IngameScript
                 return new Settings(this);
             }
 
-            /*public virtual void merge(ContentContainer template)
-            {
-                Refresh = template.Refresh;
-                BackgroundColor = template.BackgroundColor;
-                Font = template.Font;
-                FontSize = template.FontSize;
-                FontColor = template.FontColor;
-                TextAlignment = template.TextAlignment;
-
-                foreach (var gfx in template.graphics_)
-                    graphics_.Add(gfx.clone());
-            }*/
-
             #region Properties
-            /*public TemplateManager TemplateManager
-            {
-                get;
-                private set;
-            }*/
-
-            /*public string TemplateName
-            {
-                get;
-                set;
-            }*/
-
             public TimeSpan Refresh
             {
                 get;
@@ -131,7 +103,6 @@ namespace IngameScript
                     container_ = container;
 
                     // fill up handler
-                    //add("usetemplate", configUseTemplate);
                     add("refresh", configRefresh);
                     add("bgcolor", configBackgroundColor);
                     add("font", configFont);
@@ -142,23 +113,6 @@ namespace IngameScript
                 ContentContainer container_ = null;
 
                 #region Handler
-                /*bool configUseTemplate(string key, string value, Configuration.Options options)
-                {
-                    if (value != string.Empty)
-                    {
-                        ContentContainer template = tpl_.TemplateManager.loadTemplate(value);
-                        if (template == null)
-                        {
-                            tpl_.log(Console.LogType.Error, $"Invalid template name:{value}");
-                            return false;
-                        }
-
-                        tpl_.merge(template);
-                        return true;
-                    }
-                    return false;
-                }*/
-
                 bool configRefresh(string key, string value, Configuration.Options options)
                 {
                     float seconds = Configuration.asFloat(value, Default.RefreshInSec);

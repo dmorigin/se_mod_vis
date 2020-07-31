@@ -35,52 +35,6 @@ namespace IngameScript
                 return name != "shipcontroller";
             }
 
-            /*public override Graphic clone()
-            {
-                GraphicList gfx = new GraphicList(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.lines_ = lines_;
-                gfx.spacing_ = spacing_;
-
-                gfx.textShow_ = textShow_;
-                gfx.textStyle_ = textStyle_;
-
-                gfx.barShow_ = barShow_;
-                gfx.barEmbedded_ = barEmbedded_;
-                gfx.barRenderMethod_ = barRenderMethod_;
-                gfx.barThickness_ = barThickness_;
-                gfx.barThicknessType_ = barThicknessType_;
-                gfx.barBackground_ = barBackground_;
-
-                gfx.iconShow_ = iconShow_;
-                gfx.autoScroll_ = autoScroll_;
-                gfx.autoScrollInc_ = autoScrollInc_;
-
-                gfx.replace_ = new Dictionary<double, string>();
-                foreach (var pair in replace_)
-                    gfx.replace_.Add(pair.Key, pair.Value);
-                gfx.replace_ = gfx.replace_.OrderByDescending(x => x.Key).ToDictionary(a => a.Key, b => b.Value);
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             #region Rendering
             class RenderDataList : RenderDataBase
             {

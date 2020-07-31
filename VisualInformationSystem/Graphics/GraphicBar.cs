@@ -29,41 +29,6 @@ namespace IngameScript
                 renderStyledBar_ = renderSimpleBar;
             }
 
-            /*public override Graphic clone()
-            {
-                GraphicBar gfx = new GraphicBar(Template, Options);
-
-                gfx.DataCollector = DataCollector;
-                gfx.DataAccessor = gfx.DataCollector.getDataAccessor(DataAccessorName);
-                gfx.DataAccessorName = DataAccessorName;
-                gfx.Position = Position;
-                gfx.PositionType = PositionType;
-                gfx.Size = Size;
-                gfx.SizeType = SizeType;
-                gfx.VisibleThresholdA = VisibleThresholdA;
-                gfx.VisibleOperatorA = VisibleOperatorA;
-                gfx.VisibleThresholdB = VisibleThresholdB;
-                gfx.VisibleOperatorB = VisibleOperatorB;
-                gfx.VisibleCondition = VisibleCondition;
-
-                foreach (var color in Gradient)
-                    gfx.addGradientColor(color.Key, color.Value);
-
-                gfx.rotation_ = rotation_;
-                gfx.backgroundColor_ = backgroundColor_;
-                gfx.borderSize_ = borderSize_;
-                gfx.borderSizeType_ = borderSizeType_;
-                gfx.borderColor_ = borderColor_;
-                gfx.tiles_ = tiles_;
-                gfx.tileSpace_ = tileSpace_;
-                gfx.tileName_ = tileName_;
-                gfx.tileSpaceType_ = tileSpaceType_;
-                gfx.renderStyledBar_ = renderStyledBar_;
-
-                Manager.JobManager.queueJob(gfx.getConstructionJob());
-                return gfx;
-            }*/
-
             protected override bool supportCheck(string name) => true;
 
             public override void prepareRendering(Display display)

@@ -32,19 +32,19 @@ namespace IngameScript
                 return sym;
             }
 
-            double sensitivity_ = 0.01;
+            public double Sensitivity { private set; get; } = 0.01;
             public void setSensitivity(UpdateFrequency uf)
             {
                 switch(uf)
                 {
                     case UpdateFrequency.Update1:
-                        sensitivity_ = 1;
+                        Sensitivity = 1;
                         return;
                     case UpdateFrequency.Update10:
-                        sensitivity_ = 0.1;
+                        Sensitivity = 0.1;
                         return;
                     case UpdateFrequency.Update100:
-                        sensitivity_ = 0.01;
+                        Sensitivity = 0.01;
                         return;
                 }
             }
@@ -55,49 +55,44 @@ namespace IngameScript
                 exception_ = exp.ToString();
             }
 
+            public delegate void FlushStatisticCallback(Statistics self, StringBuilder sb);
+            public event FlushStatisticCallback FlushStatistic;
+
             TimeSpan nextUpdate_ = new TimeSpan(0);
             TimeSpan updateInterval_ = TimeSpan.FromSeconds(1.0);
             TimeSpan ticks_ = new TimeSpan(0);
 
             StringBuilder sb_ = new StringBuilder();
 
-            long instructionCountLastUpdate_ = 0;
+            double instructionCountLastUpdate_ = 0;
             long ticksSinceLastUpdate_ = 0;
             double timeSinceLastUpdate_ = 0.0;
 
-            public void tick(Program app, VISManager vis)
+            public void tick(Program app)
             {
                 ticks_ += app.Runtime.TimeSinceLastRun;
 
                 // update
-                instructionCountLastUpdate_ += app.Runtime.CurrentInstructionCount;
-                timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs * sensitivity_;
+                //instructionCountLastUpdate_ += app.Runtime.CurrentInstructionCount;
+                //timeSinceLastUpdate_ += app.Runtime.LastRunTimeMs * sensitivity_;
+                instructionCountLastUpdate_ = Sensitivity * (app.Runtime.CurrentInstructionCount - instructionCountLastUpdate_) + instructionCountLastUpdate_;
+                timeSinceLastUpdate_ = Sensitivity * (app.Runtime.LastRunTimeMs - timeSinceLastUpdate_) + timeSinceLastUpdate_;
                 ticksSinceLastUpdate_++;
 
                 if (nextUpdate_ <= ticks_)
                 {
-                    int jobQueuedExec = 0;
-                    int jobQueued = 0;
-                    int jobTimed = 0;
-                    //List<JobManager.JobstatisticInfo> jobInfo = new List<JobManager.JobstatisticInfo>();
-                    vis.JobManager.getStatistic(ref jobTimed, ref jobQueued, ref jobQueuedExec);//, ref jobInfo);
-
                     // print statistic
                     sb_.Clear();
-                    sb_.AppendLine($"Visual Information System ({Program.VERSION})\n=============================");
+                    sb_.AppendLine($"Visual Information System ({Program.VERSION})\n===========================");
                     sb_.AppendLine($"Running: {getRunSymbol()}");
-                    sb_.AppendLine($"VIS State: {vis.CurrentState}");
-                    sb_.AppendLine($"Data Collectors: {app.Manager.CollectorManager.Created}/{app.Manager.CollectorManager.Requested}");
                     sb_.AppendLine($"Time: {ticks_}");
                     sb_.AppendLine($"Ticks: {ticksSinceLastUpdate_}");
-                    sb_.AppendLine($"Avg Time/tick: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms");
-                    sb_.AppendLine($"Avg Inst/tick: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}");
-                    sb_.AppendLine($"Job (Timed): {jobTimed}");
-                    sb_.AppendLine($"Job (Queue/Exec): {jobQueued}/{jobQueuedExec}");
+                    //sb_.AppendLine($"Avg Time: {(timeSinceLastUpdate_ / ticksSinceLastUpdate_).ToString("#0.0#####")}ms");
+                    //sb_.AppendLine($"Avg Inst: {(instructionCountLastUpdate_ / (double)ticksSinceLastUpdate_).ToString("#0.00")}/{app.Runtime.MaxInstructionCount}");
+                    sb_.AppendLine($"Avg Time: {timeSinceLastUpdate_.ToString("#0.00####")}ms");
+                    sb_.AppendLine($"Avg Inst: {instructionCountLastUpdate_.ToString("#0.00##")}/{app.Runtime.MaxInstructionCount}");
 
-                    //sb_.AppendLine($"\nJobs executed:");
-                    //foreach (var job in jobInfo)
-                    //    sb_.AppendLine($"{job.name}/{job.id}:{job.count}");
+                    FlushStatistic?.Invoke(this, sb_);
 
                     if (exception_ != "")
                         sb_.Append($"\nException:\n{exception_}\n");
