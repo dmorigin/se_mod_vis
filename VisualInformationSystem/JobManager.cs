@@ -100,10 +100,7 @@ namespace IngameScript
                 foreach(var job in timedJobs_)
                 {
                     if (job.Name == name)
-                    {
-                        log(Console.LogType.Debug, $"Job {name} found");
                         return job;
-                    }
                 }
 
                 return null;
@@ -158,7 +155,7 @@ namespace IngameScript
             {
                 if (queuedJobs_.Count > 0)
                 {
-                    while (App.Runtime.CurrentInstructionCount <= Default.MaxInstructionCount && queuedJobs_.Count > 0)
+                    while (App.Runtime.CurrentInstructionCount <= Default.MaxInstructionCount && (queuedJobs_.Count > 0 || curQueuedJob_ != null))
                     {
                         try
                         {
