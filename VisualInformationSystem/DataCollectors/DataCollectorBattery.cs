@@ -96,6 +96,8 @@ namespace IngameScript
                         return new Capacity(this);
                     case "inout":
                         return new InOut(this);
+                    case "charging":
+                        return new Charging(this);
                 }
 
                 return base.getDataAccessor(name);
@@ -155,6 +157,37 @@ namespace IngameScript
                         item.indicator = (battery.CurrentInput / battery.MaxInput) - (battery.CurrentOutput / battery.MaxOutput);
                         item.value = new VISUnitType(battery.CurrentInput - battery.CurrentOutput, Multiplier.M, Unit.Watt);
                         item.min = new VISUnitType(battery.MaxOutput, Multiplier.M, Unit.Watt);
+                        item.max = new VISUnitType(battery.MaxInput, Multiplier.M, Unit.Watt);
+
+                        if (filter == null || (filter != null && filter(item)))
+                            container.Add(item);
+                    }
+                }
+            }
+
+            class Charging : DataAccessor
+            {
+                DataCollectorBattery collector_ = null;
+                public Charging(DataCollectorBattery dc_)
+                {
+                    collector_ = dc_;
+                }
+
+                public override double indicator() => collector_.powerAvailableStoring_;
+                public override VISUnitType value() => new VISUnitType(collector_.currentInput_, Multiplier.M, Unit.Watt);
+                public override VISUnitType min() => new VISUnitType(0, Multiplier.M, Unit.Watt);
+                public override VISUnitType max() => new VISUnitType(collector_.maxAvailableInput_, Multiplier.M, Unit.Watt);
+
+                public override void list(out List<ListContainer> container, Func<ListContainer, bool> filter = null)
+                {
+                    container = new List<ListContainer>();
+                    foreach (IMyBatteryBlock battery in collector_.Blocks)
+                    {
+                        ListContainer item = new ListContainer();
+                        item.name = battery.CustomName;
+                        item.indicator = battery.MaxInput != 0.0 ? battery.CurrentInput / battery.MaxInput : 0.0;
+                        item.value = new VISUnitType(battery.CurrentInput, Multiplier.M, Unit.Watt);
+                        item.min = new VISUnitType(0, Multiplier.M, Unit.Watt);
                         item.max = new VISUnitType(battery.MaxInput, Multiplier.M, Unit.Watt);
 
                         if (filter == null || (filter != null && filter(item)))

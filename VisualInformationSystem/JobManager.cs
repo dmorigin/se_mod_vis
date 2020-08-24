@@ -153,7 +153,7 @@ namespace IngameScript
 
             public override void tick(TimeSpan delta)
             {
-                if (queuedJobs_.Count > 0)
+                if (queuedJobs_.Count > 0 || curQueuedJob_ != null)
                 {
                     while (App.Runtime.CurrentInstructionCount <= Default.MaxInstructionCount && (queuedJobs_.Count > 0 || curQueuedJob_ != null))
                     {
