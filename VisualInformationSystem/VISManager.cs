@@ -28,15 +28,6 @@ namespace IngameScript
                 config_ = new ConfigHandler(this);
                 CurrentState = State.Stopped;
 
-                Console = new Console();
-                Timer = new Timer();
-                CollectorManager = new DataCollectorManager();
-                JobManager = new JobManager();
-            }
-
-
-            public bool construct()
-            {
                 // setup state handler
                 stateHandlers_[State.Run] = handleRunState;
                 stateHandlers_[State.Stopped] = handleStoppedState;
@@ -50,6 +41,15 @@ namespace IngameScript
                     sb.AppendLine($"Data Collectors: {CollectorManager.Created}/{CollectorManager.Requested}");
                 };
 
+                //Console = new Console();
+                //Timer = new Timer();
+                //CollectorManager = new DataCollectorManager();
+                //JobManager = new JobManager();
+            }
+
+
+            public bool construct()
+            {
                 Console.construct();
                 CollectorManager.construct();
 
@@ -69,19 +69,19 @@ namespace IngameScript
             {
                 get;
                 private set;
-            }
+            } = new JobManager();
 
             public DataCollectorManager CollectorManager
             {
                 get;
                 private set;
-            }
+            } = new DataCollectorManager();
 
             public Timer Timer
             {
                 get;
                 private set;
-            }
+            } = new Timer();
 
             List<DisplayProvider> displayProviders_ = new List<DisplayProvider>();
 
@@ -89,8 +89,9 @@ namespace IngameScript
             public Console Console
             {
                 get;
-                set;
-            }
+                private set;
+            } = new Console();
+
             public void log(Console.LogType logType, string messsage)
             {
                 Console.log(logType, messsage);

@@ -61,7 +61,7 @@ namespace IngameScript
                 valueCurrent_ = 0f;
                 foreach (IMyTerminalBlock block in Blocks)
                 {
-                    valueCurrent_ += isBool_ ? (block.GetValue<bool>(propertyName_) ? 1f : 0f) : block.GetValue<float>(propertyName_);
+                    valueCurrent_ += getValue(block);
                     blocksOn_ += isOn(block) ? 1 : 0;
                     blocksFunctional_ += block.IsFunctional ? 1 : 0;
                 }
@@ -70,11 +70,33 @@ namespace IngameScript
             }
 
             string propertyName_ = "";
-            bool isBool_ = false;
+            PropertyType type_ = PropertyType.Single;
             float valueMin_ = 0f;
             float valueMax_ = 0f;
             float valueCurrent_ = 0f;
             float ratio_ = 0f;
+
+            enum PropertyType
+            {
+                Single,
+                Int64,
+                Bool
+            }
+
+            float getValue(IMyTerminalBlock block)
+            {
+                switch (type_)
+                {
+                    case PropertyType.Bool:
+                        return block.GetValue<bool>(propertyName_) ? 1f : 0f;
+                    case PropertyType.Single:
+                        return block.GetValue<Single>(propertyName_);
+                    case PropertyType.Int64:
+                        return block.GetValue<Int64>(propertyName_);
+                }
+
+                return 0f;
+            }
 
             bool getMinMax(IMyTerminalBlock block, out float min, out float max)
             {
@@ -84,14 +106,19 @@ namespace IngameScript
                     switch (property.TypeName)
                     {
                         case "Single":
+                            min = block.GetMinimum<Single>(propertyName_);
+                            max = block.GetMaximum<Single>(propertyName_);
+                            type_ = PropertyType.Single;
+                            return true;
                         case "Int64":
-                            min = block.GetMinimum<float>(propertyName_);
-                            max = block.GetMaximum<float>(propertyName_);
+                            min = block.GetMinimum<Int64>(propertyName_);
+                            max = block.GetMaximum<Int64>(propertyName_);
+                            type_ = PropertyType.Int64;
                             return true;
                         case "Boolean":
                             min = 0f;
                             max = 1f;
-                            isBool_ = true;
+                            type_ = PropertyType.Bool;
                             return true;
                     }
                 }
@@ -131,7 +158,7 @@ namespace IngameScript
                         float min, max;
                         dc_.getMinMax(block, out min, out max);
 
-                        float value = dc_.isBool_ ? (block.GetValue<bool>(dc_.propertyName_) ? 1f : 0f) : block.GetValue<float>(dc_.propertyName_);
+                        float value = dc_.getValue(block);
 
                         ListContainer item = new ListContainer();
                         item.name = block.CustomName;

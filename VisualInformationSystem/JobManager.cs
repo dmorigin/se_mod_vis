@@ -26,16 +26,6 @@ namespace IngameScript
             public JobManager()
                 : base("JobManager")
             {
-            }
-
-            static int nextJobId_ = 1;
-            public int NextJobID
-            {
-                get { return ++nextJobId_; }
-            }
-
-            public override bool construct()
-            {
                 App.statistics_.FlushStatistic += (statistics, sb) => {
                     sb.AppendLine($"Job (Timed): {jobCountLastUpdate_}");
                     sb.AppendLine($"Job (Queue/Exec): {queuedJobCountExecutes_}/{queuedJobCountFinished_}");
@@ -44,8 +34,12 @@ namespace IngameScript
                     queuedJobCountFinished_ = 0;
                     queuedJobCountExecutes_ = 0;
                 };
+            }
 
-                return base.construct();
+            static int nextJobId_ = 1;
+            public int NextJobID
+            {
+                get { return ++nextJobId_; }
             }
 
             int jobCountLastUpdate_ = 0;
