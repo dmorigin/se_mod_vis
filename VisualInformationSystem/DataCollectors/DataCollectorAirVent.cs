@@ -106,7 +106,7 @@ namespace IngameScript
                     dc_ = obj;
                 }
 
-                public override double indicator() => 0.0;
+                public override double indicator() => dc_.oxygenLevel_;
                 public override VISUnitType min() => new VISUnitType(0.0, unit: Unit.Percent);
                 public override VISUnitType max() => new VISUnitType(1.0, unit: Unit.Percent);
                 public override VISUnitType value() => new VISUnitType(dc_.oxygenLevel_, unit: Unit.Percent);
